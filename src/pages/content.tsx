@@ -1,0 +1,361 @@
+import { html, raw } from 'hono/html'
+import { Layout, Breadcrumb } from '../components/layout'
+import { clinic } from '../data/clinic'
+import { getTreatment } from '../data/treatments'
+import { getDoctor } from '../data/doctors'
+import { breadcrumbSchema, articleSchema } from '../lib/schema'
+import type { CaseItem, Column, Notice } from '../data/types'
+
+const fmt = (iso: string) => (iso || '').slice(0, 10).replace(/-/g, '.')
+
+function emptyState(label: string, sub: string) {
+  return `<div class="empty-state" data-reveal>
+    <i class="far fa-folder-open"></i>
+    <p class="t">${label}</p>
+    <p class="s">${sub}</p>
+  </div>`
+}
+
+// ============================================================================
+// 비포/애프터 케이스 갤러리
+// ============================================================================
+export function CasesGalleryPage(items: CaseItem[], filter?: string) {
+  const crumb = [{ name: '홈', url: '/' }, { name: '비포 / 애프터', url: '/cases/gallery' }]
+  const published = items.filter((x) => x.published)
+  const cats = [...new Set(published.map((x) => x.treatmentSlug))]
+  const list = filter ? published.filter((x) => x.treatmentSlug === filter) : published
+
+  const body = html`
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">Before &amp; After</p>
+      <h1>치료 전후 케이스</h1>
+      <p class="lead">연세온치과에서 진행한 치료의 전후 기록입니다.<br>치료 결과는 개인의 구강 상태에 따라 다를 수 있습니다.</p>
+    </div>
+  </section>
+  ${Breadcrumb(crumb)}
+
+  <section class="section--tight">
+    <div class="container">
+      ${raw(cats.length ? `
+      <nav class="faq-tabs" data-reveal aria-label="케이스 분류">
+        <a href="/cases/gallery" class="faq-tab${!filter ? ' active' : ''}">전체</a>
+        ${cats.map((slug) => {
+          const t = getTreatment(slug)
+          return `<a href="/cases/gallery?treatment=${slug}" class="faq-tab${filter === slug ? ' active' : ''}">${t?.name || slug}</a>`
+        }).join('')}
+      </nav>` : '')}
+
+      ${raw(list.length ? `
+      <div class="cards cards--3" style="margin-top:2.5rem">
+        ${list.map((cs, i) => {
+          const t = getTreatment(cs.treatmentSlug)
+          const img = cs.images.intraAfter || cs.images.panoAfter || cs.images.intraBefore || cs.images.panoBefore
+          return `
+          <a href="/cases/${cs.slug}" class="card" data-reveal data-reveal-delay="${(i % 3) + 1}">
+            <div class="card-img">${img
+              ? `<img src="${img}" alt="${cs.title}" loading="lazy">`
+              : `<div class="ph" style="height:100%"><span class="ph-label">CASE</span></div>`}</div>
+            <span class="tag">${t?.name || cs.treatmentSlug} · ${cs.ageGroup} ${cs.gender}</span>
+            <h3 style="font-size:1.25rem">${cs.title}</h3>
+            <p>${cs.regionLabel} · 치료기간 ${cs.duration}</p>
+          </a>`
+        }).join('')}
+      </div>` : emptyState('등록된 케이스를 준비하고 있습니다', '실제 치료 케이스가 순차적으로 업데이트될 예정입니다.'))}
+
+      <p class="muted" style="font-size:.78rem;margin-top:3rem;line-height:1.8" data-reveal>
+        ※ 본 게시물은 의료법 제56조를 준수하며, 치료 전후 사진은 동일 환자·동일 부위이며 환자 동의하에 게시되었습니다.
+        치료 결과는 개인에 따라 다를 수 있으며, 부작용이 발생할 수 있으므로 전문의와 상담하시기 바랍니다.
+      </p>
+    </div>
+  </section>
+  `
+  return Layout({
+    title: `비포/애프터 케이스 | ${clinic.nameKo}`,
+    description: `${clinic.nameKo} 치료 전후 케이스 — 심미보철, 전체임플란트, 접착수복 실제 치료 기록.`,
+    path: '/cases/gallery',
+    jsonLd: [breadcrumbSchema(crumb)],
+  }, body)
+}
+
+export function CaseDetailPage(cs: CaseItem) {
+  const crumb = [{ name: '홈', url: '/' }, { name: '비포 / 애프터', url: '/cases/gallery' }, { name: cs.title, url: `/cases/${cs.slug}` }]
+  const t = getTreatment(cs.treatmentSlug)
+  const doc = getDoctor(cs.doctorSlug)
+
+  const pair = (label: string, before?: string, after?: string) => {
+    if (!before && !after) return ''
+    if (before && after) {
+      return `
+      <div data-reveal style="margin-bottom:3rem">
+        <h3 style="font-family:var(--serif-kr);font-size:1.2rem;margin-bottom:1rem">${label}</h3>
+        <div class="compare" data-compare style="position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:4px;background:var(--paper-2);cursor:ew-resize">
+          <img src="${after}" alt="${label} 치료 후" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+          <div class="compare-top" style="position:absolute;inset:0;clip-path:inset(0 50% 0 0)">
+            <img src="${before}" alt="${label} 치료 전" style="width:100%;height:100%;object-fit:cover">
+          </div>
+          <div class="compare-handle" style="position:absolute;top:0;bottom:0;left:50%;width:2px;background:#fff;box-shadow:0 0 8px rgba(0,0,0,.4)"></div>
+          <span style="position:absolute;left:1rem;top:1rem;background:rgba(0,0,0,.55);color:#fff;font-size:.7rem;letter-spacing:.14em;padding:.3rem .7rem;border-radius:2px">BEFORE</span>
+          <span style="position:absolute;right:1rem;top:1rem;background:rgba(0,0,0,.55);color:#fff;font-size:.7rem;letter-spacing:.14em;padding:.3rem .7rem;border-radius:2px">AFTER</span>
+        </div>
+        <p class="muted" style="font-size:.78rem;margin-top:.6rem">좌우로 드래그하여 전후를 비교해 보세요.</p>
+      </div>`
+    }
+    const single = before || after
+    return `
+    <div data-reveal style="margin-bottom:3rem">
+      <h3 style="font-family:var(--serif-kr);font-size:1.2rem;margin-bottom:1rem">${label} (${before ? '치료 전' : '치료 후'})</h3>
+      <img src="${single}" alt="${label}" style="width:100%;border-radius:4px" loading="lazy">
+    </div>`
+  }
+
+  const body = html`
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">${t?.name || 'Case'} Case</p>
+      <h1 style="font-size:var(--t-h2)">${cs.title}</h1>
+      <p class="lead">${cs.ageGroup} ${cs.gender} · ${cs.regionLabel} · 치료기간 ${cs.duration}</p>
+    </div>
+  </section>
+  ${Breadcrumb(crumb)}
+
+  <section class="section--tight">
+    <div class="container">
+      <div class="detail-grid">
+        <div>
+          ${raw(pair('구내 사진', cs.images.intraBefore, cs.images.intraAfter))}
+          ${raw(pair('파노라마', cs.images.panoBefore, cs.images.panoAfter))}
+          <div class="prose" data-reveal>
+            <h2>치료 이야기</h2>
+            ${raw(cs.description.split('\n').filter(Boolean).map((p) => `<p>${p}</p>`).join(''))}
+          </div>
+          <p class="muted" style="font-size:.78rem;margin-top:2.5rem;line-height:1.8">
+            ※ 동일 환자·동일 부위의 치료 전후 사진이며, 환자 동의하에 게시되었습니다. 치료 결과는 개인에 따라 다를 수 있으며 부작용이 발생할 수 있습니다.
+          </p>
+        </div>
+        <aside class="sidebar">
+          ${raw(doc ? `
+          <div class="sidebar-box">
+            <h4>담당 의료진</h4>
+            <p style="font-weight:600;color:var(--ink)">${doc.name} ${doc.role}</p>
+            <p class="muted" style="font-size:.85rem;margin:.4rem 0 .8rem">${doc.title}</p>
+            <a href="/doctors/${doc.slug}" class="link-arrow" style="font-size:.88rem">의료진 소개 <i class="fas fa-arrow-right"></i></a>
+          </div>` : '')}
+          ${raw(t ? `
+          <div class="sidebar-box">
+            <h4>관련 진료</h4>
+            <a href="/treatments/${t.slug}">${t.name}</a>
+          </div>` : '')}
+          <div class="sidebar-box">
+            <h4>상담</h4>
+            <a href="/reservation">예약 상담 신청</a>
+            <a href="tel:${clinic.phoneRaw}">${clinic.phone}</a>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+  <script>fetch('/api/views/case/${cs.id}',{method:'POST'}).catch(function(){});</script>
+  `
+  return Layout({
+    title: `${cs.title} | 케이스 | ${clinic.nameKo}`,
+    description: `${cs.ageGroup} ${cs.gender} ${t?.name || ''} 치료 케이스 — ${cs.description.slice(0, 110)}`,
+    path: `/cases/${cs.slug}`,
+    jsonLd: [breadcrumbSchema(crumb)],
+  }, body)
+}
+
+// ============================================================================
+// 원장 칼럼
+// ============================================================================
+export function ColumnsPage(items: Column[]) {
+  const crumb = [{ name: '홈', url: '/' }, { name: '원장 칼럼', url: '/column' }]
+  const list = items.filter((x) => x.published)
+  const body = html`
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">Column</p>
+      <h1>원장 칼럼</h1>
+      <p class="lead">치아 건강에 대해 알아두면 좋은 이야기를 원장이 직접 씁니다.</p>
+    </div>
+  </section>
+  ${Breadcrumb(crumb)}
+
+  <section class="section--tight">
+    <div class="container">
+      ${raw(list.length ? `
+      <div class="index-list">
+        ${list.map((col, i) => {
+          const doc = getDoctor(col.authorSlug)
+          return `
+          <a class="index-row" href="/column/${col.slug}" data-reveal data-reveal-delay="${(i % 3) + 1}">
+            <span class="num">${fmt(col.createdAt)}</span>
+            <span>
+              <span class="row-title" style="font-size:clamp(1.2rem,2.2vw,1.8rem)">${col.title}</span>
+              <span class="row-desc">${col.excerpt}${doc ? ` — ${doc.name} ${doc.role}` : ''}</span>
+            </span>
+            <span class="row-go"><i class="fas fa-arrow-right"></i></span>
+          </a>`
+        }).join('')}
+      </div>` : emptyState('칼럼을 준비하고 있습니다', '원장이 직접 쓰는 치아 건강 이야기가 곧 게시됩니다.'))}
+    </div>
+  </section>
+  `
+  return Layout({
+    title: `원장 칼럼 | ${clinic.nameKo}`,
+    description: `${clinic.nameKo} 원장 칼럼 — 생체모방치의학, 심미보철, 임플란트에 대한 전문의의 깊이 있는 이야기.`,
+    path: '/column',
+    jsonLd: [breadcrumbSchema(crumb)],
+  }, body)
+}
+
+export function ColumnDetailPage(col: Column) {
+  const crumb = [{ name: '홈', url: '/' }, { name: '원장 칼럼', url: '/column' }, { name: col.title, url: `/column/${col.slug}` }]
+  const doc = getDoctor(col.authorSlug)
+  const related = (col.relatedTreatments || []).map((s) => getTreatment(s)).filter(Boolean)
+  const body = html`
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">Column · ${fmt(col.createdAt)}</p>
+      <h1 style="font-size:var(--t-h2)">${col.title}</h1>
+      ${raw(doc ? `<p class="lead" style="font-size:1rem;color:var(--mist)">글 · ${doc.name} ${doc.role} (${doc.title})</p>` : '')}
+    </div>
+  </section>
+  ${Breadcrumb(crumb)}
+
+  <section class="section--tight">
+    <div class="container">
+      <div class="detail-grid">
+        <article class="prose" data-reveal>
+          ${raw(col.thumbnail ? `<img src="${col.thumbnail}" alt="${col.title}" style="width:100%;border-radius:4px;margin-bottom:2.5rem">` : '')}
+          ${raw(col.contentHtml)}
+          ${raw(doc ? `
+          <div style="border-top:1px solid var(--line);margin-top:3.5rem;padding-top:2rem">
+            <p class="muted" style="font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.6rem">Written &amp; Reviewed by</p>
+            <p style="font-weight:600;color:var(--ink);margin-bottom:.2rem">${doc.name} ${doc.role}</p>
+            <p class="muted" style="font-size:.88rem">${doc.licenses.join(' · ')}</p>
+          </div>` : '')}
+        </article>
+        <aside class="sidebar">
+          ${raw(related.length ? `
+          <div class="sidebar-box">
+            <h4>관련 진료</h4>
+            ${related.map((t) => `<a href="/treatments/${t!.slug}">${t!.name}</a>`).join('')}
+          </div>` : '')}
+          <div class="sidebar-box">
+            <h4>상담</h4>
+            <a href="/reservation">예약 상담 신청</a>
+            <a href="tel:${clinic.phoneRaw}">${clinic.phone}</a>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+  <script>fetch('/api/views/column/${col.id}',{method:'POST'}).catch(function(){});</script>
+  `
+  return Layout({
+    title: col.metaTitle || `${col.title} | ${clinic.nameKo}`,
+    description: col.metaDescription || col.excerpt,
+    path: `/column/${col.slug}`,
+    ogImage: col.thumbnail ? clinic.domain + col.thumbnail : undefined,
+    jsonLd: [
+      breadcrumbSchema(crumb),
+      articleSchema({
+        title: col.title, description: col.excerpt, path: `/column/${col.slug}`,
+        image: col.thumbnail, datePublished: col.createdAt, dateModified: col.updatedAt,
+        authorSlug: col.authorSlug, authorName: doc?.name,
+      }),
+    ],
+  }, body)
+}
+
+// ============================================================================
+// 공지사항
+// ============================================================================
+export function NoticesPage(items: Notice[]) {
+  const crumb = [{ name: '홈', url: '/' }, { name: '공지사항', url: '/notice' }]
+  const list = items.filter((x) => x.published).sort((a, b) => Number(b.pinned) - Number(a.pinned))
+  const body = html`
+  <section class="page-hero">
+    <div class="container"><p class="eyebrow">Notice</p><h1>공지사항</h1></div>
+  </section>
+  ${Breadcrumb(crumb)}
+  <section class="section--tight">
+    <div class="container">
+      ${raw(list.length ? `
+      <div class="index-list" style="max-width:880px">
+        ${list.map((n) => `
+          <a class="index-row" href="/notice/${n.id}" data-reveal style="grid-template-columns:1fr auto">
+            <span>
+              <span class="row-title" style="font-size:1.15rem">${n.pinned ? '<span class="badge" style="background:var(--ink);color:var(--paper);font-size:.62rem;padding:.2rem .5rem;border-radius:2px;margin-right:.6rem;vertical-align:middle">공지</span>' : ''}${n.title}</span>
+            </span>
+            <span class="muted" style="font-size:.85rem">${fmt(n.createdAt)}</span>
+          </a>`).join('')}
+      </div>` : emptyState('등록된 공지사항이 없습니다', '병원 소식과 안내사항이 게시될 예정입니다.'))}
+    </div>
+  </section>
+  `
+  return Layout({
+    title: `공지사항 | ${clinic.nameKo}`,
+    description: `${clinic.nameKo} 공지사항 — 진료 일정, 병원 소식 안내.`,
+    path: '/notice',
+    jsonLd: [breadcrumbSchema(crumb)],
+  }, body)
+}
+
+export function NoticeDetailPage(n: Notice) {
+  const crumb = [{ name: '홈', url: '/' }, { name: '공지사항', url: '/notice' }, { name: n.title, url: `/notice/${n.id}` }]
+  const body = html`
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">Notice · ${fmt(n.createdAt)}</p>
+      <h1 style="font-size:var(--t-h2)">${n.title}</h1>
+    </div>
+  </section>
+  ${Breadcrumb(crumb)}
+  <section class="section--tight">
+    <div class="container">
+      <article class="prose" data-reveal>
+        ${raw(n.image ? `<img src="${n.image}" alt="${n.title}" style="width:100%;border-radius:4px;margin-bottom:2rem">` : '')}
+        ${raw(n.contentHtml)}
+      </article>
+      <a href="/notice" class="link-arrow" style="margin-top:3rem;display:inline-block">목록으로 <i class="fas fa-arrow-left"></i></a>
+    </div>
+  </section>
+  <script>fetch('/api/views/notice/${n.id}',{method:'POST'}).catch(function(){});</script>
+  `
+  return Layout({
+    title: `${n.title} | 공지사항 | ${clinic.nameKo}`,
+    description: n.title,
+    path: `/notice/${n.id}`,
+    jsonLd: [breadcrumbSchema(crumb)],
+  }, body)
+}
+
+// ============================================================================
+// 병원 영상
+// ============================================================================
+export function VideoPage() {
+  const crumb = [{ name: '홈', url: '/' }, { name: '병원 영상', url: '/video' }]
+  const hasVideo = Boolean(clinic.sns.youtube)
+  const body = html`
+  <section class="page-hero">
+    <div class="container"><p class="eyebrow">Video</p><h1>병원 영상</h1>
+    <p class="lead">연세온치과의 공간과 진료 이야기를 영상으로 만나보세요.</p></div>
+  </section>
+  ${Breadcrumb(crumb)}
+  <section class="section--tight">
+    <div class="container">
+      ${raw(hasVideo
+        ? `<a href="${clinic.sns.youtube}" target="_blank" rel="noopener" class="btn btn-primary">유튜브 채널 바로가기 <i class="fab fa-youtube"></i></a>`
+        : emptyState('영상을 준비하고 있습니다', '병원 소개·진료 안내 영상이 곧 게시됩니다.'))}
+    </div>
+  </section>
+  `
+  return Layout({
+    title: `병원 영상 | ${clinic.nameKo}`,
+    description: `${clinic.nameKo} 병원 소개 영상.`,
+    path: '/video',
+    jsonLd: [breadcrumbSchema(crumb)],
+  }, body)
+}
