@@ -11,7 +11,17 @@ export const clinic = {
   nameShort: '연세온치과',
   tagline: '미소의 젊음을 켜는 치과',
   mission: '자연치아를 닮은 생체모방치의학으로, 환자의 미소에 젊음을 더한다',
-  domain: 'https://yeonseondental.com', // 실제 도메인 연결 시 교체
+  domain: 'https://www.ysondent.com', // 기존 도메인 그대로 연결 예정 (Cloudflare 배포 시 DNS 이관)
+
+  // --- '온(On)' 브랜드 의미 (원장님 답변 Q2 원문 기반) ---
+  brandStory: {
+    headline: '이름에 담은 세 가지 “온”',
+    meanings: [
+      { key: '온천장의 온', en: 'Oncheonjang', desc: '부산 동래 온천장 — 오랜 시간 사람들의 일상이 흐르는 동네에서, 이웃의 구강건강을 책임집니다.' },
+      { key: '따뜻할 온(溫)', en: 'Warmth', desc: '환자를 대할 때 따뜻한 마음을 잃지 않겠다는 약속입니다.' },
+      { key: '켜다 온(On)', en: 'Switch On', desc: '환자의 구강건강과 미소의 자신감을 다시 “켜는” 치과가 되겠습니다.' },
+    ],
+  },
   openedYear: 2022,
 
   // --- 연락처 ---
@@ -49,11 +59,14 @@ export const clinic = {
     openDate: '2022',
   },
 
-  // --- SNS (Q38) ---
+  // --- SNS · 운영 채널 (원장님 답변 '채워가야할 것들 2' 기반) ---
   sns: {
-    instagram: '', // 인스타 URL 제공 시 교체
-    youtube: '',   // 유튜브 채널 URL 제공 시 교체
-    blog: '',
+    instagram: 'https://www.instagram.com/ys_ondent',
+    youtube: 'https://www.youtube.com/@연세온치과',
+    blog: 'https://blog.naver.com/ysondent',          // 병원 브랜드블로그
+    blogPersonal: 'https://blog.naver.com/ys_ondental', // 원장 개인블로그 (E-E-A-T 저자 시그널)
+    naverPlace: 'https://naver.me/FZ8n5qiP',
+    kakaoChannel: 'http://pf.kakao.com/_xiPfab',
   },
 
   // --- 브랜드 (v3: 순백 초미니멀 — 잉크 블랙 + 오프화이트, 무채색) ---

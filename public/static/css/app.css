@@ -563,3 +563,16 @@ h1, h2, h3, h4, h5 { font-weight: 600; line-height: 1.1; color: var(--ink); lett
 .reveal-d2 { transition-delay: .2s; }
 .reveal-d3 { transition-delay: .3s; }
 @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } }
+
+/* v2 레거시 호환 — 다크 섹션·골드 버튼 */
+:root { --gold-light: #C9B58A; }
+.bg-navy { background: var(--ink); color: var(--paper); }
+.bg-navy .card { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.12); }
+.btn-gold { background: var(--gold); color: #fff; border: 1px solid var(--gold); }
+.btn-gold:hover { background: transparent; color: var(--gold-light); }
+:root { --ink-soft: var(--ink-2); }
+.btn-navy { background: var(--ink); color: var(--paper); border: 1px solid var(--ink); }
+.btn-navy:hover { background: transparent; color: var(--ink); }
+.btn-outline { background: transparent; color: var(--ink); border: 1px solid var(--ink); }
+.btn-outline:hover { background: var(--ink); color: var(--paper); }
+:root { --muted: var(--mist); --navy-dark: #0C0A07; }

@@ -35,6 +35,25 @@ export function MissionPage() {
     </div>
   </section>
 
+  <!-- '온' 브랜드 스토리 (원장님 답변 Q2 — 세 가지 의미의 언어유희) -->
+  <section class="section">
+    <div class="container">
+      <div class="sec-head center">
+        <p class="eyebrow reveal">Why “On”</p>
+        <h2 class="sec-title reveal reveal-d1">${clinic.brandStory.headline}</h2>
+        <p class="sec-desc reveal reveal-d2" style="margin-inline:auto">연세온치과의 “온”에는 세 가지 마음이 담겨 있습니다.</p>
+      </div>
+      <div class="grid grid-3">
+        ${raw(clinic.brandStory.meanings.map((m, idx) => `
+          <div class="card reveal reveal-d${idx + 1}" style="text-align:center">
+            <p class="fraunces" style="font-size:2.6rem;color:var(--gold);font-style:italic">온</p>
+            <h3 style="margin-top:.6rem">${m.key}</h3>
+            <p style="margin-top:.8rem">${m.desc}</p>
+          </div>`).join(''))}
+      </div>
+    </div>
+  </section>
+
   <!-- 핵심 가치 (Q19·Q28) — 약점은 강점으로 리프레이밍 -->
   <section class="section bg-paper2">
     <div class="container">
@@ -67,9 +86,9 @@ export function MissionPage() {
     <div class="container" style="max-width:860px;position:relative">
       <p class="eyebrow reveal" style="color:var(--gold-light);text-align:center">Director's Message</p>
       <blockquote class="font-serif reveal reveal-d1" style="font-size:clamp(1.4rem,3vw,2.2rem);color:#fff;text-align:center;line-height:1.6;margin-top:1.5rem;font-style:italic">
-        "좋은 치료의 기준은 결과물의 겉모습만이 아닙니다.<br>
-        <span class="text-gold">얼마나 자연치를 보존하면서, 얼마나 오래 유지되는 결과를 만들었는가.</span><br>
-        그것이 제가 환자분께 드리고 싶은 진료입니다."
+        "제가 생각하는 좋은 치과는,<br>
+        <span class="text-gold">환자분들께서 지금보다 더 나은 삶을 영위할 수 있도록 돕는 곳입니다.</span><br>
+        한 단계 업그레이드된 삶의 시작을 연세온치과에서 함께하시길 바랍니다."
       </blockquote>
       <p class="reveal reveal-d2" style="text-align:center;color:var(--gold-light);margin-top:2rem;font-weight:600">
         — 연세온치과의원 대표원장 ${clinic.business.owner}
