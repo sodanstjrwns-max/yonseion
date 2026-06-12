@@ -13,10 +13,11 @@ export interface SeoMeta {
 
 // 미니멀 로고 마크 — 단색 잉크 라인. 'ㅇ'(연세온의 ON) 모티프를 절제된 원으로
 export function logoMark() {
+  // 네이비 링 + 골드 코어 — "켜다(On)" 스위치 모티프
   return `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <circle cx="20" cy="20" r="15.5" stroke="currentColor" stroke-width="1.6"/>
     <path d="M20 9.5v21" stroke="currentColor" stroke-width="1.6"/>
-    <circle cx="20" cy="20" r="3" fill="currentColor"/>
+    <circle cx="20" cy="20" r="3.4" fill="#AE8A4C"/>
   </svg>`
 }
 

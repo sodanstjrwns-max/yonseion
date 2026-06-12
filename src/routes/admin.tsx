@@ -33,7 +33,7 @@ function shell(title: string, body: string, active = '') {
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
 <style>
-:root{--ink:#1A1611;--paper:#FAF7F1;--line:#E0DACE;--mist:#948D81;--acc:#16130F}
+:root{--ink:#14243E;--paper:#FAF8F2;--line:#E1DCCC;--mist:#8A93A6;--acc:#0C1830}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Pretendard',sans-serif;background:var(--paper);color:var(--ink);font-size:15px;line-height:1.6}
 a{color:inherit;text-decoration:none}
@@ -63,7 +63,7 @@ textarea{min-height:120px;resize:vertical}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
 .badge{display:inline-block;font-size:.72rem;padding:.18rem .55rem;border-radius:20px;background:#EEE8DC;color:var(--ink)}
-.badge.new{background:#1A1611;color:#fff}.badge.confirmed{background:#2E5E3A;color:#fff}.badge.done{background:#888;color:#fff}.badge.cancel{background:#9C2B2B;color:#fff}
+.badge.new{background:#14243E;color:#fff}.badge.confirmed{background:#2E5E3A;color:#fff}.badge.done{background:#888;color:#fff}.badge.cancel{background:#9C2B2B;color:#fff}
 .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;gap:1rem;flex-wrap:wrap}
 .muted{color:var(--mist);font-size:.85rem}
 @media(max-width:860px){.layout{grid-template-columns:1fr}.side{flex-direction:row;flex-wrap:wrap}.side .logout{margin:0}.main{padding:1.4rem}}
@@ -97,11 +97,11 @@ admin.get('/login', (c) => {
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex"><title>관리자 로그인 | 연세온치과</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
-<style>body{font-family:Pretendard,sans-serif;background:#1A1611;display:grid;place-items:center;min-height:100vh;margin:0}
-.box{background:#FAF7F1;border-radius:14px;padding:2.6rem;width:min(380px,90vw)}
+<style>body{font-family:Pretendard,sans-serif;background:#14243E;display:grid;place-items:center;min-height:100vh;margin:0}
+.box{background:#FAF8F2;border-radius:14px;padding:2.6rem;width:min(380px,90vw)}
 h1{font-size:1.2rem;margin:0 0 1.6rem;letter-spacing:-.01em}
-input{width:100%;padding:.75rem .9rem;border:1px solid #E0DACE;border-radius:8px;font:inherit;box-sizing:border-box}
-button{width:100%;margin-top:1rem;padding:.8rem;background:#1A1611;color:#fff;border:0;border-radius:8px;font:inherit;font-weight:600;cursor:pointer}
+input{width:100%;padding:.75rem .9rem;border:1px solid #E1DCCC;border-radius:8px;font:inherit;box-sizing:border-box}
+button{width:100%;margin-top:1rem;padding:.8rem;background:#14243E;color:#fff;border:0;border-radius:8px;font:inherit;font-weight:600;cursor:pointer}
 .err{color:#9C2B2B;font-size:.85rem;margin-top:.8rem}</style></head>
 <body><form class="box" method="POST" action="/admin/login">
 <h1>연세온치과 관리자</h1>

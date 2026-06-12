@@ -1,20 +1,26 @@
 /* ============================================================================
-   연세온치과의원 — v3 순백 초미니멀 디자인 시스템
-   순백(off-white) + 잉크 블랙 + 거대 타이포 + 큰 사진 + 90% 여백
-   레퍼런스: 럭셔리 호텔 / 하이엔드 클리닉 브로셔
+   연세온치과의원 — v4 로열 네이비 × 샴페인 골드 프리미엄 디자인 시스템
+   딥 네이비 잉크 + 아이보리 페이퍼 + 샴페인 골드 악센트
+   레퍼런스: 럭셔리 호텔 로비 / 명품 부틱 / 하이엔드 클리닉 브로셔
+   (신청서 Q33: "고급스럽고 프리미엄하게, 로고 컬러 네이비·골드" 반영)
    ============================================================================ */
 
 /* ---------- 0. Tokens ---------- */
 :root {
-  --ink: #1A1611;          /* 주조 텍스트 — 따뜻한 다크 코코아 */
-  --ink-2: #4A453D;        /* 본문 — 따뜻한 토프 그레이 */
-  --mist: #948D81;         /* 보조 텍스트 / 캡션 */
-  --mist-2: #C3BCB0;       /* 흐린 라벨 */
-  --paper: #FAF7F1;        /* 배경 — 샴페인 오프화이트 (호텔 로비 톤) */
-  --paper-2: #F1ECE2;      /* 섹션 교차 배경 */
-  --paper-3: #E9E3D7;      /* 더 깊은 톤 (이미지 폴백 등) */
-  --line: #E0DACE;         /* 헤어라인 */
-  --line-soft: #ECE7DC;
+  --ink: #14243E;          /* 주조 텍스트 — 딥 로열 네이비 */
+  --ink-deep: #0C1830;     /* 더 깊은 네이비 (호버·그라데이션) */
+  --ink-2: #44516A;        /* 본문 — 네이비 그레이 */
+  --mist: #8A93A6;         /* 보조 텍스트 / 캡션 */
+  --mist-2: #C2C8D4;       /* 흐린 라벨 */
+  --paper: #FAF8F2;        /* 배경 — 따뜻한 아이보리 (호텔 로비 톤) */
+  --paper-2: #F2EEE3;      /* 섹션 교차 배경 */
+  --paper-3: #E9E3D4;      /* 더 깊은 톤 (이미지 폴백 등) */
+  --line: #E1DCCC;         /* 헤어라인 */
+  --line-soft: #ECE7D9;
+  --gold: #AE8A4C;         /* 샴페인 골드 — 주인공 악센트 */
+  --gold-2: #8E6F3A;       /* 깊은 골드 (텍스트 대비용) */
+  --gold-light: #D7C49A;   /* 밝은 골드 (다크 배경 위) */
+  --gold-grad: linear-gradient(115deg, #C8A86B 0%, #AE8A4C 45%, #D9C18C 100%);
 
   --maxw: 1340px;
   --gutter: clamp(1.5rem, 5.5vw, 5.5rem);
@@ -59,7 +65,7 @@ body::before {
 }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; cursor: pointer; background: none; border: none; color: inherit; }
-::selection { background: var(--ink); color: var(--paper); }
+::selection { background: var(--ink); color: var(--gold-light); }
 
 h1, h2, h3, h4, h5 { font-weight: 600; line-height: 1.1; color: var(--ink); letter-spacing: -.022em; }
 
@@ -79,7 +85,7 @@ h1, h2, h3, h4, h5 { font-weight: 600; line-height: 1.1; color: var(--ink); lett
 .divider { height: 1px; background: var(--line); border: 0; }
 
 /* 매거진 섹션 인덱스 — (01) 식 */
-.sec-index { font-family: var(--serif); font-optical-sizing: auto; font-size: .8rem; color: var(--mist); letter-spacing: .1em; font-variant-numeric: oldstyle-nums; }
+.sec-index { font-family: var(--serif); font-optical-sizing: auto; font-size: .8rem; color: var(--gold); letter-spacing: .1em; font-variant-numeric: oldstyle-nums; }
 .sec-index::before { content: '('; } .sec-index::after { content: ')'; }
 
 /* 이미지 위 부유 캡션 (figure 안에) */
@@ -93,7 +99,7 @@ h1, h2, h3, h4, h5 { font-weight: 600; line-height: 1.1; color: var(--ink); lett
   font-size: .7rem; font-weight: 600; letter-spacing: .3em; text-transform: uppercase;
   color: var(--mist); display: inline-flex; align-items: center; gap: .85rem;
 }
-.eyebrow::before { content: ''; width: 34px; height: 1px; background: var(--ink); opacity: .55; }
+.eyebrow::before { content: ''; width: 34px; height: 1px; background: var(--gold); opacity: .9; }
 
 /* ---------- 3. Header ---------- */
 .site-header {
@@ -125,7 +131,7 @@ h1, h2, h3, h4, h5 { font-weight: 600; line-height: 1.1; color: var(--ink); lett
 }
 .nav-link::after {
   content: ''; position: absolute; left: 0; bottom: 0; width: 0; height: 1px;
-  background: var(--ink); transition: width .35s var(--ease);
+  background: var(--gold); transition: width .35s var(--ease);
 }
 .nav-link:hover::after { width: 100%; }
 
@@ -134,7 +140,7 @@ h1, h2, h3, h4, h5 { font-weight: 600; line-height: 1.1; color: var(--ink); lett
   padding: .7rem 1.4rem; border-radius: 100px; display: inline-flex; align-items: center; gap: .5rem;
   transition: transform .3s var(--ease), background .3s;
 }
-.header-cta:hover { transform: translateY(-2px); background: #000; }
+.header-cta:hover { transform: translateY(-2px); background: var(--gold); color: #fff; }
 
 /* mega menu */
 .has-mega { position: relative; }
@@ -199,7 +205,7 @@ h1, h2, h3, h4, h5 { font-weight: 600; line-height: 1.1; color: var(--ink); lett
   position: absolute; z-index: 1; line-height: .78; margin: 0; pointer-events: none;
   font-family: var(--serif); font-optical-sizing: auto; font-weight: 300;
   font-size: clamp(18rem, 46vw, 52rem);
-  letter-spacing: -.05em; color: var(--ink); opacity: .04;
+  letter-spacing: -.05em; color: var(--gold); opacity: .07;
   right: 2vw; top: 50%; transform: translateY(-50%); white-space: nowrap;
 }
 .hw-mark .kc { display: inline-block; }
@@ -207,7 +213,7 @@ h1, h2, h3, h4, h5 { font-weight: 600; line-height: 1.1; color: var(--ink); lett
 /* 콘텐츠 — 좌측 정렬, 주인공 */
 .hw-content { position: relative; z-index: 2; max-width: var(--maxw); margin-inline: auto; width: 100%; }
 .hw-eyebrow { font-size: .72rem; font-weight: 600; letter-spacing: .3em; text-transform: uppercase; color: var(--mist); display: inline-flex; align-items: center; gap: .85rem; margin-bottom: 2rem; }
-.hw-eyebrow::before { content: ''; width: 34px; height: 1px; background: var(--ink); opacity: .55; }
+.hw-eyebrow::before { content: ''; width: 34px; height: 1px; background: var(--gold); opacity: .9; }
 
 /* 태그라인 — 진짜 큰 헤드라인 (주인공) */
 .hw-tagline {
@@ -242,7 +248,7 @@ h1, h2, h3, h4, h5 { font-weight: 600; line-height: 1.1; color: var(--ink); lett
 .scroll-hint { position: absolute; right: var(--gutter); bottom: clamp(4.5rem, 9vw, 8rem); display: flex; flex-direction: column; align-items: center; gap: .9rem; }
 .scroll-hint span { font-size: .62rem; letter-spacing: .26em; text-transform: uppercase; color: var(--mist); writing-mode: vertical-rl; }
 .scroll-hint i { width: 1px; height: 46px; background: var(--mist-2); position: relative; overflow: hidden; }
-.scroll-hint i::after { content: ''; position: absolute; inset: 0; background: var(--ink); transform: translateY(-100%); animation: scrollLine 2.2s var(--ease-soft) infinite; }
+.scroll-hint i::after { content: ''; position: absolute; inset: 0; background: var(--gold); transform: translateY(-100%); animation: scrollLine 2.2s var(--ease-soft) infinite; }
 @keyframes scrollLine { 0% { transform: translateY(-100%); } 50% { transform: translateY(0); } 100% { transform: translateY(100%); } }
 @media (max-width: 720px) { .scroll-hint { display: none; } }
 
@@ -259,7 +265,7 @@ h1, h2, h3, h4, h5 { font-weight: 600; line-height: 1.1; color: var(--ink); lett
 }
 .btn::before { content: ''; position: absolute; inset: 0; z-index: -1; transition: transform .5s var(--ease); }
 .btn-primary { background: var(--ink); color: var(--paper); }
-.btn-primary::before { background: #000; transform: translateY(101%); }
+.btn-primary::before { background: var(--gold-grad); transform: translateY(101%); }
 .btn-primary:hover { transform: translateY(-3px); }
 .btn-primary:hover::before { transform: translateY(0); }
 .btn-ghost { border: 1px solid var(--ink); color: var(--ink); }
@@ -329,11 +335,11 @@ h1, h2, h3, h4, h5 { font-weight: 600; line-height: 1.1; color: var(--ink); lett
 .index-row:hover::before { opacity: 1; }
 .index-row:hover { padding-left: clamp(1.2rem, 2.5vw, 2.4rem); }
 .index-row .num { font-family: var(--serif); font-size: .95rem; color: var(--mist-2); font-variant-numeric: oldstyle-nums; letter-spacing: .02em; }
-.index-row .row-title { font-size: clamp(1.5rem, 2.8vw, 2.6rem); color: var(--ink); line-height: 1.1; display: inline-block; background-image: linear-gradient(var(--ink),var(--ink)); background-size: 0% 1px; background-repeat: no-repeat; background-position: 0 100%; transition: background-size .55s var(--ease); padding-bottom: 3px; }
+.index-row .row-title { font-size: clamp(1.5rem, 2.8vw, 2.6rem); color: var(--ink); line-height: 1.1; display: inline-block; background-image: linear-gradient(var(--gold),var(--gold)); background-size: 0% 1px; background-repeat: no-repeat; background-position: 0 100%; transition: background-size .55s var(--ease); padding-bottom: 3px; }
 .index-row:hover .row-title { background-size: 100% 1px; }
 .index-row .row-desc { font-size: .95rem; color: var(--mist); margin-top: .6rem; max-width: 52ch; }
 .index-row .row-go { font-size: 1.1rem; color: var(--ink); transition: transform .55s var(--ease), opacity .4s; opacity: .35; align-self: center; }
-.index-row:hover .row-go { transform: translate(8px, 0); opacity: 1; }
+.index-row:hover .row-go { transform: translate(8px, 0); opacity: 1; color: var(--gold-2); }
 
 /* ---------- 10. Cards (restrained) ---------- */
 .cards { display: grid; gap: clamp(1.5rem, 3vw, 2.5rem); }
@@ -352,7 +358,7 @@ h1, h2, h3, h4, h5 { font-weight: 600; line-height: 1.1; color: var(--ink); lett
 .quote blockquote { font-size: clamp(2rem, 4.6vw, 4rem); line-height: 1.18; color: var(--ink); letter-spacing: -.028em; font-weight: 500; }
 .quote cite { display: block; margin-top: 2.4rem; font-style: normal; font-size: .82rem; color: var(--mist); letter-spacing: .14em; text-transform: uppercase; }
 
-.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; border-top: 1px solid var(--line); }
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; border-top: 1px solid var(--gold); }
 .metric { padding-top: 2rem; }
 .metric .n { font-family: var(--serif); font-optical-sizing: auto; font-size: clamp(2.4rem, 5vw, 4.5rem); color: var(--ink); line-height: 1; letter-spacing: -.03em; font-variant-numeric: oldstyle-nums; }
 .metric .l { font-size: .85rem; color: var(--mist); margin-top: .8rem; }
@@ -370,7 +376,7 @@ h1, h2, h3, h4, h5 { font-weight: 600; line-height: 1.1; color: var(--ink); lett
 .faq-item { border-bottom: 1px solid var(--line); }
 .faq-q { display: flex; justify-content: space-between; align-items: center; gap: 2rem; padding: 1.8rem 0; font-size: clamp(1.05rem, 1.8vw, 1.35rem); font-weight: 600; color: var(--ink); width: 100%; text-align: left; }
 .faq-q i { font-size: .9rem; transition: transform .4s var(--ease); color: var(--mist); flex-shrink: 0; }
-.faq-item.open .faq-q i { transform: rotate(45deg); }
+.faq-item.open .faq-q i { transform: rotate(45deg); color: var(--gold-2); }
 .faq-a { max-height: 0; overflow: hidden; transition: max-height .5s var(--ease); }
 .faq-a-inner { padding-bottom: 1.8rem; color: var(--ink-2); max-width: 70ch; }
 .faq-item.open .faq-a { max-height: 600px; }
@@ -398,13 +404,13 @@ h1, h2, h3, h4, h5 { font-weight: 600; line-height: 1.1; color: var(--ink); lett
 .sidebar-box a:hover { color: var(--ink); padding-left: .4rem; }
 
 /* ---------- 17. CTA band ---------- */
-.cta-band { background: var(--ink); color: var(--paper); text-align: center; position: relative; overflow: hidden; }
-.cta-band::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.35)); pointer-events: none; }
+.cta-band { background: linear-gradient(160deg, var(--ink) 0%, var(--ink-deep) 100%); color: var(--paper); text-align: center; position: relative; overflow: hidden; }
+.cta-band::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 120%, rgba(174,138,76,.22) 0%, transparent 55%), radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.3)); pointer-events: none; }
 .cta-band > * { position: relative; z-index: 1; }
 .cta-band h2 { color: var(--paper); font-family: var(--serif); font-size: var(--t-h2); max-width: 20ch; margin-inline: auto; }
 .cta-band p { color: rgba(251,250,247,.7); margin: 1.5rem auto 2.5rem; max-width: 44ch; }
-.cta-band .btn-primary { background: var(--paper); color: var(--ink); }
-.cta-band .btn-primary:hover { background: #fff; }
+.cta-band .btn-primary { background: var(--gold-grad); color: #fff; }
+.cta-band .btn-primary:hover { filter: brightness(1.08); }
 
 /* ---------- 18. Footer ---------- */
 .site-footer { background: var(--paper); border-top: 1px solid var(--line); padding-block: clamp(4rem, 8vw, 6rem) 3rem; }
@@ -503,10 +509,10 @@ h1, h2, h3, h4, h5 { font-weight: 600; line-height: 1.1; color: var(--ink); lett
   color: var(--ink-2); transition: all .3s var(--ease); background: transparent;
 }
 .faq-tab:hover { border-color: var(--ink); color: var(--ink); }
-.faq-tab.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.faq-tab.active { background: var(--ink); color: var(--gold-light); border-color: var(--ink); }
 
 /* ---------- 25. Price table ---------- */
-.price-table { width: 100%; border-collapse: collapse; border-top: 2px solid var(--ink); }
+.price-table { width: 100%; border-collapse: collapse; border-top: 2px solid var(--gold); }
 .price-table th { font-size: .75rem; letter-spacing: .14em; text-transform: uppercase; color: var(--mist); text-align: left; padding: 1rem .8rem; border-bottom: 1px solid var(--line); font-weight: 600; }
 .price-table td { padding: 1.1rem .8rem; border-bottom: 1px solid var(--line-soft); font-size: .95rem; color: var(--ink-2); }
 .price-table td:first-child { color: var(--ink); font-weight: 500; }
@@ -539,14 +545,14 @@ h1, h2, h3, h4, h5 { font-weight: 600; line-height: 1.1; color: var(--ink); lett
   }
   .sticky-cta a { display: flex; align-items: center; justify-content: center; gap: .5rem; padding: .8rem; font-size: .92rem; font-weight: 600; border-radius: 4px; }
   .sticky-cta .call { border: 1px solid var(--ink); color: var(--ink); }
-  .sticky-cta .book { background: var(--ink); color: var(--paper); }
+  .sticky-cta .book { background: var(--gold-grad); color: #fff; }
   body { padding-bottom: 64px; }
 }
 @media (max-width: 860px) { .rsv-grid { grid-template-columns: 1fr; } }
 
 /* ===== 30) v2 레거시 호환 레이어 (mission/biomimetic/doctors/treatments 페이지) ===== */
 /* 신청서의 골드 계열 요청을 반영한 뮤트 앤틱 골드 악센트 — 샴페인 페이퍼 톤과 조화 */
-:root { --navy: var(--ink); --gold: #8A6E3E; }
+:root { --navy: var(--ink); }
 .gold, .text-gold { color: var(--gold); }
 .font-serif { font-family: var(--serif-kr); }
 .hero-title { font-family: var(--serif-kr); font-weight: 600; letter-spacing: -.03em; line-height: 1.28; }
@@ -565,14 +571,53 @@ h1, h2, h3, h4, h5 { font-weight: 600; line-height: 1.1; color: var(--ink); lett
 @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } }
 
 /* v2 레거시 호환 — 다크 섹션·골드 버튼 */
-:root { --gold-light: #C9B58A; }
+
 .bg-navy { background: var(--ink); color: var(--paper); }
 .bg-navy .card { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.12); }
-.btn-gold { background: var(--gold); color: #fff; border: 1px solid var(--gold); }
-.btn-gold:hover { background: transparent; color: var(--gold-light); }
-:root { --ink-soft: var(--ink-2); }
+.btn-gold { background: var(--gold-grad); color: #fff; border: 1px solid var(--gold); }
+.btn-gold:hover { filter: brightness(1.08); transform: translateY(-2px); }
+:root { --ink-soft: var(--ink-2); --muted: var(--mist); --navy-dark: var(--ink-deep); }
 .btn-navy { background: var(--ink); color: var(--paper); border: 1px solid var(--ink); }
 .btn-navy:hover { background: transparent; color: var(--ink); }
 .btn-outline { background: transparent; color: var(--ink); border: 1px solid var(--ink); }
 .btn-outline:hover { background: var(--ink); color: var(--paper); }
-:root { --muted: var(--mist); --navy-dark: #0C0A07; }
+
+
+/* ===== 31) v4 프리미엄 시그니처 디테일 ===== */
+/* 골드 헤어룰 — 섹션 제목 위 장식 */
+.gold-rule { width: 56px; height: 2px; background: var(--gold-grad); border: 0; margin: 0 0 1.6rem; }
+.center .gold-rule, .text-center .gold-rule { margin-inline: auto; }
+
+/* 카드 — 골드 상단 라인이 호버 시 그려지는 디테일 */
+.card { position: relative; }
+.card::before { content: ''; position: absolute; top: 0; left: 0; width: 0; height: 2px; background: var(--gold-grad); transition: width .6s var(--ease); }
+.card:hover::before { width: 100%; }
+
+/* 다크(네이비) 섹션 위 텍스트 보정 */
+.bg-navy .eyebrow, .cta-band .eyebrow { color: var(--gold-light); }
+.bg-navy .eyebrow::before, .cta-band .eyebrow::before { background: var(--gold-light); }
+.bg-navy h2, .bg-navy h3 { color: var(--paper); }
+
+/* 부유 캡션 — 골드 포인트 */
+.figure-float { border-left: 2px solid var(--gold); }
+
+/* 메가메뉴 NEW 배지 → 골드 */
+.mega-item .badge { border-color: var(--gold); color: var(--gold-2); }
+
+/* 인용구 — 골드 따옴표 오너먼트 */
+.quote blockquote::before { content: '\201C'; display: block; font-family: var(--serif); font-size: 4.5rem; line-height: .6; color: var(--gold); opacity: .65; margin-bottom: 1.2rem; }
+
+/* 헤더 — 스크롤 시 골드 미세 헤어라인 */
+.site-header.scrolled { border-bottom: 1px solid var(--line); box-shadow: 0 1px 0 rgba(174,138,76,.25); }
+
+/* 폼 포커스 링 → 골드 */
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus {
+  outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(174,138,76,.16);
+}
+
+/* 진료시간 표 등 강조 숫자 세리프 + 골드 옵션 */
+.gold-num { font-family: var(--serif); color: var(--gold-2); font-variant-numeric: oldstyle-nums; }
+
+/* 히어로 태그라인 — "켜는" 골드 시그니처 (켜다 On 브랜드 모티프) */
+.hw-tagline .tg-gold { background: var(--gold-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hw-tagline .tg-gold .kc { color: inherit; }
