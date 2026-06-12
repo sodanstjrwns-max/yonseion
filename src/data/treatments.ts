@@ -59,6 +59,7 @@ export const treatments: Treatment[] = [
       { name: '다이아스테마 레진수복', desc: '치아 사이 공간을 자연스럽게 메우는 접착수복' },
       { name: '심미재보철', desc: '기존 보철을 자연스럽게 재수복' },
       { name: '연조직 수술(CTG·CAF)', desc: '잇몸 라인 조화를 위한 연조직 이식·이동술' },
+      { name: '유리치은이식술(FGG)', desc: '부족한 각화치은을 보강하는 연조직 이식술' },
     ],
     faqRef: 'esthetic',
   },

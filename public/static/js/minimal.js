@@ -54,7 +54,7 @@
 
   /* ---- 4. Reveal on scroll (IntersectionObserver) ---- */
   function initReveal() {
-    var els = document.querySelectorAll('[data-reveal], .img-reveal');
+    var els = document.querySelectorAll('[data-reveal], .img-reveal, .reveal');
     if (!els.length) return;
     if (reduce || !('IntersectionObserver' in window)) {
       els.forEach(function (el) { el.classList.add('in'); });

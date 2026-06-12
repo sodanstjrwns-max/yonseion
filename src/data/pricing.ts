@@ -28,6 +28,7 @@ export const priceGroups: { label: string; items: PriceItem[] }[] = [
       { name: '라미네이트', unit: '1치', price: '내원 상담 시 안내' },
       { name: '이맥스 인레이·온레이', unit: '1치', price: '내원 상담 시 안내' },
       { name: '레진 수복 (비급여)', unit: '1치', price: '내원 상담 시 안내', note: '부위·범위에 따라 상이' },
+      { name: '연조직 이식술 (CTG·CAF·FGG)', unit: '부위당', price: '내원 상담 시 안내', note: '잇몸 라인·각화치은 개선' },
     ],
   },
   {
@@ -36,7 +37,6 @@ export const priceGroups: { label: string; items: PriceItem[] }[] = [
       { name: '교합안정장치 (스플린트)', unit: '1악', price: '내원 상담 시 안내' },
       { name: '교근 보톡스', unit: '회', price: '내원 상담 시 안내' },
       { name: '비급여 스케일링', unit: '전악', price: '내원 상담 시 안내', note: '연 1회 건강보험 적용분과 별도' },
-      { name: '치아미백', unit: '회', price: '내원 상담 시 안내' },
     ],
   },
 ]
