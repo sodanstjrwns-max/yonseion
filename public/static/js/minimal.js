@@ -111,6 +111,38 @@
     });
   }
 
+  /* ---- 5c. 스크롤 프로그레스 골드바 ---- */
+  function initProgress() {
+    var bar = document.querySelector('.scroll-progress i');
+    if (!bar) return;
+    var ticking = false;
+    function update() {
+      var h = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.transform = 'scaleX(' + (h > 0 ? Math.min(window.scrollY / h, 1) : 0) + ')';
+      ticking = false;
+    }
+    window.addEventListener('scroll', function () {
+      if (!ticking) { requestAnimationFrame(update); ticking = true; }
+    }, { passive: true });
+    update();
+  }
+
+  /* ---- 5d. SVG 스트로크 드로잉 (data-draw) — 뷰포트 진입 시 1회 ---- */
+  function initDraw() {
+    var els = document.querySelectorAll('[data-draw]');
+    if (!els.length) return;
+    if (reduce || !('IntersectionObserver' in window)) {
+      els.forEach(function (el) { el.classList.add('drawn'); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add('drawn'); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.35 });
+    els.forEach(function (el) { io.observe(el); });
+  }
+
   /* ---- 6. FAQ 아코디언 ---- */
   function initFaq() {
     document.querySelectorAll('.faq-q').forEach(function (q) {
@@ -195,7 +227,8 @@
   /* ---- init ---- */
   function init() {
     initLenis(); initHeader(); initMobileNav(); initReveal();
-    initWordmark(); initHeroWords(); initFaq(); initCount(); initParallax(); initCompare();
+    initWordmark(); initHeroWords(); initProgress(); initDraw();
+    initFaq(); initCount(); initParallax(); initCompare();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();

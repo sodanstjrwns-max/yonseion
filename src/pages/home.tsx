@@ -31,6 +31,28 @@ export function HomePage() {
     <!-- 거대 ON — 배경 워터마크 오브제 -->
     <div class="hw-mark" aria-hidden="true">${raw(splitChars('ON'))}</div>
 
+    <!-- 골드 오빗 — 공전하는 벡터 링 (켜다 On 모티프) -->
+    <div class="hw-orbit" aria-hidden="true">
+      <svg viewBox="0 0 600 600" fill="none">
+        <circle cx="300" cy="300" r="248" stroke="url(#og1)" stroke-width="1" opacity=".5"/>
+        <circle cx="300" cy="300" r="292" stroke="var(--gold)" stroke-width=".6" stroke-dasharray="2 10" opacity=".4" class="orbit-dash"/>
+        <g class="orbit-rot">
+          <circle cx="300" cy="52" r="4" fill="var(--gold)"/>
+          <circle cx="300" cy="52" r="9" stroke="var(--gold)" stroke-width=".8" opacity=".45"/>
+        </g>
+        <g class="orbit-rot-rev">
+          <circle cx="300" cy="595" r="2.2" fill="var(--gold-light)" opacity=".9"/>
+        </g>
+        <defs>
+          <linearGradient id="og1" x1="0" y1="0" x2="600" y2="600">
+            <stop offset="0" stop-color="#C8A86B" stop-opacity=".7"/>
+            <stop offset=".5" stop-color="#AE8A4C" stop-opacity=".15"/>
+            <stop offset="1" stop-color="#D9C18C" stop-opacity=".6"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+
     <!-- 상단 코너 메타 -->
     <div class="hw-corner" data-reveal>
       <div class="m-label">${clinic.nameEn} · 부산 동래 · since ${clinic.openedYear}</div>
@@ -50,6 +72,16 @@ export function HomePage() {
 
     <div class="scroll-hint" aria-hidden="true"><span>Scroll</span><i></i></div>
   </section>
+
+  <!-- ===== 마퀴 밴드 : 프리미엄 브랜드 스트립 ===== -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      ${raw(Array(2).fill(
+        ['Biomimetic Dentistry', '치과보철과 전문의', 'Esthetic Prosthetics', '자연치아 보존', 'All-on-X', '미소의 젊음을 켜다']
+          .map((w) => `<span class="mq-item">${w}</span><span class="mq-dot">◆</span>`).join('')
+      ).join(''))}
+    </div>
+  </div>
 
   <!-- ===== 미션 한 줄 : 여백 가득 ===== -->
   <section class="section">
@@ -104,9 +136,17 @@ export function HomePage() {
   <section class="section">
     <div class="container">
       <div class="split">
-        <div class="figure figure--tall img-reveal ph" data-reveal>
+        <div class="figure figure--tall img-reveal ph tooth-stage" data-reveal>
           <span class="figure-float">Biomimetic Approach</span>
-          <span class="ph-label">PHILOSOPHY</span>
+          <!-- 생체모방 치아 라인아트 — 스크롤 진입 시 스트로크 드로잉 -->
+          <svg class="tooth-art" viewBox="0 0 300 380" fill="none" data-draw>
+            <path class="td td-1" pathLength="100" d="M150 38 C92 38 64 80 64 132 C64 178 80 206 92 252 C101 287 106 330 124 342 C136 350 144 332 147 300 C149 280 149 268 150 268 C151 268 151 280 153 300 C156 332 164 350 176 342 C194 330 199 287 208 252 C220 206 236 178 236 132 C236 80 208 38 150 38 Z" stroke="var(--ink)" stroke-width="2"/>
+            <path class="td td-2" pathLength="100" d="M96 120 C112 96 134 88 150 88 C166 88 188 96 204 120" stroke="var(--gold)" stroke-width="1.6"/>
+            <path class="td td-3" pathLength="100" d="M108 156 C124 138 140 132 150 132 C160 132 176 138 192 156" stroke="var(--gold)" stroke-width="1.3" opacity=".75"/>
+            <path class="td td-4" pathLength="100" d="M120 192 C132 180 144 176 150 176 C156 176 168 180 180 192" stroke="var(--gold)" stroke-width="1" opacity=".55"/>
+            <circle class="td-core" cx="150" cy="230" r="5" fill="var(--gold)"/>
+            <text x="150" y="372" text-anchor="middle" class="tooth-cap">BIOMIMETIC · 자연치아의 결을 따라</text>
+          </svg>
         </div>
         <div class="split-text" data-reveal data-reveal-delay="2">
           <div style="display:flex;align-items:center;gap:1.2rem;margin-bottom:1.6rem">
@@ -180,6 +220,13 @@ export function HomePage() {
 
   <!-- ===== CTA 밴드 ===== -->
   <section class="section cta-band">
+    <div class="cta-orbit" aria-hidden="true">
+      <svg viewBox="0 0 600 600" fill="none">
+        <circle cx="300" cy="300" r="250" stroke="var(--gold-light)" stroke-width=".8" opacity=".4"/>
+        <circle cx="300" cy="300" r="290" stroke="var(--gold-light)" stroke-width=".5" stroke-dasharray="2 12" opacity=".35" class="orbit-dash"/>
+        <g class="orbit-rot"><circle cx="300" cy="50" r="3.5" fill="var(--gold-light)"/></g>
+      </svg>
+    </div>
     <div class="container">
       <h2 data-reveal>당신의 미소,<br>지금 다시 켜질 수 있습니다.</h2>
       <p data-reveal data-reveal-delay="1">진단부터 차근차근. 부담 없이 상담부터 시작하세요.</p>
