@@ -5,6 +5,7 @@ import { clinic } from './data/clinic'
 import { treatments } from './data/treatments'
 import { doctors } from './data/doctors'
 import { encyclopedia } from './data/encyclopedia'
+import { glossary } from './data/glossary'
 import { areaCombos } from './data/facilities'
 import type { CaseItem, Column, Notice } from './data/types'
 
@@ -154,6 +155,7 @@ app.get('/sitemap.xml', async (c) => {
     ...treatments.map((t) => ({ loc: `${base}/treatments/${t.slug}`, priority: t.category === 'core' ? '0.9' : '0.7' })),
     ...doctors.map((d) => ({ loc: `${base}/doctors/${d.slug}`, priority: '0.8' })),
     ...encyclopedia.map((e) => ({ loc: `${base}/encyclopedia/${e.slug}`, priority: '0.6' })),
+    ...glossary.map((e) => ({ loc: `${base}/encyclopedia/${e.slug}`, priority: '0.5' })),
     ...areaCombos().map((a) => ({ loc: `${base}/area/${a.slug}`, priority: '0.6' })),
   ]
   // 동적 콘텐츠
