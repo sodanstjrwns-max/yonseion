@@ -6,6 +6,7 @@ import { treatments, getTreatment, coreTreatments, treatmentGroups, treatmentsBy
 import { getDoctor } from '../data/doctors'
 import { faqGroups } from '../data/faqs'
 import { breadcrumbSchema, faqSchema, procedureSchema, speakableSchema } from '../lib/schema'
+import { autoLink } from '../lib/inlink'
 
 // ---------- 진료 전체 목록 ----------
 export function TreatmentsIndex() {
@@ -84,12 +85,12 @@ export function TreatmentDetail(slug: string) {
     <div class="container" style="display:grid;grid-template-columns:1fr 320px;gap:3.5rem;align-items:start" class="tx-grid">
       <div class="prose" style="max-width:none">
         <p class="lead reveal" style="margin-bottom:2rem">${t.hero}</p>
-        ${raw(t.sections.map((s, i) => `
+        ${raw(autoLink(t.sections.map((s, i) => `
           <div class="reveal reveal-d${i % 3}">
             <h2>${s.q}</h2>
             <div class="answer">${s.a}</div>
             ${s.body ? `<p>${s.body}</p>` : ''}
-          </div>`).join(''))}
+          </div>`).join(''), 12))}
 
         ${t.procedures ? raw(`
           <h2 class="reveal">세부 시술</h2>

@@ -5,6 +5,7 @@ import { getTreatment } from '../data/treatments'
 import { getDoctor } from '../data/doctors'
 import { breadcrumbSchema, articleSchema } from '../lib/schema'
 import type { CaseItem, Column, Notice } from '../data/types'
+import { autoLink } from '../lib/inlink'
 
 const fmt = (iso: string) => (iso || '').slice(0, 10).replace(/-/g, '.')
 
@@ -155,7 +156,7 @@ export function CaseDetailPage(cs: CaseItem, isMember = false) {
           ${raw(pair('파노라마', cs.images.panoBefore, cs.images.panoAfter))}
           <div class="prose" data-reveal>
             <h2>치료 이야기</h2>
-            ${raw(cs.description.split('\n').filter(Boolean).map((p) => `<p>${p}</p>`).join(''))}
+            ${raw(autoLink(cs.description.split('\n').filter(Boolean).map((p) => `<p>${p}</p>`).join(''), 8))}
           </div>
           <p class="muted" style="font-size:.78rem;margin-top:2.5rem;line-height:1.8">
             ※ 동일 환자·동일 부위의 치료 전후 사진이며, 환자 동의하에 게시되었습니다. 치료 결과는 개인에 따라 다를 수 있으며 부작용이 발생할 수 있습니다.
@@ -256,7 +257,7 @@ export function ColumnDetailPage(col: Column) {
       <div class="detail-grid">
         <article class="prose" data-reveal>
           ${raw(col.thumbnail ? `<img src="${col.thumbnail}" alt="${col.title}" style="width:100%;border-radius:4px;margin-bottom:2.5rem">` : '')}
-          ${raw(col.contentHtml)}
+          ${raw(autoLink(col.contentHtml, 10))}
           ${raw(doc ? `
           <div style="border-top:1px solid var(--line);margin-top:3.5rem;padding-top:2rem">
             <p class="muted" style="font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.6rem">Written &amp; Reviewed by</p>
