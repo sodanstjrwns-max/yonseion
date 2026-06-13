@@ -8,10 +8,11 @@ import { Store, newId, slugify } from '../lib/store'
 import {
   getSession, setSessionCookie, clearSession, sessionSecret, adminPassword,
 } from '../lib/auth'
-import type { CaseItem, Column, Notice, Reservation } from '../data/types'
+import type { CaseItem, Column, Notice, Reservation, User } from '../data/types'
 import { treatments } from '../data/treatments'
 import { doctors } from '../data/doctors'
 import { clinic } from '../data/clinic'
+import { regionList } from '../data/regions'
 
 export const admin = new Hono<{ Bindings: Bindings }>()
 
@@ -20,6 +21,7 @@ function shell(title: string, body: string, active = '') {
   const nav = [
     ['/admin', '대시보드', 'gauge'],
     ['/admin/reservations', '예약 관리', 'calendar-check'],
+    ['/admin/members', '회원 관리', 'users'],
     ['/admin/cases', '케이스', 'images'],
     ['/admin/columns', '칼럼', 'pen-nib'],
     ['/admin/notices', '공지', 'bullhorn'],
@@ -129,11 +131,12 @@ admin.get('/logout', (c) => {
 // ---------- 대시보드 ----------
 admin.get('/', async (c) => {
   const store = new Store(c.env.R2)
-  const [rsvIdx, caseIdx, colIdx, ntcIdx] = await Promise.all([
+  const [rsvIdx, caseIdx, colIdx, ntcIdx, userIdx] = await Promise.all([
     store.index<{ id: string }>('reservations'),
     store.index<{ id: string }>('cases'),
     store.index<{ id: string }>('columns'),
     store.index<{ id: string }>('notices'),
+    store.index<{ email: string }>('users'),
   ])
   let newCount = 0
   try {
@@ -145,6 +148,7 @@ admin.get('/', async (c) => {
   <h1>대시보드</h1>
   <div class="cards">
     <div class="stat"><div class="n">${rsvIdx.length}</div><div class="l">누적 예약 신청${newCount ? ` · 신규 ${newCount}건` : ''}</div></div>
+    <div class="stat"><div class="n">${userIdx.length}</div><div class="l">회원</div></div>
     <div class="stat"><div class="n">${caseIdx.length}</div><div class="l">케이스</div></div>
     <div class="stat"><div class="n">${colIdx.length}</div><div class="l">칼럼</div></div>
     <div class="stat"><div class="n">${ntcIdx.length}</div><div class="l">공지</div></div>
@@ -217,6 +221,58 @@ admin.post('/reservations/:id/status', async (c) => {
   return c.redirect('/admin/reservations')
 })
 
+// ---------- 회원 관리 ----------
+admin.get('/members', async (c) => {
+  const store = new Store(c.env.R2)
+  const idx = await store.index<{ email: string; name?: string; phone?: string; agreeMarketing?: boolean; createdAt?: string }>('users')
+  const body = `
+  <h1>회원 관리 <small class="muted" style="font-weight:400;font-size:.9rem">총 ${idx.length}명</small></h1>
+  ${idx.length ? `
+  <table>
+    <thead><tr><th>가입일</th><th>이름</th><th>이메일</th><th>휴대전화</th><th>마케팅 동의</th><th></th></tr></thead>
+    <tbody>
+    ${idx.map((u) => `
+      <tr>
+        <td class="muted">${(u.createdAt || '').slice(0, 10)}</td>
+        <td><strong>${u.name || '-'}</strong></td>
+        <td>${u.email}</td>
+        <td>${u.phone ? `<a href="tel:${u.phone}">${u.phone}</a>` : '-'}</td>
+        <td>${u.agreeMarketing ? '<span class="badge confirmed">동의</span>' : '<span class="badge">미동의</span>'}</td>
+        <td><form method="POST" action="/admin/members/delete" style="display:inline" onsubmit="return confirm('회원을 삭제(탈퇴 처리)할까요?')">
+          <input type="hidden" name="email" value="${u.email}"><button class="btn sm danger">삭제</button></form></td>
+      </tr>`).join('')}
+    </tbody>
+  </table>
+  <p class="muted" style="margin-top:1rem">※ 마케팅 미동의 회원에게는 광고성 정보를 발송할 수 없습니다 (정보통신망법).</p>`
+    : '<div class="panel">가입한 회원이 없습니다. 사이트의 <a href="/signup" target="_blank" style="text-decoration:underline">회원가입</a> 페이지에서 가입할 수 있습니다.</div>'}`
+  return c.html(shell('회원 관리', body, '/admin/members'))
+})
+
+admin.post('/members/delete', async (c) => {
+  const f = await c.req.parseBody()
+  const email = String(f.email || '').toLowerCase()
+  if (email) {
+    const store = new Store(c.env.R2)
+    await store.delete(`users/${encodeURIComponent(email)}.json`)
+    await store.setIndex('users', (await store.index<any>('users')).filter((x: any) => x.email !== email))
+  }
+  return c.redirect('/admin/members')
+})
+
+// ---------- 조회수 헬퍼 (D1 집계 — 봇 제외) ----------
+async function viewCounts(c: any, type: string, ids: string[]): Promise<Record<string, number>> {
+  const out: Record<string, number> = {}
+  if (!ids.length) return out
+  try {
+    const placeholders = ids.map(() => '?').join(',')
+    const rows = await c.env.DB.prepare(
+      `SELECT content_id, COUNT(*) AS n FROM page_views WHERE content_type = ? AND is_bot = 0 AND content_id IN (${placeholders}) GROUP BY content_id`
+    ).bind(type, ...ids).all()
+    for (const r of (rows?.results || []) as any[]) out[r.content_id] = r.n
+  } catch { /* D1 미연결 폴백 */ }
+  return out
+}
+
 // ---------- 이미지 업로드 (공용) ----------
 admin.post('/upload', async (c) => {
   const form = await c.req.parseBody()
@@ -246,6 +302,36 @@ async function upload(input, targetId) {
     if (note) note.textContent = '✓ 업로드 완료: ' + data.url;
   } else if (note) note.textContent = '실패: ' + (data.error || '');
 }
+// --- 드래그앤드롭 이미지 삽입 (textarea[data-dropzone]) ---
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('textarea[data-dropzone]').forEach(function (ta) {
+    ['dragenter','dragover'].forEach(function (ev) {
+      ta.addEventListener(ev, function (e) { e.preventDefault(); ta.style.outline = '2px dashed #AE8A4C'; });
+    });
+    ['dragleave','drop'].forEach(function (ev) {
+      ta.addEventListener(ev, function (e) { e.preventDefault(); ta.style.outline = ''; });
+    });
+    ta.addEventListener('drop', async function (e) {
+      var files = e.dataTransfer && e.dataTransfer.files;
+      if (!files || !files.length) return;
+      var pos = ta.selectionStart || ta.value.length;
+      for (var i = 0; i < files.length; i++) {
+        var f = files[i];
+        if (!/^image\\//.test(f.type)) continue;
+        var fd = new FormData(); fd.append('file', f);
+        var marker = '\\n<p>[이미지 업로드 중…]</p>\\n';
+        ta.value = ta.value.slice(0, pos) + marker + ta.value.slice(pos);
+        var res = await fetch('/admin/upload', { method: 'POST', body: fd });
+        var data = await res.json();
+        var tag = data.ok
+          ? '\\n<figure><img src="' + data.url + '" alt="" loading="lazy" style="width:100%;border-radius:4px"><figcaption></figcaption></figure>\\n'
+          : '\\n<!-- 업로드 실패: ' + (data.error || '') + ' -->\\n';
+        ta.value = ta.value.replace(marker, tag);
+        pos = ta.value.indexOf(tag) + tag.length;
+      }
+    });
+  });
+});
 </script>`
 
 // ============================================================================
@@ -254,10 +340,12 @@ async function upload(input, targetId) {
 admin.get('/cases', async (c) => {
   const store = new Store(c.env.R2)
   const idx = await store.index<{ id: string; title: string; createdAt: string; published: boolean }>('cases')
+  const views = await viewCounts(c, 'case', idx.map((x) => x.id))
   const body = `
   <div class="toolbar"><h1 style="margin:0">케이스 관리</h1><a class="btn" href="/admin/cases/new"><i class="fas fa-plus"></i> 새 케이스</a></div>
-  ${idx.length ? `<table><thead><tr><th>제목</th><th>등록일</th><th>상태</th><th></th></tr></thead><tbody>
+  ${idx.length ? `<table><thead><tr><th>제목</th><th>등록일</th><th>조회수</th><th>상태</th><th></th></tr></thead><tbody>
     ${idx.map((x) => `<tr><td>${x.title}</td><td class="muted">${(x.createdAt || '').slice(0, 10)}</td>
+      <td class="muted"><i class="far fa-eye" style="font-size:.75rem"></i> ${views[x.id] || 0}</td>
       <td>${x.published ? '<span class="badge confirmed">게시</span>' : '<span class="badge">비공개</span>'}</td>
       <td><a class="btn sm ghost" href="/admin/cases/${x.id}">수정</a>
       <form method="POST" action="/admin/cases/${x.id}/delete" style="display:inline" onsubmit="return confirm('삭제할까요?')"><button class="btn sm danger">삭제</button></form></td></tr>`).join('')}
@@ -284,7 +372,9 @@ function caseForm(cs?: CaseItem) {
       <div><label>진료 분류</label><select name="treatmentSlug">${txOpts}</select></div>
       <div><label>담당 원장</label><select name="doctorSlug">${docOpts}</select></div>
     </div>
-    <label>지역 라벨</label><input name="regionLabel" value="${cs?.regionLabel || ''}" placeholder="부산 동래구 온천동">
+    <label>지역 라벨 <small class="muted">(입력하면 자동완성 — 예: "온천" → 부산광역시 동래구 온천동)</small></label>
+    <input name="regionLabel" list="region-list" value="${cs?.regionLabel || ''}" placeholder="동 이름으로 검색 — 예: 온천, 장전, 명률…" autocomplete="off">
+    <datalist id="region-list">${regionList.map((r) => `<option value="${r}">`).join('')}</datalist>
     <label>상세 설명 (SEO 본문, 줄바꿈으로 문단 구분) *</label>
     <textarea name="description" required placeholder="내원 계기 → 진단 → 치료 과정 → 결과를 환자의 언어로.">${cs?.description || ''}</textarea>
     <div class="row2">
@@ -360,10 +450,12 @@ admin.post('/cases/:id/delete', async (c) => {
 admin.get('/columns', async (c) => {
   const store = new Store(c.env.R2)
   const idx = await store.index<{ id: string; title: string; createdAt: string; published: boolean }>('columns')
+  const views = await viewCounts(c, 'column', idx.map((x) => x.id))
   const body = `
   <div class="toolbar"><h1 style="margin:0">칼럼 관리</h1><a class="btn" href="/admin/columns/new"><i class="fas fa-plus"></i> 새 칼럼</a></div>
-  ${idx.length ? `<table><thead><tr><th>제목</th><th>작성일</th><th>상태</th><th></th></tr></thead><tbody>
+  ${idx.length ? `<table><thead><tr><th>제목</th><th>작성일</th><th>조회수</th><th>상태</th><th></th></tr></thead><tbody>
     ${idx.map((x) => `<tr><td>${x.title}</td><td class="muted">${(x.createdAt || '').slice(0, 10)}</td>
+      <td class="muted"><i class="far fa-eye" style="font-size:.75rem"></i> ${views[x.id] || 0}</td>
       <td>${x.published ? '<span class="badge confirmed">게시</span>' : '<span class="badge">비공개</span>'}</td>
       <td><a class="btn sm ghost" href="/admin/columns/${x.id}">수정</a>
       <form method="POST" action="/admin/columns/${x.id}/delete" style="display:inline" onsubmit="return confirm('삭제할까요?')"><button class="btn sm danger">삭제</button></form></td></tr>`).join('')}
@@ -378,8 +470,8 @@ function columnForm(col?: Column) {
   <form class="panel" method="POST">
     <label>제목 *</label><input name="title" required value="${col?.title || ''}">
     <label>요약 (목록·메타 설명) *</label><input name="excerpt" required value="${col?.excerpt || ''}" maxlength="160">
-    <label>본문 HTML * <small class="muted">(h2/h3/p/ul 태그 사용 — SEO 구조 유지)</small></label>
-    <textarea name="contentHtml" required style="min-height:320px;font-family:monospace;font-size:.85rem">${col?.contentHtml || '<h2>소제목</h2>\n<p>본문…</p>'}</textarea>
+    <label>본문 HTML * <small class="muted">(h2/h3/p/ul 태그 사용 — SEO 구조 유지 / 이미지 파일을 아래 입력란에 끌어다 놓으면 커서 위치에 자동 삽입)</small></label>
+    <textarea id="contentHtml" name="contentHtml" required data-dropzone style="min-height:320px;font-family:monospace;font-size:.85rem">${col?.contentHtml || '<h2>소제목</h2>\n<p>본문…</p>'}</textarea>
     <div class="row2">
       <div><label>작성 원장</label><select name="authorSlug">${docOpts}</select></div>
       <div><label>관련 진료 (다중 선택)</label><select name="relatedTreatments" multiple size="4">${txOpts}</select></div>
@@ -452,10 +544,12 @@ admin.post('/columns/:id/delete', async (c) => {
 admin.get('/notices', async (c) => {
   const store = new Store(c.env.R2)
   const idx = await store.index<{ id: string; title: string; createdAt: string; published: boolean; pinned?: boolean }>('notices')
+  const views = await viewCounts(c, 'notice', idx.map((x) => x.id))
   const body = `
   <div class="toolbar"><h1 style="margin:0">공지 관리</h1><a class="btn" href="/admin/notices/new"><i class="fas fa-plus"></i> 새 공지</a></div>
-  ${idx.length ? `<table><thead><tr><th>제목</th><th>작성일</th><th>상태</th><th></th></tr></thead><tbody>
+  ${idx.length ? `<table><thead><tr><th>제목</th><th>작성일</th><th>조회수</th><th>상태</th><th></th></tr></thead><tbody>
     ${idx.map((x) => `<tr><td>${x.pinned ? '📌 ' : ''}${x.title}</td><td class="muted">${(x.createdAt || '').slice(0, 10)}</td>
+      <td class="muted"><i class="far fa-eye" style="font-size:.75rem"></i> ${views[x.id] || 0}</td>
       <td>${x.published ? '<span class="badge confirmed">게시</span>' : '<span class="badge">비공개</span>'}</td>
       <td><a class="btn sm ghost" href="/admin/notices/${x.id}">수정</a>
       <form method="POST" action="/admin/notices/${x.id}/delete" style="display:inline" onsubmit="return confirm('삭제할까요?')"><button class="btn sm danger">삭제</button></form></td></tr>`).join('')}

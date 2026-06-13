@@ -99,6 +99,7 @@ function Header() {
     <a href="/encyclopedia">백과사전</a>
     <a href="/faq">자주 묻는 질문</a>
     <a href="/directions">오시는 길</a>
+    <a href="/login" style="font-size:.88rem;opacity:.8">로그인 / 회원가입</a>
     <a href="/reservation" class="link-arrow">예약 상담 →</a>
   </div>
   `
@@ -140,6 +141,8 @@ function Footer() {
           <a href="/faq">자주 묻는 질문</a>
           <a href="/notice">공지사항</a>
           <a href="/reservation">예약 상담</a>
+          <a href="/signup">회원가입</a>
+          <a href="/login">로그인</a>
         </div>
         <div>
           <h5>연락처</h5>

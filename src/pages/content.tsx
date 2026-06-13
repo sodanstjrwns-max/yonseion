@@ -50,7 +50,8 @@ export function CasesGalleryPage(items: CaseItem[], filter?: string) {
       <div class="cards cards--3" style="margin-top:2.5rem">
         ${list.map((cs, i) => {
           const t = getTreatment(cs.treatmentSlug)
-          const img = cs.images.intraAfter || cs.images.panoAfter || cs.images.intraBefore || cs.images.panoBefore
+          // 갤러리 카드는 비로그인에게도 노출 → 썸네일은 비포 사진만 사용 (애프터는 회원 전용)
+          const img = cs.images.intraBefore || cs.images.panoBefore
           return `
           <a href="/cases/${cs.slug}" class="card" data-reveal data-reveal-delay="${(i % 3) + 1}">
             <div class="card-img">${img
@@ -78,13 +79,40 @@ export function CasesGalleryPage(items: CaseItem[], filter?: string) {
   }, body)
 }
 
-export function CaseDetailPage(cs: CaseItem) {
+export function CaseDetailPage(cs: CaseItem, isMember = false) {
   const crumb = [{ name: '홈', url: '/' }, { name: '비포 / 애프터', url: '/cases/gallery' }, { name: cs.title, url: `/cases/${cs.slug}` }]
   const t = getTreatment(cs.treatmentSlug)
   const doc = getDoctor(cs.doctorSlug)
 
+  // 회원 전용 잠금 오버레이 (애프터 사진)
+  const lockOverlay = (label: string) => `
+    <div style="position:absolute;inset:0;display:grid;place-items:center;background:rgba(20,36,62,.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);z-index:2">
+      <div style="text-align:center;color:#fff;padding:1.5rem">
+        <i class="fas fa-lock" style="font-size:1.6rem;color:var(--gold-light);margin-bottom:.8rem;display:block"></i>
+        <p style="font-weight:600;margin-bottom:.3rem">${label} 치료 후 사진은 회원 전용입니다</p>
+        <p style="font-size:.82rem;opacity:.75;margin-bottom:1.1rem">로그인하면 전체 전후 비교를 보실 수 있습니다</p>
+        <a href="/login?back=/cases/${cs.slug}" class="btn-primary" style="font-size:.85rem;padding:.6rem 1.3rem">로그인</a>
+        <a href="/signup?back=/cases/${cs.slug}" style="display:inline-block;margin-left:.6rem;color:var(--gold-light);font-size:.85rem;text-decoration:underline">회원가입</a>
+      </div>
+    </div>`
+
   const pair = (label: string, before?: string, after?: string) => {
     if (!before && !after) return ''
+    // 비회원: 애프터 사진 잠금 — 비포만 표시 + 잠금 안내
+    if (after && !isMember) {
+      return `
+      <div data-reveal style="margin-bottom:3rem">
+        <h3 style="font-family:var(--serif-kr);font-size:1.2rem;margin-bottom:1rem">${label}</h3>
+        <div style="position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:4px;background:var(--paper-2)">
+          ${before
+            ? `<img src="${before}" alt="${label} 치료 전" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+               <span style="position:absolute;left:1rem;top:1rem;background:rgba(0,0,0,.55);color:#fff;font-size:.7rem;letter-spacing:.14em;padding:.3rem .7rem;border-radius:2px;z-index:3">BEFORE</span>`
+            : ''}
+          ${lockOverlay(label)}
+        </div>
+        <p class="muted" style="font-size:.78rem;margin-top:.6rem">치료 후 사진은 회원 로그인 후 열람하실 수 있습니다.</p>
+      </div>`
+    }
     if (before && after) {
       return `
       <div data-reveal style="margin-bottom:3rem">

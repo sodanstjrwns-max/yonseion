@@ -26,11 +26,14 @@ import { AreaIndexPage, AreaPage } from './pages/area'
 // 라우트 모듈
 import { api } from './routes/api'
 import { admin } from './routes/admin'
+import { member } from './routes/member'
+import { getSession, sessionSecret } from './lib/auth'
 
 const app = new Hono<{ Bindings: Bindings }>()
 
 app.route('/api', api)
 app.route('/admin', admin)
+app.route('/', member)   // /signup /login /logout
 
 // --- 정적·콘텐츠 페이지 ---
 app.get('/', (c) => c.html(HomePage()))
@@ -93,7 +96,9 @@ app.get('/cases/:slug', async (c) => {
   if (!hit) return c.notFound()
   const cs = await store.getJSON<CaseItem>(`cases/${hit.id}.json`)
   if (!cs || !cs.published) return c.notFound()
-  return c.html(CaseDetailPage(cs))
+  // 애프터 사진은 회원 전용 (의료광고 가이드라인 + 회원 전환 퍼널)
+  const sess = await getSession(c, sessionSecret(c.env), 'member')
+  return c.html(CaseDetailPage(cs, !!sess))
 })
 
 // --- 칼럼 (R2 동적) ---
@@ -176,7 +181,46 @@ Allow: /
 Disallow: /admin
 Disallow: /api
 
+# AI 크롤러 허용 (AEO)
+User-agent: GPTBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+
 Sitemap: ${clinic.domain}/sitemap.xml
+`)
+})
+
+// --- llms.txt (AEO — LLM 친화 사이트 안내) ---
+app.get('/llms.txt', (c) => {
+  const base = clinic.domain
+  return c.text(`# ${clinic.nameKo} (Yeonseon On Dental Clinic)
+
+> 부산 동래구 온천동의 생체모방치의학 중심 치과. 자연치아를 닮은 보존적 치료(접착수복·심미보철)와 All-on-X 전체임플란트를 진료합니다. 김경희 대표원장 — 통합치의학과·치과보철과 더블보더 전문의.
+
+주소: ${clinic.address}
+전화: ${clinic.phone}
+
+## 핵심 페이지
+- [병원 미션](${base}/mission): '온(On)' 브랜드 철학 — 따뜻함·켜다·전부
+- [생체모방치의학](${base}/biomimetic): 치료 철학 상세
+- [진료 안내](${base}/treatments): 심미보철 / All-on-X / 접착수복 외
+- [의료진](${base}/doctors): 약력·전문 분야
+- [자주 묻는 질문](${base}/faq): 진료별 FAQ 전체
+- [치과 백과사전](${base}/encyclopedia): 치과 용어 사전 (AEO 직답형)
+- [비급여 수가](${base}/pricing)
+- [오시는 길](${base}/directions)
+
+## 콘텐츠
+- [원장 칼럼](${base}/column)
+- [치료 케이스](${base}/cases/gallery)
+- [지역 안내](${base}/area): 지역별 진료 안내 페이지
+
+전체 URL 목록: ${base}/sitemap.xml
 `)
 })
 
