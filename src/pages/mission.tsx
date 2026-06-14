@@ -25,7 +25,7 @@ export function MissionPage() {
   <section class="section">
     <div class="container" style="max-width:840px;text-align:center">
       <p class="eyebrow reveal">Slogan</p>
-      <h2 class="font-serif reveal reveal-d1" style="font-size:clamp(2rem,5vw,3.6rem);color:var(--navy);font-style:italic;line-height:1.3;margin-top:1rem">
+      <h2 class="font-serif reveal reveal-d1" style="font-size:clamp(2rem,5vw,3.6rem);color:var(--navy);line-height:1.3;margin-top:1rem">
         "미소의 젊음을 켜는 치과<span class="text-gold">."</span>
       </h2>
       <p class="lead reveal reveal-d2" style="margin-top:2rem">
@@ -46,7 +46,7 @@ export function MissionPage() {
       <div class="grid grid-3">
         ${raw(clinic.brandStory.meanings.map((m, idx) => `
           <div class="card reveal reveal-d${idx + 1}" style="text-align:center">
-            <p class="fraunces" style="font-size:2.6rem;color:var(--gold);font-style:italic">온</p>
+            <p class="fraunces" style="font-size:2.6rem;color:var(--gold)">온</p>
             <h3 style="margin-top:.6rem">${m.key}</h3>
             <p style="margin-top:.8rem">${m.desc}</p>
           </div>`).join(''))}
@@ -85,7 +85,7 @@ export function MissionPage() {
     <div data-parallax="0.06" style="position:absolute;left:-6%;bottom:-10%;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(197,165,114,.12),transparent 70%)"></div>
     <div class="container" style="max-width:860px;position:relative">
       <p class="eyebrow reveal" style="color:var(--gold-light);text-align:center">Director's Message</p>
-      <blockquote class="font-serif reveal reveal-d1" style="font-size:clamp(1.4rem,3vw,2.2rem);color:#fff;text-align:center;line-height:1.6;margin-top:1.5rem;font-style:italic">
+      <blockquote class="font-serif reveal reveal-d1" style="font-size:clamp(1.4rem,3vw,2.2rem);color:#fff;text-align:center;line-height:1.6;margin-top:1.5rem">
         "제가 생각하는 좋은 치과는,<br>
         <span class="text-gold">환자분들께서 지금보다 더 나은 삶을 영위할 수 있도록 돕는 곳입니다.</span><br>
         한 단계 업그레이드된 삶의 시작을 연세온치과에서 함께하시길 바랍니다."

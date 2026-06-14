@@ -78,6 +78,10 @@ h1, h2, h3, h4, h5 { font-weight: 600; line-height: 1.1; color: var(--ink); lett
 /* 영문 전용 클래스 (eyebrow 등은 sans 유지) */
 .fraunces { font-family: var(--serif); font-optical-sizing: auto; }
 
+/* 기울임(italic/oblique) 효과 전면 비활성화 — 정자체 강제 */
+*, *::before, *::after { font-style: normal !important; }
+em, i, cite, address, var, dfn { font-style: normal; }
+
 /* ---------- 2. Layout primitives ---------- */
 .container { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gutter); }
 .section { padding-block: clamp(6rem, 14vw, 13rem); }   /* 거대한 세로 여백 */
@@ -662,7 +666,7 @@ h1, h2, h3, h4, h5 { font-weight: 600; line-height: 1.1; color: var(--ink); lett
 .marquee-track { display: inline-flex; align-items: center; gap: 2.4rem; white-space: nowrap; animation: mqScroll 36s linear infinite; will-change: transform; }
 .marquee:hover .marquee-track { animation-play-state: paused; }
 @keyframes mqScroll { to { transform: translateX(-50%); } }
-.mq-item { font-family: var(--serif); font-size: .95rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); font-style: italic; }
+.mq-item { font-family: var(--serif); font-size: .95rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
 .mq-item:nth-child(4n+1) { color: var(--gold-2); }
 .mq-dot { font-size: .5rem; color: var(--gold); }
 
