@@ -6,9 +6,10 @@
 - **Tagline**: 인지(SEO/AEO) → 신뢰(콘텐츠·의료진·케이스) → 전환(예약 상담) 퍼널 구조
 
 ## URLs
+- **Production**: https://yeonseon-dental.pages.dev ✅ 배포 완료 (원장님 Cloudflare 계정)
 - **Sandbox Dev**: https://3000-innan00lwvne2dmwc9mql-0e616f0a.sandbox.novita.ai
-- **Production**: (Cloudflare Pages 배포 시 갱신)
-- **Admin**: `/admin` (기본 비밀번호 `yeonseon2026!` — 배포 시 `ADMIN_PASSWORD` secret 으로 교체 필수)
+- **Admin**: `/admin` (비밀번호 = `ADMIN_PASSWORD` secret 으로 설정됨 — 기본값 무력화 완료)
+- **Custom Domain**: `ysondent.com` 연결 예정 (DNS 이관 후 `wrangler pages domain add`)
 
 ## 완성된 기능
 ### 공개 페이지 (66 URL, sitemap 자동 생성)
@@ -67,7 +68,13 @@ curl http://localhost:3000
 3. `og:image:width/height/alt`, geo.region/position·ICBM·author·format-detection 메타 보강 (로컬 SEO)
 
 ## Deployment
-- **Platform**: Cloudflare Pages (project: `yeonseon-dental`)
+- **Platform**: Cloudflare Pages (project: `yeonseon-dental`, 계정: sodanstjrwns@gmail.com)
 - **Tech Stack**: Hono + TypeScript + Vite + R2 + D1 / 프론트: 순수 CSS 디자인시스템 + Lenis
-- **Status**: ✅ 샌드박스 가동 중 / 프로덕션 미배포
+- **Status**: ✅ **프로덕션 배포 완료** — https://yeonseon-dental.pages.dev
+- **리소스**:
+  - D1: `yeonseon-dental-production` (id `51924b34-d150-4acc-a947-d269e1d0d889`) — 마이그레이션 적용 완료
+  - R2: `yeonseon-dental-bucket` — 예약·콘텐츠·이미지 저장
+  - Secrets: `ADMIN_PASSWORD`, `SESSION_SECRET` 설정 완료 (암호화)
+- **검증**: 홈/진료/예약/sitemap 200, 예약 API(R2 저장) 작동, 관리자 로그인 보안 확인
+- **다음**: ① GitHub 연동 자동배포 ② `ysondent.com` 커스텀 도메인 ③ 실데이터(사업자번호·수가·사진)
 - **Last Updated**: 2026-06-14
