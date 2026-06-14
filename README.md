@@ -59,8 +59,15 @@ curl http://localhost:3000
 ```
 ※ 참고: 글로벌 wrangler 바이너리 호환성 문제로 `--d1=` CLI 플래그 대신 `wrangler.jsonc` 바인딩을 사용. 로컬 D1 스키마는 `npx wrangler d1 migrations apply yeonseon-dental-production --local` 적용.
 
+## SEO/AEO 점검 결과 (2026-06-14)
+✅ **충족**: 캐노니컬·OG·Twitter Card 전 페이지 / JSON-LD 풀스택(Dentist·LocalBusiness·Person·MedicalProcedure·FAQPage·Breadcrumb·Article·City·WebSite·Speakable) / H1 1개 규칙 / 이미지 alt 100% / robots+sitemap / 파비콘·OG이미지 / FAQ 100문항(진료당 20) / 백과사전 509용어 / 자동 인링크 / 회원·예약·케이스 퍼널
+🔧 **이번 개선**:
+1. sitemap `lastmod`(YYYY-MM-DD)·`changefreq` 추가 — 동적 콘텐츠는 실제 작성/수정일 반영
+2. 폰트 `preload`(Pretendard·app.css) + preconnect crossorigin + FontAwesome 비동기 로드 → LCP/렌더차단 개선
+3. `og:image:width/height/alt`, geo.region/position·ICBM·author·format-detection 메타 보강 (로컬 SEO)
+
 ## Deployment
 - **Platform**: Cloudflare Pages (project: `yeonseon-dental`)
 - **Tech Stack**: Hono + TypeScript + Vite + R2 + D1 / 프론트: 순수 CSS 디자인시스템 + Lenis
 - **Status**: ✅ 샌드박스 가동 중 / 프로덕션 미배포
-- **Last Updated**: 2026-06-12
+- **Last Updated**: 2026-06-14

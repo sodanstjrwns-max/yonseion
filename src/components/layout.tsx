@@ -194,19 +194,35 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
   <meta property="og:description" content="${meta.description}">
   <meta property="og:url" content="${canonical}">
   <meta property="og:image" content="${ogImage}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="${clinic.nameKo} — ${clinic.tagline}">
   <meta property="og:locale" content="ko_KR">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${meta.title}">
   <meta name="twitter:description" content="${meta.description}">
   <meta name="twitter:image" content="${ogImage}">
 
-  <!-- Fonts -->
+  <!-- 지역(Local) 시그널 — 네이버/구글 로컬 SEO 보조 -->
+  <meta name="geo.region" content="KR-26">
+  <meta name="geo.placename" content="${clinic.addressLocality}">
+  <meta name="geo.position" content="${clinic.geo.lat};${clinic.geo.lng}">
+  <meta name="ICBM" content="${clinic.geo.lat}, ${clinic.geo.lng}">
+  <meta name="author" content="${clinic.nameKo}">
+  <meta name="format-detection" content="telephone=yes">
+
+  <!-- Fonts — preconnect(crossorigin) + 본문 우선 폰트 preload 로 LCP 단축 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&display=swap">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+  <link rel="preload" as="style" href="/static/css/app.css">
   <link rel="stylesheet" href="/static/css/app.css">
+  <!-- FontAwesome 는 아이콘 전용 — 본문 렌더링 차단 방지 위해 비동기 로드 -->
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"></noscript>
 
   <link rel="icon" type="image/svg+xml" href="/static/img/favicon.svg">
   <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">

@@ -145,33 +145,38 @@ app.get('/notice/:id', async (c) => {
 // --- sitemap.xml (정적 + 동적 콘텐츠 포함) ---
 app.get('/sitemap.xml', async (c) => {
   const base = clinic.domain
-  const staticPaths = [
-    '/', '/mission', '/biomimetic', '/treatments', '/doctors',
-    '/reservation', '/faq', '/pricing', '/directions',
-    '/cases/gallery', '/column', '/notice', '/video', '/encyclopedia', '/area',
+  const today = new Date().toISOString().slice(0, 10)   // YYYY-MM-DD (lastmod)
+  type U = { loc: string; priority: string; changefreq: string; lastmod: string }
+  const staticPaths: { p: string; cf: string }[] = [
+    { p: '/', cf: 'weekly' }, { p: '/mission', cf: 'monthly' }, { p: '/biomimetic', cf: 'monthly' },
+    { p: '/treatments', cf: 'monthly' }, { p: '/doctors', cf: 'monthly' },
+    { p: '/reservation', cf: 'yearly' }, { p: '/faq', cf: 'monthly' }, { p: '/pricing', cf: 'monthly' },
+    { p: '/directions', cf: 'yearly' }, { p: '/cases/gallery', cf: 'weekly' }, { p: '/column', cf: 'weekly' },
+    { p: '/notice', cf: 'weekly' }, { p: '/video', cf: 'monthly' }, { p: '/encyclopedia', cf: 'monthly' }, { p: '/area', cf: 'monthly' },
   ]
-  const urls: { loc: string; priority: string }[] = [
-    ...staticPaths.map((p) => ({ loc: base + p, priority: p === '/' ? '1.0' : '0.8' })),
-    ...treatments.map((t) => ({ loc: `${base}/treatments/${t.slug}`, priority: t.category === 'core' ? '0.9' : '0.7' })),
-    ...doctors.map((d) => ({ loc: `${base}/doctors/${d.slug}`, priority: '0.8' })),
-    ...encyclopedia.map((e) => ({ loc: `${base}/encyclopedia/${e.slug}`, priority: '0.6' })),
-    ...glossary.map((e) => ({ loc: `${base}/encyclopedia/${e.slug}`, priority: '0.5' })),
-    ...areaCombos().map((a) => ({ loc: `${base}/area/${a.slug}`, priority: '0.6' })),
+  const urls: U[] = [
+    ...staticPaths.map((s) => ({ loc: base + s.p, priority: s.p === '/' ? '1.0' : '0.8', changefreq: s.cf, lastmod: today })),
+    ...treatments.map((t) => ({ loc: `${base}/treatments/${t.slug}`, priority: t.category === 'core' ? '0.9' : '0.7', changefreq: 'monthly', lastmod: today })),
+    ...doctors.map((d) => ({ loc: `${base}/doctors/${d.slug}`, priority: '0.8', changefreq: 'monthly', lastmod: today })),
+    ...encyclopedia.map((e) => ({ loc: `${base}/encyclopedia/${e.slug}`, priority: '0.6', changefreq: 'monthly', lastmod: today })),
+    ...glossary.map((e) => ({ loc: `${base}/encyclopedia/${e.slug}`, priority: '0.5', changefreq: 'yearly', lastmod: today })),
+    ...areaCombos().map((a) => ({ loc: `${base}/area/${a.slug}`, priority: '0.6', changefreq: 'monthly', lastmod: today })),
   ]
-  // 동적 콘텐츠
+  // 동적 콘텐츠 — 실제 작성/수정일을 lastmod 로 사용
   try {
     const store = new Store(c.env.R2)
     const [cases, cols] = await Promise.all([
-      store.index<{ slug: string; published: boolean }>('cases'),
-      store.index<{ slug: string; published: boolean }>('columns'),
+      store.index<{ slug: string; published: boolean; createdAt?: string; updatedAt?: string }>('cases'),
+      store.index<{ slug: string; published: boolean; createdAt?: string; updatedAt?: string }>('columns'),
     ])
-    cases.filter((x) => x.published).forEach((x) => urls.push({ loc: `${base}/cases/${x.slug}`, priority: '0.7' }))
-    cols.filter((x) => x.published).forEach((x) => urls.push({ loc: `${base}/column/${x.slug}`, priority: '0.7' }))
+    const lm = (x: { updatedAt?: string; createdAt?: string }) => (x.updatedAt || x.createdAt || today).slice(0, 10)
+    cases.filter((x) => x.published).forEach((x) => urls.push({ loc: `${base}/cases/${x.slug}`, priority: '0.7', changefreq: 'monthly', lastmod: lm(x) }))
+    cols.filter((x) => x.published).forEach((x) => urls.push({ loc: `${base}/column/${x.slug}`, priority: '0.7', changefreq: 'monthly', lastmod: lm(x) }))
   } catch { /* noop */ }
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map((u) => `  <url><loc>${u.loc}</loc><priority>${u.priority}</priority></url>`).join('\n')}
+${urls.map((u) => `  <url><loc>${u.loc}</loc><lastmod>${u.lastmod}</lastmod><changefreq>${u.changefreq}</changefreq><priority>${u.priority}</priority></url>`).join('\n')}
 </urlset>`
   return c.text(xml, 200, { 'Content-Type': 'application/xml; charset=utf-8' })
 })
