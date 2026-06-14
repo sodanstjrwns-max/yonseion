@@ -11,7 +11,7 @@ export const clinic = {
   nameShort: '연세온치과',
   tagline: '미소의 젊음을 켜는 치과',
   mission: '자연치아를 닮은 생체모방치의학으로, 환자의 미소에 젊음을 더한다',
-  domain: 'https://www.ysondent.com', // 기존 도메인 그대로 연결 예정 (Cloudflare 배포 시 DNS 이관)
+  domain: 'https://yonseion.kr', // 공식 도메인 (Cloudflare Pages 연결, 가비아 등록)
 
   // --- '온(On)' 브랜드 의미 (원장님 답변 Q2 원문 기반) ---
   brandStory: {
