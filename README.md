@@ -24,10 +24,10 @@
 | 콘텐츠 | `/cases/gallery` `/cases/:slug` | 비포/애프터 (드래그 비교 슬라이더, 의료법 §56 고지) |
 | 콘텐츠 | `/column` `/column/:slug` | 원장 칼럼 (Article 스키마, 작성자 E-E-A-T) |
 | 콘텐츠 | `/notice` `/notice/:id` `/video` | 공지 · 영상 |
-| AEO | `/encyclopedia` `/encyclopedia/:slug` | 치과 백과사전 13용어 (직답형 + Speakable) |
-| 지역 SEO | `/area` `/area/:region-:treatment` | 8지역 × 4진료 = 32 랜딩 페이지 |
+| AEO | `/encyclopedia` `/encyclopedia/:slug` | 치과 백과사전 200용어 (직답형 + FAQPage·DefinedTerm·MedicalWebPage·Speakable) |
+| 지역 SEO | `/area` `/area/:region-:treatment` | **14지역 × 4진료 = 56 랜딩** (지도임베드·hasMap·MedicalBusiness/Dentist+areaServed·지역 인링크 메시) |
 | 법적 | `/privacy` `/terms` | 개인정보처리방침 · 이용약관 |
-| 시스템 | `/sitemap.xml` `/robots.txt` `404` | 동적 sitemap (R2 콘텐츠 포함) |
+| 시스템 | `/sitemap.xml`(인덱스 5분할) `/robots.txt` `/llms.txt` `/site.webmanifest` `404` | sitemap index + 5분할 / PWA manifest / AI 크롤러 허용 |
 
 ### 관리자 (`/admin` — 쿠키 세션 HMAC 서명)
 - 대시보드(통계) · 예약 관리(상태 변경: 신규→확정→완료/취소)
@@ -61,7 +61,7 @@ curl http://localhost:3000
 ※ 참고: 글로벌 wrangler 바이너리 호환성 문제로 `--d1=` CLI 플래그 대신 `wrangler.jsonc` 바인딩을 사용. 로컬 D1 스키마는 `npx wrangler d1 migrations apply yeonseon-dental-production --local` 적용.
 
 ## SEO/AEO 점검 결과 (2026-06-14)
-✅ **충족**: 캐노니컬·OG·Twitter Card 전 페이지 / JSON-LD 풀스택(Dentist·LocalBusiness·Person·MedicalProcedure·FAQPage·Breadcrumb·Article·City·WebSite·Speakable) / H1 1개 규칙 / 이미지 alt 100% / robots+sitemap / 파비콘·OG이미지 / FAQ 100문항(진료당 20) / 백과사전 509용어 / 자동 인링크 / 회원·예약·케이스 퍼널
+✅ **충족**: 캐노니컬·OG·Twitter Card 전 페이지 / JSON-LD 풀스택(Dentist·LocalBusiness·Person·MedicalProcedure·FAQPage·Breadcrumb·Article·City·WebSite·Speakable·DefinedTerm·MedicalWebPage·areaServed·hasMap) / H1 1개 규칙 / 이미지 alt 100% / robots+sitemap / 파비콘·OG이미지 / FAQ 100문항(진료당 20) / 백과사전 200용어 / 자동 인링크 / 회원·예약·케이스 퍼널
 🔧 **이번 개선**:
 1. sitemap `lastmod`(YYYY-MM-DD)·`changefreq` 추가 — 동적 콘텐츠는 실제 작성/수정일 반영
 2. 폰트 `preload`(Pretendard·app.css) + preconnect crossorigin + FontAwesome 비동기 로드 → LCP/렌더차단 개선
