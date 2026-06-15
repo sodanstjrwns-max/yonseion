@@ -144,6 +144,51 @@ export function websiteSchema() {
   }
 }
 
+// --- DefinedTerm (백과사전 용어) ---
+export function definedTermSchema(opts: {
+  term: string; termEn: string; description: string; slug: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'DefinedTerm',
+    '@id': BASE + '/encyclopedia/' + opts.slug + '#term',
+    name: opts.term,
+    alternateName: opts.termEn,
+    description: opts.description,
+    url: BASE + '/encyclopedia/' + opts.slug,
+    inDefinedTermSet: {
+      '@type': 'DefinedTermSet',
+      '@id': BASE + '/encyclopedia/#termset',
+      name: clinic.nameKo + ' 치과 백과사전',
+      url: BASE + '/encyclopedia',
+    },
+  }
+}
+
+// --- MedicalWebPage (의료 콘텐츠 페이지 — E-E-A-T: 전문의 감수) ---
+export function medicalWebPageSchema(opts: {
+  title: string; description: string; path: string;
+  reviewerName?: string; reviewerSlug?: string; lastReviewed?: string;
+}) {
+  const today = new Date().toISOString().slice(0, 10)
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'MedicalWebPage',
+    '@id': BASE + opts.path + '#webpage',
+    name: opts.title,
+    description: opts.description,
+    url: BASE + opts.path,
+    inLanguage: 'ko',
+    isPartOf: { '@id': BASE + '/#website' },
+    about: { '@type': 'MedicalEntity' },
+    lastReviewed: opts.lastReviewed || today,
+    reviewedBy: opts.reviewerName
+      ? { '@type': 'Person', name: opts.reviewerName, url: opts.reviewerSlug ? BASE + '/doctors/' + opts.reviewerSlug : undefined, worksFor: { '@id': BASE + '/#clinic' } }
+      : { '@id': BASE + '/#clinic' },
+    publisher: { '@id': BASE + '/#clinic' },
+  }
+}
+
 // --- Speakable ---
 export function speakableSchema(cssSelectors: string[]) {
   return {

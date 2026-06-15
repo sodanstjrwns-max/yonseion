@@ -226,6 +226,10 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
 
   <link rel="icon" type="image/svg+xml" href="/static/img/favicon.svg">
   <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="${clinic.nameKo}">
 
   ${raw(jsonLdArr.map((j) => `<script type="application/ld+json">${JSON.stringify(j)}</script>`).join('\n'))}
 </head>

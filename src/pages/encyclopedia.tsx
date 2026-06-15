@@ -4,7 +4,7 @@ import { clinic } from '../data/clinic'
 import { encyclopedia, getEntry, encycloCategories } from '../data/encyclopedia'
 import { glossary, GlossaryEntry } from '../data/glossary'
 import { getTreatment } from '../data/treatments'
-import { breadcrumbSchema, speakableSchema } from '../lib/schema'
+import { breadcrumbSchema, speakableSchema, faqSchema, definedTermSchema, medicalWebPageSchema } from '../lib/schema'
 
 // ============================================================================
 // 치과 백과사전 — AEO 직답형 정적 콘텐츠 허브
@@ -150,6 +150,11 @@ export function EncyclopediaDetail(slug: string) {
   const related = entry.relatedTreatments.map((s) => getTreatment(s)).filter(Boolean)
   const others = encyclopedia.filter((e) => e.category === entry.category && e.slug !== entry.slug)
 
+  // AEO 스키마: 본문 Q&A → FAQPage / 용어 → DefinedTerm / 의료감수 → MedicalWebPage
+  const faqEntries = entry.body
+    .filter((b) => /[?？]\s*$/.test(b.h.trim()))
+    .map((b) => ({ q: b.h, a: b.p }))
+
   const body = html`
   <section class="page-hero">
     <div class="container">
@@ -192,7 +197,19 @@ export function EncyclopediaDetail(slug: string) {
     title: `${entry.term}이란? | 치과 백과사전 | ${clinic.nameKo}`,
     description: entry.oneLiner,
     path: `/encyclopedia/${entry.slug}`,
-    jsonLd: [breadcrumbSchema(crumb), speakableSchema(['#encyclo-answer'])],
+    jsonLd: [
+      breadcrumbSchema(crumb),
+      definedTermSchema({ term: entry.term, termEn: entry.termEn, description: entry.oneLiner, slug: entry.slug }),
+      medicalWebPageSchema({
+        title: `${entry.term}이란?`,
+        description: entry.oneLiner,
+        path: `/encyclopedia/${entry.slug}`,
+        reviewerName: '김경희',
+        reviewerSlug: 'kim-kyunghee',
+      }),
+      ...(faqEntries.length ? [faqSchema(faqEntries)] : []),
+      speakableSchema(['#encyclo-answer']),
+    ],
   }, body)
 }
 
@@ -264,6 +281,17 @@ export function GlossaryDetail(slug: string) {
     title: `${entry.term}(${entry.termEn})이란? | 치과 백과사전 | ${clinic.nameKo}`,
     description: entry.def,
     path: `/encyclopedia/${entry.slug}`,
-    jsonLd: [breadcrumbSchema(crumb), termSchema, speakableSchema(['#encyclo-answer'])],
+    jsonLd: [
+      breadcrumbSchema(crumb),
+      termSchema,
+      medicalWebPageSchema({
+        title: `${entry.term}(${entry.termEn})이란?`,
+        description: entry.def,
+        path: `/encyclopedia/${entry.slug}`,
+        reviewerName: '김경희',
+        reviewerSlug: 'kim-kyunghee',
+      }),
+      speakableSchema(['#encyclo-answer']),
+    ],
   }, body)
 }

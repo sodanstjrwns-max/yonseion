@@ -142,11 +142,31 @@ app.get('/notice/:id', async (c) => {
   return c.html(NoticeDetailPage(n))
 })
 
-// --- sitemap.xml (정적 + 동적 콘텐츠 포함) ---
-app.get('/sitemap.xml', async (c) => {
+// ============================================================================
+// Sitemap — index + 콘텐츠별 분할 (대형 사이트 신호 / 크롤 효율↑)
+// ============================================================================
+type SmUrl = { loc: string; priority: string; changefreq: string; lastmod: string }
+const smXml = (urls: SmUrl[]) => `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.map((u) => `  <url><loc>${u.loc}</loc><lastmod>${u.lastmod}</lastmod><changefreq>${u.changefreq}</changefreq><priority>${u.priority}</priority></url>`).join('\n')}
+</urlset>`
+
+// --- sitemap.xml (인덱스) ---
+app.get('/sitemap.xml', (c) => {
   const base = clinic.domain
-  const today = new Date().toISOString().slice(0, 10)   // YYYY-MM-DD (lastmod)
-  type U = { loc: string; priority: string; changefreq: string; lastmod: string }
+  const today = new Date().toISOString().slice(0, 10)
+  const maps = ['sitemap-pages.xml', 'sitemap-treatments.xml', 'sitemap-encyclopedia.xml', 'sitemap-area.xml', 'sitemap-content.xml']
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${maps.map((m) => `  <sitemap><loc>${base}/${m}</loc><lastmod>${today}</lastmod></sitemap>`).join('\n')}
+</sitemapindex>`
+  return c.text(xml, 200, { 'Content-Type': 'application/xml; charset=utf-8' })
+})
+
+// --- sitemap-pages.xml (정적 페이지) ---
+app.get('/sitemap-pages.xml', (c) => {
+  const base = clinic.domain
+  const today = new Date().toISOString().slice(0, 10)
   const staticPaths: { p: string; cf: string }[] = [
     { p: '/', cf: 'weekly' }, { p: '/mission', cf: 'monthly' }, { p: '/biomimetic', cf: 'monthly' },
     { p: '/treatments', cf: 'monthly' }, { p: '/doctors', cf: 'monthly' },
@@ -154,15 +174,45 @@ app.get('/sitemap.xml', async (c) => {
     { p: '/directions', cf: 'yearly' }, { p: '/cases/gallery', cf: 'weekly' }, { p: '/column', cf: 'weekly' },
     { p: '/notice', cf: 'weekly' }, { p: '/video', cf: 'monthly' }, { p: '/encyclopedia', cf: 'monthly' }, { p: '/area', cf: 'monthly' },
   ]
-  const urls: U[] = [
+  const urls: SmUrl[] = [
     ...staticPaths.map((s) => ({ loc: base + s.p, priority: s.p === '/' ? '1.0' : '0.8', changefreq: s.cf, lastmod: today })),
-    ...treatments.map((t) => ({ loc: `${base}/treatments/${t.slug}`, priority: t.category === 'core' ? '0.9' : '0.7', changefreq: 'monthly', lastmod: today })),
     ...doctors.map((d) => ({ loc: `${base}/doctors/${d.slug}`, priority: '0.8', changefreq: 'monthly', lastmod: today })),
+  ]
+  return c.text(smXml(urls), 200, { 'Content-Type': 'application/xml; charset=utf-8' })
+})
+
+// --- sitemap-treatments.xml ---
+app.get('/sitemap-treatments.xml', (c) => {
+  const base = clinic.domain
+  const today = new Date().toISOString().slice(0, 10)
+  const urls: SmUrl[] = treatments.map((t) => ({ loc: `${base}/treatments/${t.slug}`, priority: t.category === 'core' ? '0.9' : '0.7', changefreq: 'monthly', lastmod: today }))
+  return c.text(smXml(urls), 200, { 'Content-Type': 'application/xml; charset=utf-8' })
+})
+
+// --- sitemap-encyclopedia.xml (200 용어 + glossary) ---
+app.get('/sitemap-encyclopedia.xml', (c) => {
+  const base = clinic.domain
+  const today = new Date().toISOString().slice(0, 10)
+  const urls: SmUrl[] = [
     ...encyclopedia.map((e) => ({ loc: `${base}/encyclopedia/${e.slug}`, priority: '0.6', changefreq: 'monthly', lastmod: today })),
     ...glossary.map((e) => ({ loc: `${base}/encyclopedia/${e.slug}`, priority: '0.5', changefreq: 'yearly', lastmod: today })),
-    ...areaCombos().map((a) => ({ loc: `${base}/area/${a.slug}`, priority: '0.6', changefreq: 'monthly', lastmod: today })),
   ]
-  // 동적 콘텐츠 — 실제 작성/수정일을 lastmod 로 사용
+  return c.text(smXml(urls), 200, { 'Content-Type': 'application/xml; charset=utf-8' })
+})
+
+// --- sitemap-area.xml (지역 SEO) ---
+app.get('/sitemap-area.xml', (c) => {
+  const base = clinic.domain
+  const today = new Date().toISOString().slice(0, 10)
+  const urls: SmUrl[] = areaCombos().map((a) => ({ loc: `${base}/area/${a.slug}`, priority: '0.6', changefreq: 'monthly', lastmod: today }))
+  return c.text(smXml(urls), 200, { 'Content-Type': 'application/xml; charset=utf-8' })
+})
+
+// --- sitemap-content.xml (R2 동적 콘텐츠 — 케이스/칼럼) ---
+app.get('/sitemap-content.xml', async (c) => {
+  const base = clinic.domain
+  const today = new Date().toISOString().slice(0, 10)
+  const urls: SmUrl[] = []
   try {
     const store = new Store(c.env.R2)
     const [cases, cols] = await Promise.all([
@@ -173,12 +223,7 @@ app.get('/sitemap.xml', async (c) => {
     cases.filter((x) => x.published).forEach((x) => urls.push({ loc: `${base}/cases/${x.slug}`, priority: '0.7', changefreq: 'monthly', lastmod: lm(x) }))
     cols.filter((x) => x.published).forEach((x) => urls.push({ loc: `${base}/column/${x.slug}`, priority: '0.7', changefreq: 'monthly', lastmod: lm(x) }))
   } catch { /* noop */ }
-
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map((u) => `  <url><loc>${u.loc}</loc><lastmod>${u.lastmod}</lastmod><changefreq>${u.changefreq}</changefreq><priority>${u.priority}</priority></url>`).join('\n')}
-</urlset>`
-  return c.text(xml, 200, { 'Content-Type': 'application/xml; charset=utf-8' })
+  return c.text(smXml(urls), 200, { 'Content-Type': 'application/xml; charset=utf-8' })
 })
 
 // --- robots.txt ---
@@ -229,6 +274,28 @@ app.get('/llms.txt', (c) => {
 
 전체 URL 목록: ${base}/sitemap.xml
 `)
+})
+
+// --- PWA manifest (site.webmanifest) ---
+app.get('/site.webmanifest', (c) => {
+  const manifest = {
+    name: clinic.nameKo,
+    short_name: clinic.nameKo,
+    description: clinic.mission,
+    start_url: '/',
+    scope: '/',
+    display: 'standalone',
+    background_color: clinic.brand.paper,
+    theme_color: clinic.brand.paper,
+    lang: 'ko',
+    dir: 'ltr',
+    categories: ['medical', 'health'],
+    icons: [
+      { src: '/static/img/favicon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
+      { src: '/static/img/apple-touch-icon.png', sizes: '180x180', type: 'image/png', purpose: 'maskable' },
+    ],
+  }
+  return c.json(manifest, 200, { 'Content-Type': 'application/manifest+json; charset=utf-8', 'Cache-Control': 'public, max-age=86400' })
 })
 
 // --- 404 ---
