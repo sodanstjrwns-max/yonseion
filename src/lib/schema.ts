@@ -33,12 +33,26 @@ export function organizationSchema() {
       addressCountry: 'KR',
     },
     geo: { '@type': 'GeoCoordinates', latitude: clinic.geo.lat, longitude: clinic.geo.lng },
+    hasMap: clinic.mapUrl,
+    // 서비스 제공 지역 — 로컬팩(지도) 진입 핵심 시그널
+    areaServed: clinic.areaServed.map((a) => ({ '@type': 'AdministrativeArea', name: a })),
+    // 진료 시설 — 휠체어 접근 등 (가능 시 확장)
+    availableLanguage: { '@type': 'Language', name: 'Korean' },
+    currenciesAccepted: 'KRW',
+    paymentAccepted: '현금, 카드',
     openingHoursSpecification: [
       { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Thursday', 'Friday'], opens: '09:30', closes: '18:30' },
       { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Tuesday', opens: '09:30', closes: '20:00' },
       { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Saturday', opens: '09:30', closes: '13:00' },
     ],
-    sameAs: [clinic.sns.instagram, clinic.sns.youtube, clinic.sns.blog].filter(Boolean),
+    // 핵심 진료 서비스 — makesOffer (검색 의도 매칭)
+    makesOffer: [
+      { '@type': 'Offer', itemOffered: { '@type': 'MedicalProcedure', name: '임플란트', url: BASE + '/treatments/implant-guide' } },
+      { '@type': 'Offer', itemOffered: { '@type': 'MedicalProcedure', name: 'All-on-X 전체임플란트', url: BASE + '/treatments/all-on-x' } },
+      { '@type': 'Offer', itemOffered: { '@type': 'MedicalProcedure', name: '심미보철', url: BASE + '/treatments/esthetic-prosthetics' } },
+      { '@type': 'Offer', itemOffered: { '@type': 'MedicalProcedure', name: '충치치료(접착수복)', url: BASE + '/treatments/adhesive-restoration' } },
+    ],
+    sameAs: [clinic.sns.instagram, clinic.sns.youtube, clinic.sns.blog, clinic.sns.naverPlace].filter(Boolean),
   }
 }
 
@@ -128,6 +142,62 @@ export function placeSchema(regionFull: string) {
     '@type': 'City',
     name: regionFull,
     containedInPlace: { '@type': 'AdministrativeArea', name: clinic.addressRegion },
+  }
+}
+
+// --- 지역 페이지용 MedicalBusiness + areaServed + Service (로컬 SEO 강화) ---
+// "이 병원이 [지역]에서 [진료]를 제공한다"를 구글에 명시 → 로컬팩 진입
+export function areaServiceSchema(opts: {
+  regionName: string; regionFull: string; regionAdmin: string;
+  treatmentName: string; treatmentSlug: string; treatmentKeyword: string;
+  path: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': ['MedicalBusiness', 'Dentist'],
+    '@id': BASE + opts.path + '#localbusiness',
+    name: `${clinic.nameKo} — ${opts.regionName} ${opts.treatmentName}`,
+    description: `${opts.regionFull} ${opts.treatmentKeyword} — ${clinic.nameKo}. ${clinic.subway}.`,
+    url: BASE + opts.path,
+    telephone: clinic.phone,
+    image: BASE + '/static/img/og-default.jpg',
+    priceRange: '₩₩',
+    parentOrganization: { '@id': BASE + '/#clinic' },
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: clinic.address,
+      addressLocality: clinic.addressLocality,
+      addressRegion: clinic.addressRegion,
+      postalCode: clinic.postalCode,
+      addressCountry: 'KR',
+    },
+    geo: { '@type': 'GeoCoordinates', latitude: clinic.geo.lat, longitude: clinic.geo.lng },
+    hasMap: clinic.mapUrl,
+    areaServed: { '@type': 'AdministrativeArea', name: opts.regionAdmin },
+    makesOffer: {
+      '@type': 'Offer',
+      itemOffered: {
+        '@type': 'MedicalProcedure',
+        name: opts.treatmentName,
+        url: BASE + '/treatments/' + opts.treatmentSlug,
+      },
+      areaServed: { '@type': 'AdministrativeArea', name: opts.regionAdmin },
+    },
+  }
+}
+
+// --- Service (진료를 특정 지역에 제공) ---
+export function localServiceSchema(opts: {
+  treatmentName: string; treatmentSlug: string; regionAdmin: string; regionName: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    serviceType: opts.treatmentName,
+    name: `${opts.regionName} ${opts.treatmentName}`,
+    provider: { '@id': BASE + '/#clinic' },
+    areaServed: { '@type': 'AdministrativeArea', name: opts.regionAdmin },
+    url: BASE + '/treatments/' + opts.treatmentSlug,
   }
 }
 
