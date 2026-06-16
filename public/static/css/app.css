@@ -54,6 +54,9 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
+  /* 한글은 어절(단어) 단위로 줄바꿈 — 글자 한복판에서 끊기는 현상 방지 */
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 img { max-width: 100%; display: block; }
 
@@ -68,7 +71,7 @@ a { color: inherit; text-decoration: none; }
 button { font: inherit; cursor: pointer; background: none; border: none; color: inherit; }
 ::selection { background: var(--ink); color: var(--gold-light); }
 
-h1, h2, h3, h4, h5 { font-weight: 600; line-height: 1.1; color: var(--ink); letter-spacing: -.022em; }
+h1, h2, h3, h4, h5 { font-weight: 600; line-height: 1.1; color: var(--ink); letter-spacing: -.022em; word-break: keep-all; overflow-wrap: break-word; }
 
 /* 국문 헤드라인은 Noto Serif KR, 영문/숫자는 Fraunces로 자연 폴백 */
 .serif, .sec-title, .hero h1, .page-hero h1, .quote blockquote,
@@ -560,7 +563,7 @@ em, i, cite, address, var, dfn { font-style: normal; }
 :root { --navy: var(--ink); }
 .gold, .text-gold { color: var(--gold); }
 .font-serif { font-family: var(--serif-kr); }
-.hero-title { font-family: var(--serif-kr); font-weight: 600; letter-spacing: -.03em; line-height: 1.28; }
+.hero-title { font-family: var(--serif-kr); font-weight: 600; letter-spacing: -.03em; line-height: 1.28; word-break: keep-all; overflow-wrap: break-word; }
 .hero-eyebrow { margin-bottom: 1.4rem; }
 .hero-sub { font-size: var(--t-lead); color: var(--ink-2); margin-top: 1.6rem; max-width: 52ch; }
 .sec-desc { color: var(--mist); margin-top: 1rem; max-width: 60ch; font-size: 1.05rem; }
