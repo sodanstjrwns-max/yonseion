@@ -76,15 +76,15 @@ export const clinic = {
     kakaoChannel: 'http://pf.kakao.com/_xiPfab',
   },
 
-  // --- 브랜드 (v4: 로열 네이비 × 샴페인 골드 — 신청서 Q33 로고 컬러 반영) ---
+  // --- 브랜드 (차콜블랙 × 샴페인 골드 × 미색 페이퍼) ---
   brand: {
-    ink: '#14243E',        // 딥 로열 네이비 (텍스트/주조)
-    paper: '#FAF8F2',      // 따뜻한 아이보리 (배경)
-    mist: '#8A93A6',       // 네이비 그레이 (보조 텍스트)
-    line: '#E1DCCC',       // 헤어라인
-    navy: '#14243E',
-    navyDark: '#0C1830',
-    gold: '#AE8A4C',       // 샴페인 골드 (악센트)
+    ink: '#1A1A1A',        // 차콜블랙 (텍스트/주조)
+    paper: '#FBF9F1',      // 미색 도는 따뜻한 아이보리 (배경)
+    mist: '#8A8A8A',       // 뉴트럴 그레이 (보조 텍스트)
+    line: '#E3DECE',       // 헤어라인
+    navy: '#1A1A1A',       // (레거시 키 — 차콜블랙으로 통일)
+    navyDark: '#000000',   // 순블랙
+    gold: '#AE8A4C',       // 샴페인 골드 (악센트 — 유지)
     goldLight: '#D7C49A',
   },
 } as const

@@ -305,11 +305,11 @@ app.notFound((c) => {
 <title>페이지를 찾을 수 없습니다 | ${clinic.nameKo}</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
-<style>body{font-family:Pretendard,sans-serif;background:#FAF8F2;color:#14243E;display:grid;place-items:center;min-height:100vh;margin:0;text-align:center}
-h1{font-size:5rem;margin:0;letter-spacing:-.04em}p{color:#8A93A6;margin:.8rem 0 2rem}
-a{display:inline-block;background:#14243E;color:#FAF8F2;padding:.85rem 1.8rem;border-radius:2px;text-decoration:none;margin:0 .3rem}</style></head>
+<style>body{font-family:Pretendard,sans-serif;background:#FBF9F1;color:#1A1A1A;display:grid;place-items:center;min-height:100vh;margin:0;text-align:center}
+h1{font-size:5rem;margin:0;letter-spacing:-.04em}p{color:#8A8A8A;margin:.8rem 0 2rem}
+a{display:inline-block;background:#1A1A1A;color:#FBF9F1;padding:.85rem 1.8rem;border-radius:2px;text-decoration:none;margin:0 .3rem}</style></head>
 <body><div><h1>404</h1><p>찾으시는 페이지가 없습니다.<br>주소가 바뀌었거나 삭제된 페이지일 수 있습니다.</p>
-<a href="/">홈으로</a><a href="/reservation" style="background:transparent;color:#14243E;border:1px solid #E1DCCC">예약 상담</a></div></body></html>`, 404)
+<a href="/">홈으로</a><a href="/reservation" style="background:transparent;color:#1A1A1A;border:1px solid #E3DECE">예약 상담</a></div></body></html>`, 404)
 })
 
 export default app
