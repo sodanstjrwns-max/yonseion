@@ -564,10 +564,10 @@ em, i, cite, address, var, dfn { font-style: normal; }
 .gold, .text-gold { color: var(--gold); }
 .font-serif { font-family: var(--serif-kr); }
 .hero-title { font-family: var(--serif-kr); font-weight: 600; letter-spacing: -.03em; line-height: 1.28; word-break: keep-all; overflow-wrap: break-word; }
-/* 미션 히어로 — 줄을 블록으로 묶어 '으로/다' 같은 글자 중간 끊김 원천 차단 */
-.mission-title { font-size: clamp(1.8rem, 5.2vw, 4.4rem); line-height: 1.3; }
+/* 미션 히어로 — 줄을 블록으로 묶어 '으로/다' 글자 중간 끊김 차단 + 화면 폭 넘침 방지 */
+.mission-title { container-type: inline-size; font-size: clamp(1.5rem, 7.2vw, 3.4rem); line-height: 1.34; padding-inline: .4rem; }
+@supports (font-size: 1cqw) { .mission-title { font-size: clamp(1.5rem, 8.6cqw, 3.4rem); } }
 .mission-title .ln { display: block; white-space: nowrap; }
-@media (max-width: 380px) { .mission-title { font-size: 1.6rem; } }
 .hero-eyebrow { margin-bottom: 1.4rem; }
 .hero-sub { font-size: var(--t-lead); color: var(--ink-2); margin-top: 1.6rem; max-width: 52ch; }
 .sec-desc { color: var(--mist); margin-top: 1rem; max-width: 60ch; font-size: 1.05rem; }
