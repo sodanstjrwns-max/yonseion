@@ -9,8 +9,10 @@ export function MissionPage() {
   <section class="hero" style="min-height:88vh">
     <div class="hero-inner" style="text-align:center;max-width:900px">
       <p class="eyebrow hero-eyebrow reveal">Our Mission</p>
-      <h1 class="hero-title reveal reveal-d1" style="font-size:clamp(2.2rem,6vw,5rem)">
-        자연치아를 닮은<br><span class="gold">생체모방치의학</span>으로,<br>미소에 젊음을 더한다
+      <h1 class="hero-title mission-title reveal reveal-d1">
+        <span class="ln">자연치아를 닮은</span>
+        <span class="ln"><span class="gold">생체모방치의학</span>으로,</span>
+        <span class="ln">미소에 젊음을 더한다</span>
       </h1>
       <p class="hero-sub reveal reveal-d2" style="margin-inline:auto">
         연세온치과의원이 존재하는 이유입니다.
