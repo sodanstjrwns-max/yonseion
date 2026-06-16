@@ -16,7 +16,13 @@ function b64urlDecode(s: string): Uint8Array {
   s = s.replace(/-/g, '+').replace(/_/g, '/')
   while (s.length % 4) s += '='
   const bin = atob(s)
-  return Uint8Array.from(bin, (c) => c.charCodeAt(0))
+  const out = new Uint8Array(bin.length)
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i)
+  return out
+}
+// crypto.subtle 가 기대하는 BufferSource (ArrayBuffer) 로 변환
+function toArrayBuffer(u8: Uint8Array): ArrayBuffer {
+  return u8.buffer.slice(u8.byteOffset, u8.byteOffset + u8.byteLength) as ArrayBuffer
 }
 
 async function hmacKey(secret: string): Promise<CryptoKey> {
@@ -41,7 +47,7 @@ export async function verifySession(token: string, secret: string): Promise<Sess
   const [body, sig] = token.split('.')
   if (!body || !sig) return null
   const key = await hmacKey(secret)
-  const ok = await crypto.subtle.verify('HMAC', key, b64urlDecode(sig), enc.encode(body))
+  const ok = await crypto.subtle.verify('HMAC', key, toArrayBuffer(b64urlDecode(sig)), enc.encode(body))
   if (!ok) return null
   try {
     const payload = JSON.parse(new TextDecoder().decode(b64urlDecode(body))) as SessionPayload
