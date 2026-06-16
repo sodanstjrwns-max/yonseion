@@ -77,14 +77,45 @@ export function personSchema(doc: Doctor) {
 
 // --- MedicalProcedure (시술별) ---
 export function procedureSchema(t: Treatment) {
-  return {
+  const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'MedicalProcedure',
     name: t.name,
     url: BASE + '/treatments/' + t.slug,
     description: t.hero,
     procedureType: 'https://schema.org/SurgicalProcedure',
+    relevantSpecialty: { '@type': 'MedicalSpecialty', name: 'Dentistry' },
     provider: { '@id': BASE + '/#clinic' },
+  }
+  // 진료 단계 → howPerformed (구글 리치 결과 + AEO 신호)
+  if (t.process?.length) {
+    schema.howPerformed = t.process.map((p) => `${p.step}: ${p.desc}`).join(' / ')
+  }
+  // 대상 증상 → indication (이런 분께 권합니다)
+  if (t.symptoms?.length) {
+    schema.indication = t.symptoms.map((s) => ({ '@type': 'MedicalIndication', name: s }))
+  }
+  if (t.caution) schema.followup = t.caution
+  return schema
+}
+
+// --- HowTo (진료 단계 — 구글 단계별 리치 결과) ---
+export function howToSchema(opts: {
+  name: string
+  description: string
+  steps: { step: string; desc: string }[]
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: opts.name,
+    description: opts.description,
+    step: opts.steps.map((s, i) => ({
+      '@type': 'HowToStep',
+      position: i + 1,
+      name: s.step,
+      text: s.desc,
+    })),
   }
 }
 
@@ -211,6 +242,25 @@ export function websiteSchema() {
     name: clinic.nameKo,
     inLanguage: 'ko',
     publisher: { '@id': BASE + '/#clinic' },
+  }
+}
+
+// --- ItemList (진료 목록 — 구조화된 컬렉션) ---
+export function itemListSchema(opts: {
+  name: string; items: { name: string; url: string; description?: string }[];
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: opts.name,
+    numberOfItems: opts.items.length,
+    itemListElement: opts.items.map((it, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: it.name,
+      url: BASE + it.url,
+      ...(it.description ? { description: it.description } : {}),
+    })),
   }
 }
 
