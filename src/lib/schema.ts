@@ -96,7 +96,43 @@ export function procedureSchema(t: Treatment) {
     schema.indication = t.symptoms.map((s) => ({ '@type': 'MedicalIndication', name: s }))
   }
   if (t.caution) schema.followup = t.caution
+  // 회복·관리 단계 → preparation/recovery 보조 신호
+  if (t.aftercare?.length) {
+    schema.followup = [t.caution, t.aftercare.map((a) => `${a.phase}: ${a.desc}`).join(' / ')]
+      .filter(Boolean)
+      .join(' ')
+  }
+  // 세부 시술 → subjectOf (허브-스포크 연결)
+  if (t.procedures?.length) {
+    schema.subjectOf = t.procedures.map((p) => ({
+      '@type': 'MedicalProcedure',
+      name: p.name,
+      description: p.desc,
+    }))
+  }
+  // 연관 백과 용어 → relatedLink (내부 링크 메시 + 토픽 클러스터)
+  if (t.encyclopediaRefs?.length) {
+    schema.relatedLink = t.encyclopediaRefs.map((slug) => BASE + '/encyclopedia/' + slug)
+  }
   return schema
+}
+
+// --- DataFeed/Table 대체: 비교표를 Q&A 형태로(AEO에 더 잘 잡힘) ---
+// 비교표 제목을 질문으로, 표 내용을 답변 텍스트로 직렬화
+export function compareQaSchema(opts: {
+  title: string
+  cols: string[]
+  rows: string[][]
+}) {
+  const answer = opts.rows
+    .map((r) => `${r[0]} — ${opts.cols.slice(1).map((c, i) => `${c}: ${r[i + 1]}`).join(', ')}`)
+    .join(' / ')
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Question',
+    name: opts.title,
+    acceptedAnswer: { '@type': 'Answer', text: answer },
+  }
 }
 
 // --- HowTo (진료 단계 — 구글 단계별 리치 결과) ---

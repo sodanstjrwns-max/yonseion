@@ -5,7 +5,8 @@ import { clinic } from '../data/clinic'
 import { treatments, getTreatment, coreTreatments, treatmentGroups, treatmentsByGroup, type Treatment } from '../data/treatments'
 import { getDoctor } from '../data/doctors'
 import { faqGroups } from '../data/faqs'
-import { breadcrumbSchema, faqSchema, procedureSchema, speakableSchema, howToSchema, medicalWebPageSchema, itemListSchema } from '../lib/schema'
+import { getEntry } from '../data/encyclopedia'
+import { breadcrumbSchema, procedureSchema, speakableSchema, howToSchema, medicalWebPageSchema, itemListSchema, compareQaSchema } from '../lib/schema'
 import { autoLink } from '../lib/inlink'
 
 // ---------- 진료 전체 목록 ----------
@@ -79,6 +80,15 @@ export function TreatmentDetail(slug: string) {
   const docs = t.doctorSlugs.map(getDoctor).filter(Boolean)
   const related = t.relatedTreatments.map(getTreatment).filter(Boolean) as Treatment[]
   const faqGroup = faqGroups[t.faqRef]
+  // 진료별 전용 FAQ + 그룹 FAQ 병합 (중복 질문 제거) → 더 풍부한 FAQPage
+  const mergedFaqs = [
+    ...(t.faqs || []),
+    ...(faqGroup?.faqs || []).filter((g) => !(t.faqs || []).some((f) => f.q === g.q)),
+  ]
+  // 백과사전 크로스링크 (존재하는 엔트리만)
+  const encRefs = (t.encyclopediaRefs || [])
+    .map((s) => { const e = getEntry(s); return e ? { slug: s, term: e.term } : null })
+    .filter(Boolean) as { slug: string; term: string }[]
 
   const body = html`
   <section class="page-hero">
@@ -95,8 +105,21 @@ export function TreatmentDetail(slug: string) {
       <div class="prose" style="max-width:none">
         <p class="lead reveal" id="tx-answer" style="margin-bottom:2rem">${t.hero}</p>
 
+        ${raw(`
+          <nav class="tx-toc reveal" aria-label="목차">
+            <span class="tx-toc-label"><i class="fas fa-list-ul"></i> 이 페이지에서 확인하실 내용</span>
+            <ul>
+              ${t.symptoms?.length ? '<li><a href="#tx-symptoms">이런 분께 권합니다</a></li>' : ''}
+              ${t.sections.slice(0, 4).map((s, i) => `<li><a href="#tx-sec-${i}">${s.q.replace(/<[^>]+>/g, '')}</a></li>`).join('')}
+              ${t.compare ? '<li><a href="#tx-compare">비교 한눈에 보기</a></li>' : ''}
+              ${t.process?.length ? '<li><a href="#tx-process">진료 과정</a></li>' : ''}
+              ${t.aftercare?.length ? '<li><a href="#tx-aftercare">회복·관리</a></li>' : ''}
+              ${mergedFaqs.length ? '<li><a href="#tx-faq">자주 묻는 질문</a></li>' : ''}
+            </ul>
+          </nav>`)}
+
         ${t.symptoms?.length ? raw(`
-          <div class="symptom-box reveal" style="background:var(--charcoal);border-radius:14px;padding:1.9rem 2.1rem;margin-bottom:2.4rem;box-shadow:0 10px 34px rgba(0,0,0,.16)">
+          <div class="symptom-box reveal" id="tx-symptoms" style="background:var(--charcoal);border-radius:14px;padding:1.9rem 2.1rem;margin-bottom:2.4rem;box-shadow:0 10px 34px rgba(0,0,0,.16)">
             <h2 style="margin:0 0 1.2rem;font-size:1.15rem;color:#fff;font-family:var(--serif-kr)"><i class="fas fa-circle-check" style="color:var(--gold-light);margin-right:.5rem"></i>이런 분께 권합니다</h2>
             <ul style="margin:0;padding:0;list-style:none;display:grid;gap:.85rem">
               ${t.symptoms.map((s) => `<li style="display:flex;gap:.8rem;align-items:flex-start;font-size:.96rem;color:rgba(255,255,255,.86);line-height:1.6"><i class="fas fa-check" style="color:var(--gold-light);margin-top:.3rem;flex-shrink:0;font-size:.82rem"></i><span>${s}</span></li>`).join('')}
@@ -104,14 +127,27 @@ export function TreatmentDetail(slug: string) {
           </div>`) : ''}
 
         ${raw(autoLink(t.sections.map((s, i) => `
-          <div class="reveal reveal-d${i % 3}">
+          <div class="reveal reveal-d${i % 3}" id="tx-sec-${i}">
             <h2>${s.q}</h2>
             <div class="answer">${s.a}</div>
             ${s.body ? `<p>${s.body}</p>` : ''}
           </div>`).join(''), 12))}
 
+        ${t.compare ? raw(`
+          <div class="tx-compare reveal" id="tx-compare" style="margin-top:2.6rem">
+            <h2 style="margin-bottom:1.1rem">${t.compare.title}</h2>
+            <div class="tx-table-wrap">
+              <table class="tx-table">
+                <thead><tr>${t.compare.cols.map((c, i) => `<th${i === 0 ? ' class="tx-th-first"' : ''}>${c}</th>`).join('')}</tr></thead>
+                <tbody>
+                  ${t.compare.rows.map((r) => `<tr>${r.map((cell, i) => i === 0 ? `<th scope="row">${cell}</th>` : `<td>${cell}</td>`).join('')}</tr>`).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>`) : ''}
+
         ${t.process?.length ? raw(`
-          <h2 class="reveal" style="margin-top:2.5rem">진료는 이렇게 진행됩니다</h2>
+          <h2 class="reveal" id="tx-process" style="margin-top:2.5rem">진료는 이렇게 진행됩니다</h2>
           <ol class="tx-steps reveal">
             ${t.process.map((p, i) => `
               <li>
@@ -130,6 +166,29 @@ export function TreatmentDetail(slug: string) {
               </div>`).join('')}
           </div>`) : ''}
 
+        ${t.aftercare?.length ? raw(`
+          <h2 class="reveal" id="tx-aftercare" style="margin-top:2.6rem">회복과 관리, 이렇게 도와드립니다</h2>
+          <div class="tx-after reveal">
+            ${t.aftercare.map((a) => `
+              <div class="tx-after-item">
+                <span class="tx-after-phase"><i class="fas fa-leaf"></i> ${a.phase}</span>
+                <p>${a.desc}</p>
+              </div>`).join('')}
+          </div>`) : ''}
+
+        ${t.evidence?.length ? raw(`
+          <div class="tx-evidence reveal" style="margin-top:2.4rem">
+            <h3 style="font-size:1rem;margin:0 0 1rem;color:var(--navy)"><i class="fas fa-microscope" style="color:var(--gold);margin-right:.5rem"></i>진료 기준·근거</h3>
+            <div class="tx-evidence-grid">
+              ${t.evidence.map((e) => `
+                <div class="tx-evidence-card">
+                  <span class="tx-ev-label">${e.label}</span>
+                  <strong class="tx-ev-value">${e.value}</strong>
+                  ${e.note ? `<small class="tx-ev-note">${e.note}</small>` : ''}
+                </div>`).join('')}
+            </div>
+          </div>`) : ''}
+
         ${t.priceNote || t.caution ? raw(`
           <div class="notice-box reveal" style="margin-top:2.6rem;display:grid;gap:1rem">
             ${t.priceNote ? `<div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:1.4rem 1.6rem">
@@ -140,6 +199,14 @@ export function TreatmentDetail(slug: string) {
               <h3 style="margin:0 0 .5rem;font-size:1rem;color:var(--navy)"><i class="fas fa-circle-info" style="color:var(--gold);margin-right:.5rem"></i>진료 전 알아두실 점</h3>
               <p style="margin:0;font-size:.86rem;color:var(--muted);line-height:1.7">${t.caution}</p>
             </div>` : ''}
+          </div>`) : ''}
+
+        ${encRefs.length ? raw(`
+          <div class="tx-enc reveal" style="margin-top:2.4rem">
+            <h3 style="font-size:1rem;margin:0 0 .9rem;color:var(--navy)"><i class="fas fa-book-open" style="color:var(--gold);margin-right:.5rem"></i>더 알아보기 — 치과 용어 사전</h3>
+            <div class="tx-enc-chips">
+              ${encRefs.map((e) => `<a href="/encyclopedia/${e.slug}" class="tx-enc-chip">${e.term} <i class="fas fa-arrow-right"></i></a>`).join('')}
+            </div>
           </div>`) : ''}
 
         <p class="reveal" style="margin-top:2rem;font-size:.82rem;color:var(--muted);border-top:1px solid var(--line);padding-top:1rem">
@@ -165,11 +232,11 @@ export function TreatmentDetail(slug: string) {
     </div>
   </section>
 
-  ${faqGroup ? html`
-  <section class="section bg-paper2">
+  ${mergedFaqs.length ? html`
+  <section class="section bg-paper2" id="tx-faq">
     <div class="container" style="max-width:840px">
       <div class="sec-head center"><p class="eyebrow reveal">FAQ</p><h2 class="sec-title reveal reveal-d1">${t.name} 자주 묻는 질문</h2></div>
-      ${FaqAccordion(faqGroup.faqs)}
+      ${FaqAccordion(mergedFaqs)}
       <p style="text-align:center;margin-top:2rem" class="reveal"><a href="/faq" class="btn btn-outline">전체 FAQ 보기 <i class="fas fa-arrow-right"></i></a></p>
     </div>
   </section>` : ''}
@@ -194,6 +261,45 @@ export function TreatmentDetail(slug: string) {
     .tx-steps li div{ padding-top:.15rem }
     .tx-steps li strong{ display:block;color:var(--navy);font-size:1.02rem;margin-bottom:.25rem }
     .tx-steps li div span{ font-size:.93rem;color:var(--ink-soft);line-height:1.6 }
+
+    /* 목차 TOC */
+    .tx-toc{ background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:1.2rem 1.5rem;margin-bottom:2.2rem }
+    .tx-toc-label{ display:block;font-size:.82rem;font-weight:700;color:var(--gold-2);letter-spacing:.02em;margin-bottom:.6rem }
+    .tx-toc ul{ list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:.5rem .9rem }
+    .tx-toc li a{ font-size:.88rem;color:var(--ink-soft);text-decoration:none;border-bottom:1px dashed var(--line);padding-bottom:1px;transition:color .15s }
+    .tx-toc li a:hover{ color:var(--gold-2);border-bottom-color:var(--gold) }
+
+    /* 비교표 */
+    .tx-table-wrap{ overflow-x:auto;border:1px solid var(--line);border-radius:12px }
+    .tx-table{ width:100%;border-collapse:collapse;background:#fff;font-size:.92rem;min-width:480px }
+    .tx-table th,.tx-table td{ padding:.85rem 1rem;text-align:left;border-bottom:1px solid var(--line-soft) }
+    .tx-table thead th{ background:var(--charcoal);color:#fff;font-weight:600;font-size:.88rem }
+    .tx-table thead th.tx-th-first{ background:var(--navy) }
+    .tx-table tbody th[scope=row]{ background:var(--paper-2);color:var(--navy);font-weight:600;white-space:nowrap }
+    .tx-table tbody td{ color:var(--ink-soft) }
+    .tx-table tbody tr:last-child th,.tx-table tbody tr:last-child td{ border-bottom:none }
+
+    /* 회복 타임라인 */
+    .tx-after{ display:grid;gap:.9rem;margin-top:1.2rem }
+    .tx-after-item{ border-left:3px solid var(--gold);background:var(--paper-2);border-radius:0 10px 10px 0;padding:1rem 1.3rem }
+    .tx-after-phase{ display:block;font-weight:700;color:var(--navy);font-size:.95rem;margin-bottom:.3rem }
+    .tx-after-phase i{ color:var(--gold);margin-right:.4rem;font-size:.85rem }
+    .tx-after-item p{ margin:0;font-size:.9rem;color:var(--ink-soft);line-height:1.6 }
+
+    /* 근거 카드 */
+    .tx-evidence{ background:var(--paper-2);border:1px solid var(--line);border-radius:14px;padding:1.5rem 1.7rem }
+    .tx-evidence-grid{ display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem }
+    .tx-evidence-card{ background:#fff;border:1px solid var(--line);border-radius:10px;padding:1rem 1.1rem;text-align:center }
+    .tx-ev-label{ display:block;font-size:.78rem;color:var(--muted);margin-bottom:.35rem }
+    .tx-ev-value{ display:block;font-size:1.05rem;color:var(--navy);font-family:var(--serif-kr) }
+    .tx-ev-note{ display:block;font-size:.76rem;color:var(--muted);margin-top:.3rem }
+
+    /* 백과 크로스링크 칩 */
+    .tx-enc-chips{ display:flex;flex-wrap:wrap;gap:.6rem }
+    .tx-enc-chip{ display:inline-flex;align-items:center;gap:.4rem;font-size:.85rem;color:var(--navy);background:#fff;border:1px solid var(--line);border-radius:999px;padding:.45rem 1rem;text-decoration:none;transition:all .15s }
+    .tx-enc-chip i{ font-size:.72rem;color:var(--gold);transition:transform .15s }
+    .tx-enc-chip:hover{ border-color:var(--gold);background:var(--paper-2) }
+    .tx-enc-chip:hover i{ transform:translateX(3px) }
   </style>
   `
 
@@ -216,11 +322,20 @@ export function TreatmentDetail(slug: string) {
       steps: t.process,
     }))
   }
-  if (faqGroup) jsonLd.push(faqSchema(faqGroup.faqs))
+  // FAQPage — 병합 FAQ + 비교표를 Q&A로 직렬화(AEO 강화)
+  if (mergedFaqs.length || t.compare) {
+    const faqEntities: object[] = mergedFaqs.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    }))
+    if (t.compare) faqEntities.push(compareQaSchema(t.compare))
+    jsonLd.push({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqEntities })
+  }
 
   return Layout({
-    title: `${t.name} | ${clinic.nameKo} · 부산 동래`,
-    description: t.hero.slice(0, 155),
+    title: t.metaTitle || `${t.name} | ${clinic.nameKo} · 부산 동래`,
+    description: t.metaDescription || t.hero.slice(0, 155),
     path: '/treatments/' + t.slug,
     jsonLd,
   }, body)
