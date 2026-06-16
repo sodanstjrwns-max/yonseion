@@ -96,10 +96,10 @@ export function TreatmentDetail(slug: string) {
         <p class="lead reveal" id="tx-answer" style="margin-bottom:2rem">${t.hero}</p>
 
         ${t.symptoms?.length ? raw(`
-          <div class="symptom-box reveal" style="background:var(--paper-2);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:12px;padding:1.6rem 1.8rem;margin-bottom:2.4rem">
-            <h2 style="margin:0 0 1rem;font-size:1.15rem;color:var(--navy)"><i class="fas fa-circle-check" style="color:var(--gold);margin-right:.5rem"></i>이런 분께 권합니다</h2>
-            <ul style="margin:0;padding:0;list-style:none;display:grid;gap:.7rem">
-              ${t.symptoms.map((s) => `<li style="display:flex;gap:.7rem;align-items:flex-start;font-size:.95rem;color:var(--ink-soft)"><i class="fas fa-check" style="color:var(--gold);margin-top:.25rem;flex-shrink:0;font-size:.85rem"></i><span>${s}</span></li>`).join('')}
+          <div class="symptom-box reveal" style="background:var(--charcoal);border-radius:14px;padding:1.9rem 2.1rem;margin-bottom:2.4rem;box-shadow:0 10px 34px rgba(0,0,0,.16)">
+            <h2 style="margin:0 0 1.2rem;font-size:1.15rem;color:#fff;font-family:var(--serif-kr)"><i class="fas fa-circle-check" style="color:var(--gold-light);margin-right:.5rem"></i>이런 분께 권합니다</h2>
+            <ul style="margin:0;padding:0;list-style:none;display:grid;gap:.85rem">
+              ${t.symptoms.map((s) => `<li style="display:flex;gap:.8rem;align-items:flex-start;font-size:.96rem;color:rgba(255,255,255,.86);line-height:1.6"><i class="fas fa-check" style="color:var(--gold-light);margin-top:.3rem;flex-shrink:0;font-size:.82rem"></i><span>${s}</span></li>`).join('')}
             </ul>
           </div>`) : ''}
 
