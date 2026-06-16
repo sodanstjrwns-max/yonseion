@@ -17,7 +17,7 @@ export function logoMark() {
   return `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="lm">
     <circle class="lm-ring" cx="20" cy="20" r="15.5" stroke="currentColor" stroke-width="1.6" pathLength="100"/>
     <path class="lm-stem" d="M20 9.5v21" stroke="currentColor" stroke-width="1.6" pathLength="100"/>
-    <circle class="lm-core" cx="20" cy="20" r="3.4" fill="#AE8A4C"/>
+    <circle class="lm-core" cx="20" cy="20" r="3.4" fill="#C59F66"/>
   </svg>`
 }
 
@@ -36,9 +36,8 @@ function Header() {
   return html`
   <header class="site-header">
     <div class="nav-inner">
-      <a href="/" class="logo" aria-label="${clinic.nameKo} 홈" style="color:var(--ink)">
-        <span class="logo-mark">${raw(logoMark())}</span>
-        <span class="logo-text">${clinic.nameKo}<small>YEONSEON ON DENTAL</small></span>
+      <a href="/" class="logo logo-img" aria-label="${clinic.nameKo} 홈">
+        <img src="/static/img/logo-horizontal-color.png" alt="${clinic.nameKo}" width="320" height="110" decoding="async" />
       </a>
       <nav class="gnb" aria-label="주 메뉴">
         <a href="/mission" class="nav-link">병원미션</a>
@@ -118,9 +117,8 @@ function Footer() {
     <div class="container">
       <div class="footer-grid">
         <div>
-          <div class="logo" style="margin-bottom:1.4rem;color:var(--ink)">
-            <span class="logo-mark">${raw(logoMark())}</span>
-            <span class="logo-text">${clinic.nameKo}<small>${clinic.tagline}</small></span>
+          <div class="logo logo-img" style="margin-bottom:1.4rem">
+            <img src="/static/img/logo-horizontal-color.png" alt="${clinic.nameKo}" width="360" height="124" decoding="async" />
           </div>
           <p style="max-width:320px;line-height:1.8;color:var(--mist)">
             ${clinic.mission}

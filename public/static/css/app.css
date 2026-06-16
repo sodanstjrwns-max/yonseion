@@ -7,21 +7,23 @@
 
 /* ---------- 0. Tokens ---------- */
 :root {
-  --ink: #000000;          /* 제목/주조 텍스트 — 순블랙 */
-  --ink-deep: #000000;     /* 더 깊은 톤 (호버·그라데이션) — 순블랙 */
-  --ink-2: #000000;        /* 본문 — 순블랙 */
-  --mist: #6B6B6B;         /* 보조 텍스트 / 캡션 — 진회색 (위계 유지) */
-  --mist-2: #BDBDBD;       /* 흐린 라벨 */
+  /* ===== 로고 추출 브랜드 컬러 (logo-horizontal-color.png 픽셀 평균) ===== */
+  /* 네이비 #343E4C · 골드 #C59F66 · 서브그레이 #989898 */
+  --ink: #2E3A4B;          /* 제목/주조 텍스트 — 로고 딥 네이비 (살짝 진하게) */
+  --ink-deep: #222C3A;     /* 더 깊은 톤 (호버·그라데이션) */
+  --ink-2: #2A3543;        /* 본문 — 로고 네이비 (가독 위해 살짝 진하게) */
+  --mist: #6E7681;         /* 보조 텍스트 / 캡션 — 로고 그레이 톤 */
+  --mist-2: #AEB4BC;       /* 흐린 라벨 */
   --paper: #FBF9F1;        /* 배경 — 더 미색 도는 따뜻한 아이보리 */
   --paper-2: #F4F0E4;      /* 섹션 교차 배경 (미색) */
   --paper-3: #EBE5D5;      /* 더 깊은 톤 (이미지 폴백 등) */
   --line: #E3DECE;         /* 헤어라인 */
   --line-soft: #EEE9DB;
-  --charcoal: #1F1F1F;     /* 차콜블랙 — 강조 배경 블록 (시선 집중) */
-  --gold: #AE8A4C;         /* 샴페인 골드 — 주인공 악센트 */
-  --gold-2: #8E6F3A;       /* 깊은 골드 (텍스트 대비용) */
-  --gold-light: #D7C49A;   /* 밝은 골드 (다크 배경 위) */
-  --gold-grad: linear-gradient(115deg, #C8A86B 0%, #AE8A4C 45%, #D9C18C 100%);
+  --charcoal: #232D3A;     /* 강조 배경 블록 — 로고 네이비 다크 (순블랙 대신 브랜드 톤) */
+  --gold: #C59F66;         /* 샴페인 골드 — 로고 골드 정확값 */
+  --gold-2: #A07F45;       /* 깊은 골드 (텍스트 대비용) */
+  --gold-light: #E0C99B;   /* 밝은 골드 (다크 배경 위) */
+  --gold-grad: linear-gradient(115deg, #D2B07B 0%, #C59F66 45%, #E2CB9C 100%);
 
   --maxw: 1340px;
   --gutter: clamp(1.5rem, 5.5vw, 5.5rem);
@@ -131,6 +133,11 @@ em, i, cite, address, var, dfn { font-style: normal; }
 .logo-mark svg { width: 100%; height: 100%; }
 .logo-text { display: flex; flex-direction: column; line-height: 1; font-weight: 600; color: var(--ink); font-size: 1.12rem; letter-spacing: -.01em; }
 .logo-text small { font-size: .55rem; letter-spacing: .26em; color: var(--mist); font-weight: 500; margin-top: .35rem; }
+/* 실제 로고 이미지 (가로형 2.91:1) — 헤더/푸터 공용 */
+.logo-img { gap: 0; }
+.logo-img img { display: block; width: auto; height: 40px; }
+.site-footer .logo-img img { height: 52px; }
+@media (max-width: 640px) { .logo-img img { height: 34px; } }
 
 .gnb { display: flex; align-items: center; gap: clamp(1rem, 2.4vw, 2.6rem); }
 .nav-link {
