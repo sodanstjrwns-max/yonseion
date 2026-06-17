@@ -104,6 +104,33 @@ export function MissionPage() {
     </div>
   </section>
 
+  <!-- 진료 현장 — 원장이 직접 상담하고 진료합니다 -->
+  <section class="section">
+    <div class="container">
+      <div class="sec-head center">
+        <p class="eyebrow reveal">In the Chair</p>
+        <h2 class="sec-title reveal reveal-d1">설명부터 진료까지, <span class="gold">대표원장이 직접</span></h2>
+        <p class="sec-desc reveal reveal-d2" style="margin-inline:auto">무엇을 왜 하는지 충분히 설명드린 뒤, 정밀 진단과 디지털 장비로 치료합니다.</p>
+      </div>
+      <div class="grid" style="grid-template-columns:1.4fr 1fr;gap:1.2rem" id="practice-gallery">
+        <figure class="img-reveal reveal" style="position:relative;border-radius:16px;overflow:hidden;aspect-ratio:3/2;margin:0">
+          <img src="/static/img/consult-explain.jpg" alt="${clinic.business.owner} 대표원장이 환자에게 치료 계획을 설명하는 상담 장면" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+          <figcaption style="position:absolute;left:1.1rem;bottom:1rem;color:#fff;font-size:.85rem;font-weight:600;text-shadow:0 1px 8px rgba(0,0,0,.5)">충분한 상담 · 명확한 설명</figcaption>
+        </figure>
+        <div style="display:grid;grid-template-rows:1fr 1fr;gap:1.2rem">
+          <figure class="img-reveal reveal reveal-d1" style="position:relative;border-radius:16px;overflow:hidden;margin:0">
+            <img src="/static/img/treatment-digital.jpg" alt="구강 스캐너와 3D 디지털 임프레션을 활용한 디지털 진료" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+            <figcaption style="position:absolute;left:1.1rem;bottom:.9rem;color:#fff;font-size:.82rem;font-weight:600;text-shadow:0 1px 8px rgba(0,0,0,.5)">디지털 정밀 진단</figcaption>
+          </figure>
+          <figure class="img-reveal reveal reveal-d2" style="position:relative;border-radius:16px;overflow:hidden;margin:0">
+            <img src="/static/img/treatment-scene.jpg" alt="확대경(루페)을 착용하고 정밀하게 진행하는 진료 장면" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+            <figcaption style="position:absolute;left:1.1rem;bottom:.9rem;color:#fff;font-size:.82rem;font-weight:600;text-shadow:0 1px 8px rgba(0,0,0,.5)">루페 정밀 진료</figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- 원장 메시지 -->
   <section class="section bg-navy" style="position:relative;overflow:hidden">
     <div data-parallax="0.06" style="position:absolute;left:-6%;bottom:-10%;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(197,165,114,.12),transparent 70%)"></div>
@@ -140,6 +167,7 @@ export function MissionPage() {
       </div>
     </div>
   </section>
+  <style>@media (max-width:760px){ #practice-gallery{ grid-template-columns:1fr !important } }</style>
   `
   return Layout({
     title: `병원미션 | ${clinic.nameKo} · 미소의 젊음을 켜는 치과`,
