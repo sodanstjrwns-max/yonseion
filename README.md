@@ -83,7 +83,10 @@ curl http://localhost:3000
 - **구글 드라이브 자료 자동 수집**: 원장 인터뷰 문서 + 사진 50장 다운로드 → 웹용 최적화(508MB→5MB), `public/static/img/photos/`
 - **실사진 적용**: 홈(리셉션 풀블리드 + 원장 프로필) / 의료진 페이지(스튜디오 프로필) / 미션 페이지(상담·디지털진단·루페진료 3컷 밴드 신규)
 - **누끼 로고 확정**: 검은 배경 제거한 투명 로고(`logo-horizontal-color-t.png`) 헤더·푸터 적용, 파비콘/OG/터치아이콘 네이비+골드 재생성
-- **원장 칼럼 3편 발행** (R2): 생체모방치의학 환자 오해 바로잡기 시리즈 — `/column/biomimetic-myth-conservative-is-easy`, `/column/biomimetic-myth-overlay-is-not-a-crown-type`, `/column/biomimetic-myth-conservative-is-not-cheaper` (Article+MedicalWebPage 스키마, 저자 E-E-A-T, 사이트맵 자동 포함)
+- **원장 칼럼 5편 발행** (R2, Article+MedicalWebPage 스키마, 저자 E-E-A-T, 사이트맵 자동 포함):
+  - 생체모방치의학 환자 오해 시리즈 3편 — `/column/biomimetic-myth-conservative-is-easy`, `/column/biomimetic-myth-overlay-is-not-a-crown-type`, `/column/biomimetic-myth-conservative-is-not-cheaper`
+  - 인터뷰 기반 케이스 칼럼 2편 — `/column/all-on-x-전체임플란트-자신감` (무치악 All-on-X, 환자 동의 케이스), `/column/중장년-심미보철-앞니` (중장년 심미보철 CTG)
+  - **케이스 칼럼은 동의받은 사례만 사용**, 미동의 케이스(50대 여성 무치악)는 익명·비식별 처리하거나 미사용 (원장님 확정 대기)
 - **운영 채널 확인**: 인스타·유튜브·블로그·네이버플레이스·카카오톡 채널 모두 푸터 노출 (원장님 원문과 일치)
 - **커스텀 도메인**: `yonseion.kr` 라이브 (구 `ysondent.com`/`연세온치과.com`은 신규 사이트로 대체 예정)
-- **Last Updated**: 2026-06-17
+- **Last Updated**: 2026-06-17 (칼럼 5편 — 한글 케이스 2편 R2 검증 완료, `/column` 리스트 5편 정상 노출)
