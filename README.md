@@ -6,10 +6,11 @@
 - **Tagline**: 인지(SEO/AEO) → 신뢰(콘텐츠·의료진·케이스) → 전환(예약 상담) 퍼널 구조
 
 ## URLs
-- **Production**: https://yeonseon-dental.pages.dev ✅ 배포 완료 (원장님 Cloudflare 계정)
+- **Production**: https://yonseion.kr ✅ 커스텀 도메인 라이브 (원장님 Cloudflare 계정)
+- **Pages**: https://yeonseon-dental.pages.dev
 - **Sandbox Dev**: https://3000-innan00lwvne2dmwc9mql-0e616f0a.sandbox.novita.ai
 - **Admin**: `/admin` (비밀번호 = `ADMIN_PASSWORD` secret 으로 설정됨 — 기본값 무력화 완료)
-- **Custom Domain**: `ysondent.com` 연결 예정 (DNS 이관 후 `wrangler pages domain add`)
+- **Custom Domain**: `yonseion.kr` ✅ 연결 완료
 
 ## 완성된 기능
 ### 공개 페이지 (66 URL, sitemap 자동 생성)
@@ -76,5 +77,13 @@ curl http://localhost:3000
   - R2: `yeonseon-dental-bucket` — 예약·콘텐츠·이미지 저장
   - Secrets: `ADMIN_PASSWORD`, `SESSION_SECRET` 설정 완료 (암호화)
 - **검증**: 홈/진료/예약/sitemap 200, 예약 API(R2 저장) 작동, 관리자 로그인 보안 확인
-- **다음**: ① GitHub 연동 자동배포 ② `ysondent.com` 커스텀 도메인 ③ 실데이터(사업자번호·수가·사진)
-- **Last Updated**: 2026-06-14
+- **다음**: ① 사업자등록번호·비급여 수가 실데이터 ② Google Search Console / Naver Search Advisor 등록+사이트맵 제출 ③ 50대 여성 환자 케이스 처리 방향 확정
+
+## 2026-06-17 업데이트 — 원장님 제공 자료 반영
+- **구글 드라이브 자료 자동 수집**: 원장 인터뷰 문서 + 사진 50장 다운로드 → 웹용 최적화(508MB→5MB), `public/static/img/photos/`
+- **실사진 적용**: 홈(리셉션 풀블리드 + 원장 프로필) / 의료진 페이지(스튜디오 프로필) / 미션 페이지(상담·디지털진단·루페진료 3컷 밴드 신규)
+- **누끼 로고 확정**: 검은 배경 제거한 투명 로고(`logo-horizontal-color-t.png`) 헤더·푸터 적용, 파비콘/OG/터치아이콘 네이비+골드 재생성
+- **원장 칼럼 3편 발행** (R2): 생체모방치의학 환자 오해 바로잡기 시리즈 — `/column/biomimetic-myth-conservative-is-easy`, `/column/biomimetic-myth-overlay-is-not-a-crown-type`, `/column/biomimetic-myth-conservative-is-not-cheaper` (Article+MedicalWebPage 스키마, 저자 E-E-A-T, 사이트맵 자동 포함)
+- **운영 채널 확인**: 인스타·유튜브·블로그·네이버플레이스·카카오톡 채널 모두 푸터 노출 (원장님 원문과 일치)
+- **커스텀 도메인**: `yonseion.kr` 라이브 (구 `ysondent.com`/`연세온치과.com`은 신규 사이트로 대체 예정)
+- **Last Updated**: 2026-06-17
