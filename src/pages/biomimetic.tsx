@@ -30,6 +30,14 @@ export function BiomimeticPage() {
     </div>
   </section>
 
+  <!-- 풀블리드 진료 사진 -->
+  <section class="section--tight">
+    <figure class="full-bleed img-reveal reveal" style="margin:0;position:relative;aspect-ratio:21/9;overflow:hidden">
+      <img src="/static/img/treatment-digital.jpg" alt="구강스캐너와 3D 디지털 인상으로 진행하는 ${clinic.nameShort}의 정밀 접착 진료" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:center 40%">
+      <span class="figure-float">원칙을 지키는 디지털 정밀 진료</span>
+    </figure>
+  </section>
+
   <!-- 3원칙 -->
   <section class="section bg-paper2">
     <div class="container">

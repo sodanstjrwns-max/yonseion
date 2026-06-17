@@ -126,9 +126,9 @@ export function HomePage() {
 
   <!-- ===== 풀블리드 사진 (패럴랙스 + 부유 캡션) ===== -->
   <section class="section--tight">
-    <figure class="full-bleed img-reveal ph ph--wide" data-reveal style="position:relative;aspect-ratio:21/9">
+    <figure class="full-bleed img-reveal" data-reveal style="position:relative;aspect-ratio:21/9;overflow:hidden">
+      <img src="/static/img/clinic-reception.jpg" alt="${clinic.nameKo} 리셉션과 대기 공간" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
       <span class="figure-float">연세온치과 · 진료 공간</span>
-      <span class="ph-label">CLINIC INTERIOR</span>
     </figure>
   </section>
 
@@ -166,9 +166,9 @@ export function HomePage() {
   <section class="section bg-paper-2">
     <div class="container">
       <div class="split split--reverse">
-        <div class="figure figure--tall img-reveal ph ph--alt" data-reveal>
+        <div class="figure figure--tall img-reveal" data-reveal style="overflow:hidden">
+          <img src="${lead.photo}" alt="${lead.name} ${lead.role} — ${lead.title}" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:center 30%">
           <span class="figure-float">${lead.name} · ${lead.role}</span>
-          <span class="ph-label">${lead.name} 대표원장</span>
         </div>
         <div class="split-text" data-reveal data-reveal-delay="2">
           <div style="display:flex;align-items:center;gap:1.2rem;margin-bottom:1.6rem">

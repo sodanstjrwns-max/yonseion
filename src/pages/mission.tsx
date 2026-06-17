@@ -82,6 +82,28 @@ export function MissionPage() {
     </div>
   </section>
 
+  <!-- 진료 현장 — 원장이 직접 상담하고 진료하는 모습 -->
+  <section class="section">
+    <div class="container">
+      <div class="sec-head center">
+        <p class="eyebrow reveal">In the Clinic</p>
+        <h2 class="sec-title reveal reveal-d1">설명하고, 보여드리고, <span class="gold">함께 결정합니다</span></h2>
+        <p class="sec-desc reveal reveal-d2" style="margin-inline:auto">대표원장이 직접 진단·상담하고, 디지털 장비로 확인하며 치료합니다.</p>
+      </div>
+      <div class="grid grid-3" style="gap:1.2rem">
+        <figure class="reveal" style="margin:0;aspect-ratio:4/3;border-radius:14px;overflow:hidden">
+          <img src="/static/img/consult-explain.jpg" alt="${clinic.business.owner} 대표원장이 치아 모형으로 치료를 설명하는 상담 장면" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+        </figure>
+        <figure class="reveal reveal-d1" style="margin:0;aspect-ratio:4/3;border-radius:14px;overflow:hidden">
+          <img src="/static/img/treatment-digital.jpg" alt="구강스캐너로 디지털 인상을 채득하며 진행하는 정밀 진료" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+        </figure>
+        <figure class="reveal reveal-d2" style="margin:0;aspect-ratio:4/3;border-radius:14px;overflow:hidden">
+          <img src="/static/img/treatment-scene.jpg" alt="확대경(루페)을 착용하고 정밀하게 진행하는 보철 진료" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+        </figure>
+      </div>
+    </div>
+  </section>
+
   <!-- 원장 메시지 -->
   <section class="section bg-navy" style="position:relative;overflow:hidden">
     <div data-parallax="0.06" style="position:absolute;left:-6%;bottom:-10%;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(197,165,114,.12),transparent 70%)"></div>

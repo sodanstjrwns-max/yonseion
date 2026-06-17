@@ -37,7 +37,7 @@ function Header() {
   <header class="site-header">
     <div class="nav-inner">
       <a href="/" class="logo logo-img" aria-label="${clinic.nameKo} 홈">
-        <img src="/static/img/logo-horizontal-color.png" alt="${clinic.nameKo}" width="320" height="110" decoding="async" />
+        <img src="/static/img/logo-horizontal-color-t.png" alt="${clinic.nameKo}" width="320" height="110" decoding="async" />
       </a>
       <nav class="gnb" aria-label="주 메뉴">
         <a href="/mission" class="nav-link">병원미션</a>
@@ -118,7 +118,7 @@ function Footer() {
       <div class="footer-grid">
         <div>
           <div class="logo logo-img" style="margin-bottom:1.4rem">
-            <img src="/static/img/logo-horizontal-color.png" alt="${clinic.nameKo}" width="360" height="124" decoding="async" />
+            <img src="/static/img/logo-horizontal-color-t.png" alt="${clinic.nameKo}" width="360" height="124" decoding="async" />
           </div>
           <p style="max-width:320px;line-height:1.8;color:var(--mist)">
             ${clinic.mission}
