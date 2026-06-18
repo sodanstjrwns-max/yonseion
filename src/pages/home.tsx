@@ -83,15 +83,41 @@ export function HomePage() {
     </div>
   </div>
 
-  <!-- ===== 미션 한 줄 : 여백 가득 ===== -->
+  <!-- ===== 미션 한 줄 + 원장 사진 : 2단 ===== -->
   <section class="section">
     <div class="container">
-      <div class="quote" style="max-width:30ch" data-reveal>
-        <blockquote>닳고 무너진 치아에<br>다시 자연의 형태를.</blockquote>
-        <cite>— ${clinic.nameKo} · 생체모방치의학</cite>
+      <div class="quote-split" id="home-quote">
+        <div class="quote" data-reveal>
+          <blockquote class="quote-big"><span>닳고 무너진 치아에,</span><span>다시 자연의 형태를.</span></blockquote>
+          <cite>— ${clinic.nameKo} · 생체모방치의학</cite>
+        </div>
+        <figure class="quote-portrait img-reveal" data-reveal data-reveal-delay="2">
+          <img src="/static/img/doctor-kim-hero.jpg" alt="${lead.name} ${lead.role} — ${lead.title}" loading="lazy">
+          <figcaption><strong>${lead.name}</strong> · ${lead.role}<br><span>${lead.title}</span></figcaption>
+        </figure>
       </div>
     </div>
   </section>
+  <style>
+    .quote-split{display:grid;grid-template-columns:1.55fr .9fr;gap:clamp(2rem,4vw,3.6rem);align-items:center}
+    #home-quote .quote-big{line-height:1.24;font-size:clamp(1.6rem,2.9vw,2.5rem)}
+    #home-quote .quote-big span{display:block;white-space:nowrap}
+    .quote-portrait{margin:0;position:relative;border-radius:14px;overflow:hidden;box-shadow:0 24px 60px -28px rgba(46,58,75,.45)}
+    .quote-portrait img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;object-position:center 22%}
+    .quote-portrait figcaption{position:absolute;left:0;right:0;bottom:0;padding:1.4rem 1.3rem .95rem;
+      color:#fff;font-size:.92rem;letter-spacing:.01em;line-height:1.4;
+      background:linear-gradient(to top,rgba(28,36,48,.82) 0%,rgba(28,36,48,.45) 55%,transparent 100%)}
+    .quote-portrait figcaption strong{font-weight:700}
+    .quote-portrait figcaption span{opacity:.8;font-size:.82rem}
+    @media (max-width:820px){
+      .quote-split{grid-template-columns:1fr;gap:2.2rem}
+      .quote-portrait{max-width:380px;justify-self:center}
+      #home-quote .quote-big{font-size:clamp(1.8rem,7vw,2.4rem)}
+    }
+    @media (max-width:430px){
+      #home-quote .quote-big span{white-space:normal;word-break:keep-all}
+    }
+  </style>
 
   <hr class="divider container" style="border:0;height:1px;background:var(--line)">
 
