@@ -2,6 +2,9 @@ import { html, raw } from 'hono/html'
 import { clinic } from '../data/clinic'
 import { coreTreatments, treatmentGroups, treatmentsByGroup } from '../data/treatments'
 
+// 정적 CSS 캐시 버스팅용 버전 — app.css 변경 시 이 값을 올리면 엣지/브라우저 캐시가 갱신됨
+const ASSET_VER = '20260618a'
+
 export interface SeoMeta {
   title: string
   description: string
@@ -216,8 +219,8 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
   <link rel="preload" as="style" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&display=swap">
-  <link rel="preload" as="style" href="/static/css/app.css">
-  <link rel="stylesheet" href="/static/css/app.css">
+  <link rel="preload" as="style" href="/static/css/app.css?v=${ASSET_VER}">
+  <link rel="stylesheet" href="/static/css/app.css?v=${ASSET_VER}">
   <!-- FontAwesome 는 아이콘 전용 — 본문 렌더링 차단 방지 위해 비동기 로드 -->
   <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"></noscript>
