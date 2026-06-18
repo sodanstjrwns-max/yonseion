@@ -101,7 +101,7 @@ export function TreatmentDetail(slug: string) {
   ${Breadcrumb(crumb)}
 
   <section class="section">
-    <div class="container" style="display:grid;grid-template-columns:1fr 320px;gap:3.5rem;align-items:start" class="tx-grid">
+    <div class="container tx-grid" style="display:grid;grid-template-columns:1fr 320px;gap:3.5rem;align-items:start">
       <div class="prose" style="max-width:none">
         <p class="lead reveal" id="tx-answer" style="margin-bottom:2rem">${t.hero}</p>
 

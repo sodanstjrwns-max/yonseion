@@ -46,7 +46,7 @@
 
 /* ---------- 1. Reset ---------- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; overflow-x: hidden; width: 100%; }
 body {
   font-family: var(--sans);
   font-size: var(--t-body);
@@ -181,9 +181,10 @@ em, i, cite, address, var, dfn { font-style: normal; }
 .mobile-nav {
   position: fixed; inset: 0; z-index: 200; background: var(--paper);
   display: flex; flex-direction: column; justify-content: center; gap: .4rem;
-  padding: 2rem var(--gutter); transform: translateX(100%); transition: transform .5s var(--ease);
+  padding: 2rem var(--gutter); transform: translateX(100%); transition: transform .5s var(--ease), visibility .5s;
+  visibility: hidden; pointer-events: none; overflow-y: auto;
 }
-.mobile-nav.open { transform: translateX(0); }
+.mobile-nav.open { transform: translateX(0); visibility: visible; pointer-events: auto; }
 .mobile-nav a { font-size: 1.6rem; font-weight: 600; color: var(--ink); padding: .4rem 0; letter-spacing: -.02em; }
 .mobile-nav a.sub { font-size: 1rem; font-weight: 400; color: var(--mist); padding-left: 1rem; }
 .mobile-close { position: absolute; top: 1.6rem; right: var(--gutter); font-size: 2rem; color: var(--ink); }
@@ -564,6 +565,23 @@ em, i, cite, address, var, dfn { font-style: normal; }
   body { padding-bottom: 64px; }
 }
 @media (max-width: 860px) { .rsv-grid { grid-template-columns: 1fr; } }
+
+/* ---------- 29b. Mobile touch-target & readability tuning ---------- */
+@media (max-width: 860px) {
+  /* 푸터 하단 법적 링크: 탭 영역 확대(세로 패딩) */
+  .footer-bottom { gap: .4rem 1.4rem; }
+  .footer-bottom a { display: inline-flex; align-items: center; min-height: 40px; padding: .35rem 0; }
+  /* 브레드크럼: 손가락으로 누르기 쉽게 */
+  .breadcrumb { font-size: .85rem; flex-wrap: wrap; row-gap: .2rem; }
+  .breadcrumb a { display: inline-flex; align-items: center; min-height: 36px; }
+  /* 진료 상세 목차(TOC): 칩 간격 + 탭 높이 */
+  .tx-toc ul { gap: .65rem 1rem; }
+  .tx-toc li a { display: inline-flex; align-items: center; min-height: 32px; padding: .15rem 0; font-size: .92rem; }
+  /* 본문 내 화살표 링크: 탭 높이 확보 */
+  .link-arrow { display: inline-flex; align-items: center; min-height: 40px; }
+  /* eyebrow 라벨 가독성 소폭 상향 */
+  .eyebrow, .hw-eyebrow { font-size: .72rem; letter-spacing: .14em; }
+}
 
 /* ===== 30) v2 레거시 호환 레이어 (mission/biomimetic/doctors/treatments 페이지) ===== */
 /* 신청서의 골드 계열 요청을 반영한 뮤트 앤틱 골드 악센트 — 샴페인 페이퍼 톤과 조화 */
