@@ -8,23 +8,46 @@
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ---- 1. Lenis 부드러운 스크롤 (있으면 사용) ---- */
+  // 모바일/터치 기기는 OS 네이티브 관성 스크롤이 가장 자연스러우므로 Lenis 비활성
+  var isTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches
+             || ('ontouchstart' in window && window.innerWidth <= 1024);
+
   function initLenis() {
-    if (reduce || typeof Lenis === 'undefined') return;
+    if (reduce || isTouch || typeof Lenis === 'undefined') {
+      // 데스크톱 비활성 시에도 앵커 링크는 부드럽게 동작하도록 폴백
+      bindAnchors(null);
+      return;
+    }
     try {
-      var lenis = new Lenis({ duration: 1.1, easing: function (t) { return 1 - Math.pow(1 - t, 3); }, smoothWheel: true });
+      var lenis = new Lenis({
+        lerp: 0.12,            // 0~1, 클수록 즉각적 (기존 duration:1.1 → 둔함)
+        wheelMultiplier: 1.15, // 휠 1회당 이동량 살짝 증가 → 가볍게
+        touchMultiplier: 2,
+        smoothWheel: true
+      });
       function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
       requestAnimationFrame(raf);
       window.__lenis = lenis;
-      // 앵커 링크
-      document.addEventListener('click', function (e) {
-        var a = e.target.closest('a[href^="#"]');
-        if (!a) return;
-        var id = a.getAttribute('href');
-        if (id.length < 2) return;
-        var el = document.querySelector(id);
-        if (el) { e.preventDefault(); lenis.scrollTo(el, { offset: -80 }); }
-      });
-    } catch (err) { /* noop */ }
+      bindAnchors(lenis);
+    } catch (err) { bindAnchors(null); }
+  }
+
+  // 앵커 링크 부드러운 이동 (Lenis 있으면 사용, 없으면 네이티브 smooth)
+  function bindAnchors(lenis) {
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest('a[href^="#"]');
+      if (!a) return;
+      var id = a.getAttribute('href');
+      if (id.length < 2) return;
+      var el = document.querySelector(id);
+      if (!el) return;
+      e.preventDefault();
+      if (lenis) { lenis.scrollTo(el, { offset: -80 }); }
+      else {
+        var top = el.getBoundingClientRect().top + window.pageYOffset - 80;
+        window.scrollTo({ top: top, behavior: 'smooth' });
+      }
+    });
   }
 
   /* ---- 2. 헤더 스크롤 상태 ---- */
