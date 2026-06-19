@@ -176,13 +176,89 @@ export function HomePage() {
     </div>
   </section>
 
-  <!-- ===== 풀블리드 사진 (패럴랙스 + 부유 캡션) ===== -->
-  <section class="section--tight">
-    <figure class="full-bleed img-reveal" data-reveal style="position:relative;aspect-ratio:21/9;overflow:hidden">
-      <img src="/static/img/clinic-reception.jpg" alt="${clinic.nameKo} 리셉션과 대기 공간" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:center 60%">
-      <span class="figure-float">연세온치과 · 진료 공간</span>
-    </figure>
+  <!-- ===== 진료 공간 : 매거진 화보 그리드 ===== -->
+  <section class="section space-section" id="space-gallery">
+    <div class="container">
+      <div class="space-head" data-reveal>
+        <span class="eyebrow">Our Space</span>
+        <h2 class="sec-title">머무는 동안 편안하도록,<br>공간까지 진료의 일부로.</h2>
+        <p class="sec-lead">서울대학교 치과병원과 동일한 진료 시스템 위에, 빛과 동선을 섬세하게 설계했습니다. 진료과목별 공간 구성과 첨단 디지털 장비, 그리고 따뜻한 채광 속에서 진료를 받으실 수 있습니다.</p>
+      </div>
+
+      <div class="mag-grid">
+        <figure class="mag-cell mag-hero img-reveal" data-reveal>
+          <img src="/static/img/photos/clinic_15.jpg" alt="${clinic.nameKo} 리셉션 — 로고 사인이 새겨진 메인 데스크" loading="lazy" decoding="async">
+          <figcaption><span class="cap-no">01</span> 리셉션 · 첫인상을 결정하는 공간</figcaption>
+        </figure>
+
+        <figure class="mag-cell mag-tall img-reveal" data-reveal data-reveal-delay="1">
+          <img src="/static/img/photos/clinic_22.jpg" alt="${clinic.nameKo} 진료실 — 로고가 새겨진 진료 의자와 밝은 채광" loading="lazy" decoding="async">
+          <figcaption><span class="cap-no">02</span> 진료실 · 채광이 드는 1인 공간</figcaption>
+        </figure>
+
+        <figure class="mag-cell img-reveal" data-reveal data-reveal-delay="2">
+          <img src="/static/img/photos/clinic_16.jpg" alt="${clinic.nameKo} 대기 라운지 — 소파와 자연광" loading="lazy" decoding="async">
+          <figcaption><span class="cap-no">03</span> 대기 라운지</figcaption>
+        </figure>
+
+        <figure class="mag-cell img-reveal" data-reveal data-reveal-delay="3">
+          <img src="/static/img/photos/clinic_03.jpg" alt="${clinic.nameKo} 개별 진료실 — 그린톤 인테리어와 디지털 장비" loading="lazy" decoding="async">
+          <figcaption><span class="cap-no">04</span> 개별 진료실</figcaption>
+        </figure>
+
+        <figure class="mag-cell mag-wide img-reveal" data-reveal data-reveal-delay="1">
+          <img src="/static/img/photos/clinic_19.jpg" alt="${clinic.nameKo} 브랜드 월 — 치아를 소중히 여기는 마음, 언제나 켜져 있습니다" loading="lazy" decoding="async">
+          <figcaption><span class="cap-no">05</span> “치아를 소중히 여기는 마음, 언제나 켜져 있습니다”</figcaption>
+        </figure>
+
+        <figure class="mag-cell img-reveal" data-reveal data-reveal-delay="2">
+          <img src="/static/img/photos/clinic_21.jpg" alt="${clinic.nameKo} 오픈 진료 공간 — 다수의 진료 유닛" loading="lazy" decoding="async">
+          <figcaption><span class="cap-no">06</span> 오픈 진료 공간</figcaption>
+        </figure>
+
+        <figure class="mag-cell img-reveal" data-reveal data-reveal-delay="3">
+          <img src="/static/img/photos/clinic_27.jpg" alt="${clinic.nameKo} 디지털 영상 진단실 — 3D CT 장비" loading="lazy" decoding="async">
+          <figcaption><span class="cap-no">07</span> 디지털 영상 진단실 (3D CT)</figcaption>
+        </figure>
+      </div>
+
+      <div class="mt-3" data-reveal>
+        <a href="/directions" class="link-arrow">오시는 길 · 둘러보기 <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </div>
   </section>
+  <style>
+    .space-section{padding-top:clamp(4rem,7vw,6.5rem)}
+    .space-head{max-width:46rem;margin-bottom:clamp(2.6rem,4vw,3.8rem)}
+    .space-head .sec-title{margin:1rem 0 1.2rem}
+    .mag-grid{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-flow:dense;
+      grid-auto-rows:clamp(125px,12vw,170px);gap:clamp(.6rem,1vw,1rem)}
+    .mag-cell{position:relative;margin:0;overflow:hidden;border-radius:6px;
+      grid-column:span 2;grid-row:span 2;background:var(--line)}
+    .mag-cell img{width:100%;height:100%;object-fit:cover;display:block;
+      transition:transform 1.1s cubic-bezier(.2,.7,.2,1)}
+    .mag-cell:hover img{transform:scale(1.05)}
+    .mag-cell figcaption{position:absolute;left:0;right:0;bottom:0;z-index:2;
+      padding:1.7rem 1.1rem .9rem;color:#fff;font-size:.82rem;letter-spacing:.01em;line-height:1.4;
+      background:linear-gradient(to top,rgba(22,29,40,.8) 0%,rgba(22,29,40,.3) 58%,transparent 100%)}
+    .mag-cell .cap-no{display:inline-block;margin-right:.5rem;color:var(--gold-light);
+      font-family:var(--serif);font-size:.78rem;letter-spacing:.06em}
+    /* 비대칭 배치 — 6컬럼이 행마다 빈틈없이 차도록 span 합=6 */
+    .mag-hero{grid-column:span 4;grid-row:span 4}   /* 큰 메인 (좌측 상단) */
+    .mag-tall{grid-column:span 2;grid-row:span 4}   /* 우측 세로 (진료실) */
+    .mag-wide{grid-column:span 4;grid-row:span 2}   /* 가로 와이드 (브랜드월) */
+    @media (max-width:860px){
+      .mag-grid{grid-template-columns:repeat(2,1fr);grid-auto-rows:clamp(120px,30vw,170px)}
+      .mag-cell{grid-column:span 1;grid-row:span 2}
+      .mag-hero{grid-column:span 2;grid-row:span 3}
+      .mag-tall{grid-column:span 1;grid-row:span 3}
+      .mag-wide{grid-column:span 2;grid-row:span 2}
+      .mag-cell figcaption{font-size:.76rem;padding:1.4rem .85rem .75rem}
+    }
+    @media (max-width:480px){
+      .mag-grid{gap:.5rem;grid-auto-rows:30vw}
+    }
+  </style>
 
   <!-- ===== 에디토리얼 스플릿 : 철학 ===== -->
   <section class="section">
