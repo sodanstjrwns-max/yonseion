@@ -83,38 +83,64 @@ export function HomePage() {
     </div>
   </div>
 
-  <!-- ===== 미션 한 줄 + 원장 사진 : 2단 ===== -->
-  <section class="section">
+  <!-- ===== 미션 한 줄 + 원장 사진 : 에디토리얼 2단 ===== -->
+  <section class="section quote-section" id="home-quote">
     <div class="container">
-      <div class="quote-split" id="home-quote">
+      <div class="quote-split">
         <div class="quote" data-reveal>
+          <span class="quote-eyebrow">Our Philosophy</span>
           <blockquote class="quote-big"><span>닳고 무너진 치아에,</span><span>다시 자연의 형태를.</span></blockquote>
-          <cite>— ${clinic.nameKo} · 생체모방치의학</cite>
+          <p class="quote-sub">치아 하나하나의 색조와 형태, 씹는 힘까지 자연이 만든 본래의 모습에 가장 가깝게 되살립니다.</p>
+          <cite class="quote-cite"><span class="cite-line"></span><span class="cite-txt">${clinic.nameKo} · 생체모방치의학</span></cite>
         </div>
         <figure class="quote-portrait img-reveal" data-reveal data-reveal-delay="2">
           <img src="/static/img/doctor-kim-hero.jpg" alt="${lead.name} ${lead.role} — ${lead.title}" loading="lazy">
-          <figcaption><strong>${lead.name}</strong> · ${lead.role}<br><span>${lead.title}</span></figcaption>
+          <figcaption>
+            <strong>${lead.name}</strong><span class="role-tag">대표원장</span>
+            <span class="cap-title">${lead.title}</span>
+          </figcaption>
         </figure>
       </div>
     </div>
   </section>
   <style>
-    .quote-split{display:grid;grid-template-columns:1.55fr .9fr;gap:clamp(2rem,4vw,3.6rem);align-items:center}
-    #home-quote .quote-big{line-height:1.24;font-size:clamp(1.6rem,2.9vw,2.5rem)}
+    .quote-section{padding-top:clamp(4rem,7vw,6.5rem);padding-bottom:clamp(4rem,7vw,6.5rem)}
+    .quote-split{display:grid;grid-template-columns:1.05fr 1fr;gap:clamp(2.4rem,5vw,5rem);align-items:center}
+    #home-quote .quote-eyebrow{display:inline-block;font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;
+      color:var(--gold);font-weight:600;margin-bottom:1.4rem}
+    #home-quote .quote-big{position:relative;line-height:1.18;font-family:var(--serif-kr);font-weight:600;
+      font-size:clamp(2.2rem,4vw,3.4rem);color:var(--ink);letter-spacing:-.01em;margin:0}
+    #home-quote .quote-big::before{content:'\\201C';position:absolute;top:-.55em;left:-.06em;
+      font-family:var(--serif);font-size:clamp(4rem,8vw,7rem);color:var(--gold);opacity:.22;line-height:1;pointer-events:none}
     #home-quote .quote-big span{display:block;white-space:nowrap}
-    .quote-portrait{margin:0;position:relative;border-radius:14px;overflow:hidden;box-shadow:0 24px 60px -28px rgba(46,58,75,.45)}
-    .quote-portrait img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;object-position:center 22%}
-    .quote-portrait figcaption{position:absolute;left:0;right:0;bottom:0;padding:1.4rem 1.3rem .95rem;
-      color:#fff;font-size:.92rem;letter-spacing:.01em;line-height:1.4;
-      background:linear-gradient(to top,rgba(28,36,48,.82) 0%,rgba(28,36,48,.45) 55%,transparent 100%)}
-    .quote-portrait figcaption strong{font-weight:700}
-    .quote-portrait figcaption span{opacity:.8;font-size:.82rem}
-    @media (max-width:820px){
-      .quote-split{grid-template-columns:1fr;gap:2.2rem}
-      .quote-portrait{max-width:380px;justify-self:center}
-      #home-quote .quote-big{font-size:clamp(1.8rem,7vw,2.4rem)}
+    #home-quote .quote-sub{margin-top:1.7rem;font-size:clamp(1rem,1.3vw,1.12rem);line-height:1.85;
+      color:var(--ink-2);max-width:26em;word-break:keep-all}
+    #home-quote .quote-cite{display:flex;align-items:center;gap:1rem;margin-top:2.2rem;
+      font-style:normal;font-size:.95rem;letter-spacing:.02em;color:var(--mist)}
+    #home-quote .quote-cite .cite-line{display:inline-block;width:2.6rem;height:1px;background:var(--gold);flex:none}
+    #home-quote .quote-cite .cite-txt{white-space:nowrap}
+    .quote-portrait{margin:0;position:relative;border-radius:16px;overflow:hidden;
+      box-shadow:0 36px 80px -34px rgba(46,58,75,.5)}
+    .quote-portrait::after{content:'';position:absolute;inset:0;border:1px solid rgba(255,255,255,.14);border-radius:16px;pointer-events:none}
+    .quote-portrait img{display:block;width:100%;aspect-ratio:5/6;object-fit:cover;object-position:center 18%}
+    .quote-portrait figcaption{position:absolute;left:0;right:0;bottom:0;padding:2.6rem 1.7rem 1.4rem;
+      color:#fff;letter-spacing:.01em;line-height:1.45;
+      background:linear-gradient(to top,rgba(24,31,42,.88) 0%,rgba(24,31,42,.5) 50%,transparent 100%)}
+    .quote-portrait figcaption strong{font-size:1.35rem;font-weight:700;font-family:var(--serif-kr)}
+    .quote-portrait figcaption .role-tag{display:inline-block;margin-left:.7rem;padding:.18rem .6rem;
+      font-size:.72rem;letter-spacing:.04em;border:1px solid rgba(224,201,155,.55);border-radius:999px;
+      color:var(--gold-light);vertical-align:middle}
+    .quote-portrait figcaption .cap-title{display:block;margin-top:.55rem;font-size:.9rem;opacity:.82}
+    @media (max-width:860px){
+      .quote-split{grid-template-columns:1fr;gap:2.8rem}
+      .quote-portrait{max-width:440px;justify-self:center;width:100%}
+      .quote{text-align:center;display:flex;flex-direction:column;align-items:center}
+      #home-quote .quote-big{font-size:clamp(2rem,6.6vw,2.8rem)}
+      #home-quote .quote-big::before{left:50%;transform:translateX(-50%);top:-.62em}
+      #home-quote .quote-cite{justify-content:center}
+      #home-quote .quote-sub{margin-left:auto;margin-right:auto}
     }
-    @media (max-width:430px){
+    @media (max-width:560px){
       #home-quote .quote-big span{white-space:normal;word-break:keep-all}
     }
   </style>
