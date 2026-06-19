@@ -164,7 +164,7 @@ export function HomePage() {
       <div class="split">
         <figure class="figure img-reveal tooth-photo" data-reveal>
           <span class="figure-float">Biomimetic Approach</span>
-          <img src="/static/img/biomimetic-tooth.jpg" alt="연세온치과 실제 진료 케이스 — 자연 색조와 절단연 투명감을 살린 앞니 심미 보철 결과" loading="lazy" decoding="async">
+          <img src="/static/img/biomimetic-tooth-v2.jpg" alt="연세온치과 실제 진료 케이스 — 자연 색조와 절단연 투명감을 살린 앞니 심미 보철 결과" loading="lazy" decoding="async">
           <figcaption>실제 진료 케이스 — 옆 치아와 자연스럽게 어우러지는 색조·형태 재현</figcaption>
         </figure>
         <div class="split-text" data-reveal data-reveal-delay="2">
