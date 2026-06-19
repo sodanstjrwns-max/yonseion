@@ -162,18 +162,11 @@ export function HomePage() {
   <section class="section">
     <div class="container">
       <div class="split">
-        <div class="figure figure--tall img-reveal ph tooth-stage" data-reveal>
+        <figure class="figure figure--tall img-reveal tooth-photo" data-reveal>
           <span class="figure-float">Biomimetic Approach</span>
-          <!-- 생체모방 치아 라인아트 — 스크롤 진입 시 스트로크 드로잉 -->
-          <svg class="tooth-art" viewBox="0 0 300 380" fill="none" data-draw>
-            <path class="td td-1" pathLength="100" d="M150 38 C92 38 64 80 64 132 C64 178 80 206 92 252 C101 287 106 330 124 342 C136 350 144 332 147 300 C149 280 149 268 150 268 C151 268 151 280 153 300 C156 332 164 350 176 342 C194 330 199 287 208 252 C220 206 236 178 236 132 C236 80 208 38 150 38 Z" stroke="var(--ink)" stroke-width="2"/>
-            <path class="td td-2" pathLength="100" d="M96 120 C112 96 134 88 150 88 C166 88 188 96 204 120" stroke="var(--gold)" stroke-width="1.6"/>
-            <path class="td td-3" pathLength="100" d="M108 156 C124 138 140 132 150 132 C160 132 176 138 192 156" stroke="var(--gold)" stroke-width="1.3" opacity=".75"/>
-            <path class="td td-4" pathLength="100" d="M120 192 C132 180 144 176 150 176 C156 176 168 180 180 192" stroke="var(--gold)" stroke-width="1" opacity=".55"/>
-            <circle class="td-core" cx="150" cy="230" r="5" fill="var(--gold)"/>
-            <text x="150" y="372" text-anchor="middle" class="tooth-cap">BIOMIMETIC · 자연치아의 결을 따라</text>
-          </svg>
-        </div>
+          <img src="/static/img/biomimetic-tooth.jpg" alt="자연 앞니의 절단연 투명도와 발달구 — 생체모방치의학이 모방하는 자연치아의 결" loading="lazy" decoding="async">
+          <figcaption>자연치아의 결 — 절단연 투명도와 발달구의 미세한 디테일</figcaption>
+        </figure>
         <div class="split-text" data-reveal data-reveal-delay="2">
           <div style="display:flex;align-items:center;gap:1.2rem;margin-bottom:1.6rem">
             <span class="sec-index">02</span>

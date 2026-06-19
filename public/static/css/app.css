@@ -705,18 +705,17 @@ em, i, cite, address, var, dfn { font-style: normal; }
 .mq-item:nth-child(4n+1) { color: var(--gold-2); }
 .mq-dot { font-size: .5rem; color: var(--gold); }
 
-/* ---- 생체모방 치아 라인아트 — 스트로크 드로잉 ---- */
-.tooth-stage { display: grid; place-items: center; }
-.tooth-art { width: min(68%, 300px); height: auto; overflow: visible; }
-.tooth-art .td { stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; }
-.tooth-art.drawn .td-1 { animation: lmDraw 2.2s var(--ease) .1s forwards; }
-.tooth-art.drawn .td-2 { animation: lmDraw 1.2s var(--ease) 1.4s forwards; }
-.tooth-art.drawn .td-3 { animation: lmDraw 1.2s var(--ease) 1.7s forwards; }
-.tooth-art.drawn .td-4 { animation: lmDraw 1.2s var(--ease) 2.0s forwards; }
-.tooth-art .td-core { transform-origin: 150px 230px; transform: scale(0); }
-.tooth-art.drawn .td-core { animation: lmCore .8s var(--ease) 2.5s forwards, toothGlow 3s ease-in-out 3.4s infinite; }
-@keyframes toothGlow { 0%,100% { opacity: 1; } 50% { opacity: .5; } }
-.tooth-cap { font-family: var(--sans); font-size: 9.5px; letter-spacing: .3em; fill: var(--mist); }
+/* ---- 생체모방 치아 실사 사진 ---- */
+.tooth-photo { border-radius: 4px; }
+.tooth-photo img { object-position: center 38%; }
+/* 라벨은 상단으로(하단 캡션과 겹침 방지) */
+.tooth-photo .figure-float { top: 1.5rem; bottom: auto; }
+.tooth-photo figcaption {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+  padding: 2.4rem 1.4rem 1.1rem; font-size: .8rem; letter-spacing: .01em; color: #fff;
+  background: linear-gradient(to top, rgba(20,18,16,.72) 0%, rgba(20,18,16,.32) 55%, transparent 100%);
+  line-height: 1.5;
+}
 
 /* ---- CTA 밴드 — 골드 오빗 오너먼트 ---- */
 .cta-orbit { position: absolute; right: -8%; top: 50%; transform: translateY(-50%); width: clamp(300px, 36vw, 520px); aspect-ratio: 1; opacity: .5; pointer-events: none; }
