@@ -3,7 +3,7 @@ import { clinic } from '../data/clinic'
 import { coreTreatments, treatmentGroups, treatmentsByGroup } from '../data/treatments'
 
 // 정적 CSS 캐시 버스팅용 버전 — app.css 변경 시 이 값을 올리면 엣지/브라우저 캐시가 갱신됨
-const ASSET_VER = '20260618d'
+const ASSET_VER = '20260619a'
 
 export interface SeoMeta {
   title: string
@@ -76,6 +76,7 @@ function Header() {
                 <a class="mega-item" href="/video">병원 영상</a>
               </div>
               <div class="mega-col"><h4>안내</h4>
+                <a class="mega-item" href="/pricing">진료비용 안내</a>
                 <a class="mega-item" href="/faq">자주 묻는 질문</a>
                 <a class="mega-item" href="/notice">공지사항</a>
               </div>
@@ -99,6 +100,7 @@ function Header() {
     <a href="/cases/gallery">비포 / 애프터</a>
     <a href="/column">원장 칼럼</a>
     <a href="/encyclopedia">백과사전</a>
+    <a href="/pricing">진료비용 안내</a>
     <a href="/faq">자주 묻는 질문</a>
     <a href="/directions">오시는 길</a>
     <a href="/login" style="font-size:.88rem;opacity:.8">로그인 / 회원가입</a>
@@ -156,7 +158,7 @@ function Footer() {
       </div>
 
       <p class="footer-legal">
-        ${clinic.business.company} · 대표자 ${clinic.business.owner} · 사업자등록번호 ${clinic.business.bizNo} · ${clinic.address} · 개업 ${clinic.business.openDate} · TEL ${clinic.phone}<br>
+        ${clinic.business.company} · 대표자 ${clinic.business.owner} · 사업자등록번호 ${clinic.business.bizNo} (부가가치세 면세사업자) · ${clinic.address} · 개업 ${clinic.business.openDate} · TEL ${clinic.phone}<br>
         본 사이트의 진료 정보는 일반적인 의학 정보이며, 개인의 상태에 따라 진단·치료 방법과 결과가 다를 수 있습니다. 정확한 내용은 내원하여 전문의와 상담하시기 바랍니다. 의료광고는 관련 법령을 준수합니다.
       </p>
       <div class="footer-bottom">

@@ -535,8 +535,24 @@ em, i, cite, address, var, dfn { font-style: normal; }
 .price-table th { font-size: .75rem; letter-spacing: .14em; text-transform: uppercase; color: var(--mist); text-align: left; padding: 1rem .8rem; border-bottom: 1px solid var(--line); font-weight: 600; }
 .price-table td { padding: 1.1rem .8rem; border-bottom: 1px solid var(--line-soft); font-size: .95rem; color: var(--ink-2); }
 .price-table td:first-child { color: var(--ink); font-weight: 500; }
-.price-table td.price { font-family: var(--serif); white-space: nowrap; }
+.price-table td.price { font-family: var(--serif); white-space: nowrap; color: var(--ink); }
 .price-table td.muted { font-size: .85rem; }
+/* 진료비용 — 분류 바로가기 칩 */
+.price-nav { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 2.6rem; }
+.price-nav a {
+  font-size: .82rem; letter-spacing: .01em; color: var(--ink-2);
+  border: 1px solid var(--line); border-radius: 999px; padding: .5rem 1rem;
+  background: var(--paper); transition: all .25s; white-space: nowrap; min-height: 36px;
+  display: inline-flex; align-items: center;
+}
+.price-nav a:hover { border-color: var(--gold); color: var(--ink); background: rgba(197,159,102,.07); }
+/* 모바일 가로 스크롤 래퍼 */
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+@media (max-width: 640px) {
+  .price-table th, .price-table td { padding: .85rem .6rem; }
+  .price-table td.muted { display: none; }
+  .price-table th:last-child { display: none; }
+}
 .notice-box { border: 1px solid var(--line); border-radius: 4px; padding: 1.6rem 1.8rem; background: var(--paper-2); }
 .notice-box p { font-size: .88rem; color: var(--ink-2); line-height: 1.9; }
 

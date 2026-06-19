@@ -74,21 +74,27 @@ export function PricingPage() {
 
   <section class="section--tight">
     <div class="container">
-      ${raw(priceGroups.map((g) => `
-        <div data-reveal style="margin-bottom:3.5rem">
-          <h2 style="font-family:var(--serif-kr);font-size:var(--t-h3);margin-bottom:1.2rem">${g.label}</h2>
-          <table class="price-table">
-            <thead><tr><th>항목</th><th>단위</th><th>비용</th><th>비고</th></tr></thead>
-            <tbody>
-              ${g.items.map((it) => `
-                <tr>
-                  <td>${it.name}</td>
-                  <td>${it.unit}</td>
-                  <td class="price">${it.price}</td>
-                  <td class="muted">${it.note || ''}</td>
-                </tr>`).join('')}
-            </tbody>
-          </table>
+      <nav class="price-nav" data-reveal aria-label="진료 분류 바로가기">
+        ${raw(priceGroups.map((g, i) => `<a href="#price-${i}">${g.label}</a>`).join(''))}
+      </nav>
+
+      ${raw(priceGroups.map((g, i) => `
+        <div id="price-${i}" data-reveal style="margin-bottom:3.5rem;scroll-margin-top:90px">
+          <h2 style="font-family:var(--serif-kr);font-size:var(--t-h3);margin-bottom:.4rem">${g.label}</h2>
+          ${g.desc ? `<p class="muted" style="font-size:.92rem;margin-bottom:1.2rem">${g.desc}</p>` : '<div style="margin-bottom:1.2rem"></div>'}
+          <div class="table-scroll">
+            <table class="price-table">
+              <thead><tr><th>항목</th><th>비용</th><th>비고</th></tr></thead>
+              <tbody>
+                ${g.items.map((it) => `
+                  <tr>
+                    <td>${it.name}</td>
+                    <td class="price">${it.price}</td>
+                    <td class="muted">${it.note || ''}</td>
+                  </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
         </div>`).join(''))}
 
       <div class="notice-box" data-reveal>
@@ -147,7 +153,7 @@ export function DirectionsPage() {
         </div>
         <div class="metric" data-reveal data-reveal-delay="1">
           <div class="l" style="margin-top:0;margin-bottom:.6rem"><i class="fas fa-square-parking"></i> 주차</div>
-          <p class="text-ink" style="line-height:1.7">허브메디컬타워 건물 주차장 이용</p>
+          <p class="text-ink" style="line-height:1.7">허브메디타워 건물 주차장 이용</p>
           <p class="muted" style="font-size:.88rem;margin-top:.4rem">자세한 주차 안내는 내원 전 전화 문의 부탁드립니다.</p>
         </div>
         <div class="metric" data-reveal data-reveal-delay="2">

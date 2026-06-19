@@ -30,7 +30,7 @@ export const clinic = {
   email: 'ys_ondental@naver.com',
 
   // --- 위치 ---
-  address: '부산광역시 동래구 온천장로 114, 허브메디컬타워 9층',
+  address: '부산광역시 동래구 온천장로 114, 901호(온천동, 허브메디타워)',
   addressRegion: '부산광역시',
   addressLocality: '동래구',
   postalCode: '47734',
@@ -58,12 +58,12 @@ export const clinic = {
   hoursSummary: '평일 09:30-18:30 · 화 야간 ~20:00 · 토 09:30-13:00',
   closedDays: '수요일·일요일·공휴일 휴진',
 
-  // --- 사업자 정보 (푸터) ---
+  // --- 사업자 정보 (푸터) — 사업자등록증 원문 (부가가치세 면세사업자) ---
   business: {
     company: '연세온치과의원',
     owner: '김경희',
-    bizNo: '000-00-00000', // 사업자등록번호 (제공 시 교체)
-    openDate: '2022',
+    bizNo: '248-90-01937', // 사업자등록번호 (사업자등록증 기준)
+    openDate: '2022.03.07',
   },
 
   // --- SNS · 운영 채널 (원장님 답변 '채워가야할 것들 2' 기반) ---
