@@ -162,10 +162,10 @@ export function HomePage() {
   <section class="section">
     <div class="container">
       <div class="split">
-        <figure class="figure figure--tall img-reveal tooth-photo" data-reveal>
+        <figure class="figure img-reveal tooth-photo" data-reveal>
           <span class="figure-float">Biomimetic Approach</span>
-          <img src="/static/img/biomimetic-tooth.jpg" alt="자연 앞니의 절단연 투명도와 발달구 — 생체모방치의학이 모방하는 자연치아의 결" loading="lazy" decoding="async">
-          <figcaption>자연치아의 결 — 절단연 투명도와 발달구의 미세한 디테일</figcaption>
+          <img src="/static/img/biomimetic-tooth.jpg" alt="연세온치과 실제 진료 케이스 — 자연 색조와 절단연 투명감을 살린 앞니 심미 보철 결과" loading="lazy" decoding="async">
+          <figcaption>실제 진료 케이스 — 옆 치아와 자연스럽게 어우러지는 색조·형태 재현</figcaption>
         </figure>
         <div class="split-text" data-reveal data-reveal-delay="2">
           <div style="display:flex;align-items:center;gap:1.2rem;margin-bottom:1.6rem">

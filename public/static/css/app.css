@@ -705,11 +705,12 @@ em, i, cite, address, var, dfn { font-style: normal; }
 .mq-item:nth-child(4n+1) { color: var(--gold-2); }
 .mq-dot { font-size: .5rem; color: var(--gold); }
 
-/* ---- 생체모방 치아 실사 사진 ---- */
-.tooth-photo { border-radius: 4px; }
-.tooth-photo img { object-position: center 38%; }
+/* ---- 생체모방 실제 케이스 사진 (가로 3:2 원본) ---- */
+.tooth-photo { border-radius: 4px; aspect-ratio: 4 / 3; }
+.tooth-photo img { object-fit: cover; object-position: center 42%; }
 /* 라벨은 상단으로(하단 캡션과 겹침 방지) */
 .tooth-photo .figure-float { top: 1.5rem; bottom: auto; }
+@media (max-width: 860px) { .tooth-photo { aspect-ratio: 3 / 2; } }
 .tooth-photo figcaption {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
   padding: 2.4rem 1.4rem 1.1rem; font-size: .8rem; letter-spacing: .01em; color: #fff;
