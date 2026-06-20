@@ -5,9 +5,29 @@ import { Hono } from 'hono'
 import type { Bindings } from '../lib/bindings'
 import { Store, newId } from '../lib/store'
 import { isBot } from '../lib/auth'
-import type { Reservation } from '../data/types'
+import type { Reservation, Notice } from '../data/types'
 
 export const api = new Hono<{ Bindings: Bindings }>()
+
+// --- 활성 팝업 공지 조회 (메인 히어로 팝업용) ---
+api.get('/popups', async (c) => {
+  const store = new Store(c.env.R2)
+  const today = new Date().toISOString().slice(0, 10)
+  const idx = await store.index<{ id: string; popup?: boolean; published?: boolean; popupUntil?: string; pinned?: boolean }>('notices')
+  const active = idx.filter((x) => x.popup && x.published !== false && (!x.popupUntil || x.popupUntil >= today))
+  // 고정 공지를 먼저, 최대 3건
+  active.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0))
+  const out: Array<{ id: string; title: string; contentHtml: string; image?: string; link?: string }> = []
+  for (const it of active.slice(0, 3)) {
+    const n = await store.getJSON<Notice>(`notices/${it.id}.json`)
+    if (n && n.popup && n.published) {
+      out.push({ id: n.id, title: n.title, contentHtml: n.contentHtml, image: n.image, link: n.link })
+    }
+  }
+  return c.json({ ok: true, popups: out }, 200, {
+    'Cache-Control': 'public, max-age=120',
+  })
+})
 
 // --- 예약 접수 ---
 api.post('/reservations', async (c) => {

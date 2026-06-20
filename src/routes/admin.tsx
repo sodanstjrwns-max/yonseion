@@ -16,6 +16,13 @@ import { regionList } from '../data/regions'
 
 export const admin = new Hono<{ Bindings: Bindings }>()
 
+// HTML 속성/텍스트 영역 이스케이프 (XSS·따옴표 깨짐 방지)
+function esc(s: string): string {
+  return String(s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+}
+
 // ---------- 공통 셸 ----------
 function shell(title: string, body: string, active = '') {
   const nav = [
@@ -48,7 +55,8 @@ a{color:inherit;text-decoration:none}
 .main{padding:2.2rem 2.6rem;max-width:1100px}
 h1{font-size:1.5rem;margin-bottom:1.6rem;letter-spacing:-.02em}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem}
-.stat{background:#fff;border:1px solid var(--line);border-radius:10px;padding:1.3rem}
+.stat{background:#fff;border:1px solid var(--line);border-radius:10px;padding:1.3rem;transition:border-color .15s,box-shadow .15s}
+a.stat:hover{border-color:#C9BE9E;box-shadow:0 4px 14px rgba(20,36,62,.08)}
 .stat .n{font-size:1.9rem;font-weight:700}.stat .l{color:var(--mist);font-size:.85rem}
 table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
 th,td{padding:.75rem .9rem;text-align:left;border-bottom:1px solid var(--line);font-size:.9rem;vertical-align:top}
@@ -68,6 +76,20 @@ textarea{min-height:120px;resize:vertical}
 .badge.new{background:#14243E;color:#fff}.badge.confirmed{background:#2E5E3A;color:#fff}.badge.done{background:#888;color:#fff}.badge.cancel{background:#9C2B2B;color:#fff}
 .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;gap:1rem;flex-wrap:wrap}
 .muted{color:var(--mist);font-size:.85rem}
+/* 토글 스위치 */
+.switch{display:flex;align-items:center;gap:.7rem;padding:.85rem 1rem;border:1px solid var(--line);border-radius:9px;background:#FBFAF6;cursor:pointer;margin:.5rem 0;transition:border-color .15s,background .15s}
+.switch:hover{border-color:#C9BE9E}
+.switch input{display:none}
+.switch .track{flex:0 0 44px;width:44px;height:25px;border-radius:20px;background:#CFC9BA;position:relative;transition:background .2s}
+.switch .track::after{content:'';position:absolute;top:3px;left:3px;width:19px;height:19px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+.switch input:checked+.track{background:#2E7D52}
+.switch input:checked+.track::after{transform:translateX(19px)}
+.switch .sw-text{flex:1}
+.switch .sw-text b{display:block;font-size:.9rem;font-weight:600}
+.switch .sw-text small{color:var(--mist);font-size:.78rem}
+.switch.accent input:checked+.track{background:#AE8A4C}
+.badge.pin{background:#AE8A4C;color:#fff}.badge.popup{background:#2E5E8A;color:#fff}.badge.off{background:#DDD6C7;color:#7A7361}
+.sub-fields{padding:1rem 1.1rem;border-left:3px solid #E4D9BC;background:#FCFAF3;border-radius:0 8px 8px 0;margin:.3rem 0 .6rem}
 @media(max-width:860px){.layout{grid-template-columns:1fr}.side{flex-direction:row;flex-wrap:wrap}.side .logout{margin:0}.main{padding:1.4rem}}
 </style>
 </head>
@@ -144,25 +166,58 @@ admin.get('/', async (c) => {
     newCount = row?.n || 0
   } catch { /* noop */ }
 
+  // 활성 팝업 공지 현황
+  const today = new Date().toISOString().slice(0, 10)
+  const activePopups = (ntcIdx as any[]).filter((x) => x.popup && x.published !== false && (!x.popupUntil || x.popupUntil >= today))
+
+  // 최근 예약 5건
+  const recentRsv: Reservation[] = []
+  for (const it of (rsvIdx as any[]).slice(0, 5)) {
+    const r = await store.getJSON<Reservation>(`reservations/${it.id}.json`)
+    if (r) recentRsv.push(r)
+  }
+  const rsvBadge = (s: string) => `<span class="badge ${s}">${({ new: '신규', confirmed: '확정', done: '완료', cancel: '취소' } as any)[s] || s}</span>`
+  const fmtDate = (iso: string) => { try { const d = new Date(iso); return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}` } catch { return (iso || '').slice(0, 10) } }
+
   const body = `
   <h1>대시보드</h1>
+  ${newCount ? `<div class="panel" style="background:#14243E;color:#fff;border:0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+    <span style="font-size:1rem"><i class="fas fa-bell" style="color:#E0C99B;margin-right:.5rem"></i> 확인하지 않은 <b>신규 예약 ${newCount}건</b>이 있습니다.</span>
+    <a class="btn" style="background:#E0C99B;color:#14243E" href="/admin/reservations">예약 확인하기 <i class="fas fa-arrow-right"></i></a>
+  </div>` : ''}
+  ${activePopups.length ? `<div class="panel" style="background:#FCF7EA;border-color:#E4D9BC;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.8rem;padding:.9rem 1.2rem">
+    <span><i class="fas fa-bullhorn" style="color:#AE8A4C;margin-right:.4rem"></i> 메인 화면에 공지 <b>${activePopups.length}건</b>이 팝업으로 노출 중입니다.</span>
+    <a class="btn sm ghost" href="/admin/notices">공지 관리</a>
+  </div>` : ''}
   <div class="cards">
-    <div class="stat"><div class="n">${rsvIdx.length}</div><div class="l">누적 예약 신청${newCount ? ` · 신규 ${newCount}건` : ''}</div></div>
-    <div class="stat"><div class="n">${userIdx.length}</div><div class="l">회원</div></div>
-    <div class="stat"><div class="n">${caseIdx.length}</div><div class="l">케이스</div></div>
-    <div class="stat"><div class="n">${colIdx.length}</div><div class="l">칼럼</div></div>
-    <div class="stat"><div class="n">${ntcIdx.length}</div><div class="l">공지</div></div>
+    <a class="stat" href="/admin/reservations" style="display:block"><div class="n">${rsvIdx.length}</div><div class="l">누적 예약${newCount ? ` · <b style="color:#9C2B2B">신규 ${newCount}</b>` : ''}</div></a>
+    <a class="stat" href="/admin/members" style="display:block"><div class="n">${userIdx.length}</div><div class="l">회원</div></a>
+    <a class="stat" href="/admin/cases" style="display:block"><div class="n">${caseIdx.length}</div><div class="l">케이스</div></a>
+    <a class="stat" href="/admin/columns" style="display:block"><div class="n">${colIdx.length}</div><div class="l">칼럼</div></a>
+    <a class="stat" href="/admin/notices" style="display:block"><div class="n">${ntcIdx.length}</div><div class="l">공지${activePopups.length ? ` · <b style="color:#AE8A4C">팝업 ${activePopups.length}</b>` : ''}</div></a>
   </div>
-  <div class="panel">
-    <strong>빠른 작업</strong>
-    <div style="display:flex;gap:.7rem;margin-top:1rem;flex-wrap:wrap">
-      <a class="btn" href="/admin/cases/new"><i class="fas fa-plus"></i> 케이스 등록</a>
-      <a class="btn" href="/admin/columns/new"><i class="fas fa-plus"></i> 칼럼 작성</a>
-      <a class="btn" href="/admin/notices/new"><i class="fas fa-plus"></i> 공지 작성</a>
-      <a class="btn ghost" href="/admin/reservations"><i class="fas fa-calendar-check"></i> 예약 확인</a>
+
+  <div class="row2" style="align-items:start">
+    <div class="panel" style="margin-bottom:0">
+      <div class="toolbar" style="margin-bottom:.8rem"><strong>최근 예약 신청</strong><a class="muted" href="/admin/reservations" style="font-size:.82rem">전체 보기 →</a></div>
+      ${recentRsv.length ? `<table style="border:0">
+        <tbody>${recentRsv.map((r) => `<tr>
+          <td style="border-bottom:1px solid var(--line)"><b>${esc(r.name)}</b><br><small class="muted">${esc(r.treatment || '문의')}</small></td>
+          <td style="border-bottom:1px solid var(--line);text-align:right"><small class="muted">${fmtDate(r.createdAt)}</small><br>${rsvBadge(r.status)}</td>
+        </tr>`).join('')}</tbody>
+      </table>` : '<p class="muted">아직 예약 신청이 없습니다.</p>'}
+    </div>
+    <div class="panel" style="margin-bottom:0">
+      <strong>빠른 작업</strong>
+      <div style="display:flex;flex-direction:column;gap:.6rem;margin-top:1rem">
+        <a class="btn" href="/admin/notices/new"><i class="fas fa-bullhorn"></i> 공지 작성 (팝업 띄우기)</a>
+        <a class="btn ghost" href="/admin/cases/new"><i class="fas fa-plus"></i> 케이스 등록</a>
+        <a class="btn ghost" href="/admin/columns/new"><i class="fas fa-pen-nib"></i> 칼럼 작성</a>
+        <a class="btn ghost" href="/" target="_blank"><i class="fas fa-arrow-up-right-from-square"></i> 사이트 미리보기</a>
+      </div>
     </div>
   </div>
-  <p class="muted">병원 기본정보(전화·주소·진료시간)는 <code>src/data/clinic.ts</code> 한 파일에서 관리됩니다.</p>`
+  <p class="muted" style="margin-top:1.6rem">병원 기본정보(전화·주소·진료시간)는 <code>src/data/clinic.ts</code> 파일에서 관리됩니다.</p>`
   return c.html(shell('대시보드', body, '/admin'))
 })
 
@@ -543,14 +598,18 @@ admin.post('/columns/:id/delete', async (c) => {
 // ============================================================================
 admin.get('/notices', async (c) => {
   const store = new Store(c.env.R2)
-  const idx = await store.index<{ id: string; title: string; createdAt: string; published: boolean; pinned?: boolean }>('notices')
+  const idx = await store.index<{ id: string; title: string; createdAt: string; published: boolean; pinned?: boolean; popup?: boolean; popupUntil?: string }>('notices')
   const views = await viewCounts(c, 'notice', idx.map((x) => x.id))
+  const today = new Date().toISOString().slice(0, 10)
+  const popupActive = (x: any) => x.popup && x.published && (!x.popupUntil || x.popupUntil >= today)
+  const activeCount = idx.filter(popupActive).length
   const body = `
   <div class="toolbar"><h1 style="margin:0">공지 관리</h1><a class="btn" href="/admin/notices/new"><i class="fas fa-plus"></i> 새 공지</a></div>
+  ${activeCount ? `<div class="panel" style="background:#FCF7EA;border-color:#E4D9BC;display:flex;align-items:center;gap:.6rem;padding:.9rem 1.2rem"><i class="fas fa-bullhorn" style="color:#AE8A4C"></i> 현재 메인 화면에 <b>${activeCount}건</b>의 공지가 팝업으로 노출 중입니다.</div>` : ''}
   ${idx.length ? `<table><thead><tr><th>제목</th><th>작성일</th><th>조회수</th><th>상태</th><th></th></tr></thead><tbody>
-    ${idx.map((x) => `<tr><td>${x.pinned ? '📌 ' : ''}${x.title}</td><td class="muted">${(x.createdAt || '').slice(0, 10)}</td>
+    ${idx.map((x) => `<tr><td>${esc(x.title)}</td><td class="muted">${(x.createdAt || '').slice(0, 10)}</td>
       <td class="muted"><i class="far fa-eye" style="font-size:.75rem"></i> ${views[x.id] || 0}</td>
-      <td>${x.published ? '<span class="badge confirmed">게시</span>' : '<span class="badge">비공개</span>'}</td>
+      <td style="white-space:nowrap">${x.published ? '<span class="badge confirmed">게시</span>' : '<span class="badge off">비공개</span>'}${x.pinned ? ' <span class="badge pin">고정</span>' : ''}${popupActive(x) ? ' <span class="badge popup"><i class="fas fa-bullhorn" style="font-size:.65rem"></i> 팝업</span>' : (x.popup ? ' <span class="badge off">팝업 대기</span>' : '')}</td>
       <td><a class="btn sm ghost" href="/admin/notices/${x.id}">수정</a>
       <form method="POST" action="/admin/notices/${x.id}/delete" style="display:inline" onsubmit="return confirm('삭제할까요?')"><button class="btn sm danger">삭제</button></form></td></tr>`).join('')}
   </tbody></table>` : '<div class="panel">작성된 공지가 없습니다.</div>'}`
@@ -560,14 +619,41 @@ admin.get('/notices', async (c) => {
 function noticeForm(n?: Notice) {
   return `
   <form class="panel" method="POST">
-    <label>제목 *</label><input name="title" required value="${n?.title || ''}">
+    <label>제목 *</label><input name="title" required value="${esc(n?.title || '')}">
     <label>본문 HTML *</label>
-    <textarea name="contentHtml" required style="min-height:220px">${n?.contentHtml || '<p>내용…</p>'}</textarea>
+    <textarea name="contentHtml" required style="min-height:220px">${esc(n?.contentHtml || '<p>내용…</p>')}</textarea>
     <label>이미지 (선택)</label>
-    <input type="text" id="image" name="image" value="${n?.image || ''}" placeholder="/api/images/...">
+    <input type="text" id="image" name="image" value="${esc(n?.image || '')}" placeholder="/api/images/...">
     <input type="file" accept="image/*" onchange="upload(this,'image')" style="margin-top:.3rem"><small class="muted"></small>
-    <label><input type="checkbox" name="pinned" style="width:auto;margin-right:.5rem" ${n?.pinned ? 'checked' : ''}>상단 고정 (대표 공지)</label>
-    <label><input type="checkbox" name="published" style="width:auto;margin-right:.5rem" ${n?.published !== false ? 'checked' : ''}>게시</label>
+
+    <div style="margin-top:1.6rem;border-top:1px solid var(--line);padding-top:1.2rem">
+      <strong style="font-size:.95rem">노출 설정</strong>
+
+      <label class="switch"><input type="checkbox" name="published" ${n?.published !== false ? 'checked' : ''}><span class="track"></span>
+        <span class="sw-text"><b>게시</b><small>체크 해제 시 사이트에 노출되지 않습니다 (임시 저장)</small></span></label>
+
+      <label class="switch"><input type="checkbox" name="pinned" ${n?.pinned ? 'checked' : ''}><span class="track"></span>
+        <span class="sw-text"><b>상단 고정</b><small>공지 목록 맨 위에 대표 공지로 고정합니다</small></span></label>
+
+      <label class="switch accent"><input type="checkbox" name="popup" id="popupToggle" ${n?.popup ? 'checked' : ''} onchange="document.getElementById('popupFields').style.display=this.checked?'block':'none'"><span class="track"></span>
+        <span class="sw-text"><b><i class="fas fa-bullhorn" style="color:#AE8A4C;margin-right:.3rem"></i>메인 페이지 팝업으로 띄우기</b><small>홈 화면 접속 시 팝업 창으로 이 공지를 노출합니다</small></span></label>
+
+      <div class="sub-fields" id="popupFields" style="display:${n?.popup ? 'block' : 'none'}">
+        <div class="row2">
+          <div>
+            <label style="margin-top:0">팝업 노출 종료일 (선택)</label>
+            <input type="date" name="popupUntil" value="${esc(n?.popupUntil || '')}">
+            <small class="muted">이 날짜까지만 팝업이 뜹니다. 비우면 계속 노출.</small>
+          </div>
+          <div>
+            <label style="margin-top:0">팝업 클릭 시 이동 링크 (선택)</label>
+            <input type="text" name="link" value="${esc(n?.link || '')}" placeholder="예: /reservation 또는 https://...">
+            <small class="muted">비우면 공지 상세 페이지로 이동합니다.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <button class="btn" style="margin-top:1.2rem"><i class="fas fa-floppy-disk"></i> 저장</button>
   </form>${uploadScript}`
 }
@@ -590,11 +676,14 @@ async function saveNotice(c: any, existing?: Notice) {
     image: String(f.image || '') || undefined,
     pinned: !!f.pinned,
     published: !!f.published,
+    popup: !!f.popup,
+    popupUntil: String(f.popupUntil || '') || undefined,
+    link: String(f.link || '').trim() || undefined,
     createdAt: existing?.createdAt || new Date().toISOString(),
   }
   await store.putJSON(`notices/${n.id}.json`, n)
   const idx = (await store.index<any>('notices')).filter((x: any) => x.id !== n.id)
-  idx.unshift({ id: n.id, title: n.title, createdAt: n.createdAt, published: n.published, pinned: n.pinned })
+  idx.unshift({ id: n.id, title: n.title, createdAt: n.createdAt, published: n.published, pinned: n.pinned, popup: n.popup, popupUntil: n.popupUntil })
   await store.setIndex('notices', idx)
 }
 

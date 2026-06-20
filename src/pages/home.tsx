@@ -354,6 +354,80 @@ export function HomePage() {
       <a href="/reservation" class="btn btn-primary" data-reveal data-reveal-delay="2">예약 상담 신청 <i class="fas fa-arrow-right"></i></a>
     </div>
   </section>
+
+  <!-- ===== 공지 팝업 (관리자에서 ON 한 공지를 동적으로 표시) ===== -->
+  <div id="noticePopupRoot" aria-live="polite"></div>
+  <style>
+    #noticePopupRoot .np-overlay{position:fixed;inset:0;z-index:9999;background:rgba(14,22,38,.55);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:1.2rem;opacity:0;transition:opacity .3s ease}
+    #noticePopupRoot .np-overlay.show{opacity:1}
+    #noticePopupRoot .np-card{background:#fff;border-radius:18px;max-width:420px;width:100%;overflow:hidden;box-shadow:0 30px 80px rgba(10,18,34,.45);transform:translateY(18px) scale(.98);transition:transform .35s cubic-bezier(.16,1,.3,1);max-height:88vh;display:flex;flex-direction:column}
+    #noticePopupRoot .np-overlay.show .np-card{transform:none}
+    #noticePopupRoot .np-img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#f1ece0;display:block}
+    #noticePopupRoot .np-body{padding:1.6rem 1.7rem;overflow-y:auto}
+    #noticePopupRoot .np-eyebrow{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold,#C59F66);font-weight:600;margin-bottom:.5rem}
+    #noticePopupRoot .np-title{font-size:1.25rem;font-weight:700;line-height:1.35;color:var(--ink,#14243E);margin-bottom:.8rem;letter-spacing:-.02em}
+    #noticePopupRoot .np-content{font-size:.93rem;line-height:1.7;color:#4a5364}
+    #noticePopupRoot .np-content p{margin:0 0 .6rem}
+    #noticePopupRoot .np-content img{max-width:100%;border-radius:8px;margin:.5rem 0}
+    #noticePopupRoot .np-cta{display:inline-flex;align-items:center;gap:.4rem;margin-top:1.1rem;background:var(--ink,#14243E);color:#fff;padding:.7rem 1.3rem;border-radius:9px;font-size:.9rem;font-weight:600;text-decoration:none}
+    #noticePopupRoot .np-foot{display:flex;justify-content:space-between;align-items:center;padding:.8rem 1.5rem;border-top:1px solid #eee5d4;background:#faf8f2}
+    #noticePopupRoot .np-foot button{background:none;border:0;font:inherit;color:#8A93A6;font-size:.85rem;cursor:pointer;padding:.3rem .2rem}
+    #noticePopupRoot .np-foot button:hover{color:#14243E}
+    #noticePopupRoot .np-dots{display:flex;gap:.4rem;justify-content:center;padding:.6rem 0 0}
+    #noticePopupRoot .np-dots span{width:7px;height:7px;border-radius:50%;background:#d8cfba;cursor:pointer;transition:background .2s}
+    #noticePopupRoot .np-dots span.on{background:var(--gold,#C59F66)}
+  </style>
+  ${raw(`<script>
+  (function(){
+    function dismissedToday(id){
+      try{ return localStorage.getItem('np_hide_'+id) === new Date().toISOString().slice(0,10); }catch(e){ return false; }
+    }
+    function hideToday(id){
+      try{ localStorage.setItem('np_hide_'+id, new Date().toISOString().slice(0,10)); }catch(e){}
+    }
+    fetch('/api/popups').then(function(r){ return r.json(); }).then(function(d){
+      if(!d || !d.ok || !d.popups || !d.popups.length) return;
+      var items = d.popups.filter(function(p){ return !dismissedToday(p.id); });
+      if(!items.length) return;
+      var root = document.getElementById('noticePopupRoot');
+      var i = 0;
+      var ov = document.createElement('div');
+      ov.className = 'np-overlay';
+      root.appendChild(ov);
+      function render(){
+        var p = items[i];
+        var cta = '<a class="np-cta" href="'+ (p.link || ('/notice/'+p.id)) +'">자세히 보기 <i class="fas fa-arrow-right"></i></a>';
+        var img = p.image ? '<img class="np-img" src="'+p.image+'" alt="">' : '';
+        var dots = items.length>1 ? '<div class="np-dots">'+items.map(function(_,k){return '<span class="'+(k===i?'on':'')+'" data-k="'+k+'"></span>';}).join('')+'</div>' : '';
+        ov.innerHTML = '<div class="np-card" role="dialog" aria-modal="true" aria-label="공지 팝업">'+
+          img +
+          '<div class="np-body"><div class="np-eyebrow">연세온치과 공지</div>'+
+          '<div class="np-title">'+p.title+'</div>'+
+          '<div class="np-content">'+p.contentHtml+'</div>'+ cta +'</div>'+
+          dots +
+          '<div class="np-foot"><button data-act="today">오늘 하루 보지 않기</button><button data-act="close">닫기 ✕</button></div>'+
+        '</div>';
+        ov.querySelectorAll('.np-dots span').forEach(function(s){
+          s.addEventListener('click', function(){ i = +this.getAttribute('data-k'); render(); });
+        });
+        ov.querySelector('[data-act="today"]').addEventListener('click', function(){ hideToday(p.id); next(); });
+        ov.querySelector('[data-act="close"]').addEventListener('click', next);
+      }
+      function next(){
+        if(i < items.length-1){ i++; render(); }
+        else { close(); }
+      }
+      function close(){
+        ov.classList.remove('show');
+        setTimeout(function(){ ov.remove(); }, 320);
+      }
+      ov.addEventListener('click', function(e){ if(e.target===ov) close(); });
+      document.addEventListener('keydown', function onEsc(e){ if(e.key==='Escape'){ close(); document.removeEventListener('keydown', onEsc); } });
+      render();
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){ ov.classList.add('show'); }); });
+    }).catch(function(){});
+  })();
+  </script>`)}
   `
 
   return Layout(meta, body)

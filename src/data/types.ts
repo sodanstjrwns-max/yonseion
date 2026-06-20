@@ -45,6 +45,9 @@ export interface Notice {
   image?: string
   pinned: boolean               // 대표(상단고정)
   published: boolean
+  popup: boolean                // 메인 히어로 팝업 노출 여부
+  popupUntil?: string           // 팝업 노출 종료일 (YYYY-MM-DD, 선택) — 이후 자동 숨김
+  link?: string                 // 팝업 클릭 시 이동할 링크 (선택, 기본은 공지 상세)
   createdAt: string
 }
 
