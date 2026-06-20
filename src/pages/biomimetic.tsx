@@ -57,6 +57,29 @@ export function BiomimeticPage() {
     </div>
   </section>
 
+  <!-- 실제 진료 케이스 갤러리 -->
+  <section class="section">
+    <div class="container">
+      <div class="sec-head center">
+        <p class="eyebrow reveal">Clinical Cases</p>
+        <h2 class="sec-title reveal reveal-d1">자연치를 닮은 <span class="gold">실제 진료 케이스</span></h2>
+        <p class="reveal reveal-d1" style="max-width:680px;margin:1rem auto 0;color:var(--ink-soft)">옆 치아와 어우러지는 색조·형태·절단연 투명감까지, 자연치의 구조를 모방해 복원한 연세온치과의 실제 보존·심미 보철 결과입니다.</p>
+      </div>
+      <div class="case-grid">
+        ${raw([
+          { src: 'case-biomimetic-01', alt: '연세온치과 실제 진료 케이스 — 자연 색조와 절단연 투명감을 살린 상악 앞니 심미 보철 결과', cap: '앞니 심미 보철 — 자연 색조·절단연 투명감 재현' },
+          { src: 'case-biomimetic-02', alt: '연세온치과 실제 진료 케이스 — 전악 보철로 균일한 형태와 밝은 색조를 회복한 결과', cap: '전악 보철 — 균일한 형태와 밝은 색조 회복' },
+          { src: 'case-biomimetic-03', alt: '연세온치과 실제 진료 케이스 — 잇몸과 조화롭게 어우러지는 상악 앞니 심미 보철 결과', cap: '앞니 심미 보철 — 잇몸과 조화로운 형태·색조' },
+        ].map((c, i) => `
+          <figure class="case-card img-reveal reveal reveal-d${i}">
+            <img src="/static/img/${c.src}.jpg" alt="${c.alt}" loading="lazy" decoding="async">
+            <figcaption>${c.cap}</figcaption>
+          </figure>`).join(''))}
+      </div>
+      <p style="text-align:center;color:var(--muted);font-size:.82rem;margin-top:1.4rem">※ 실제 치료 사례이며, 치료 결과는 환자의 구강 상태에 따라 개인차가 있을 수 있습니다.</p>
+    </div>
+  </section>
+
   <!-- 비교 (일반 vs 생체모방) -->
   <section class="section">
     <div class="container" style="max-width:900px">
@@ -114,6 +137,11 @@ export function BiomimeticPage() {
   <style>
     .faq-item.open .faq-a { max-height: 320px; }
     .faq-item.open .faq-q i { transform: rotate(45deg); }
+    .case-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.4rem; margin-top:2.4rem; }
+    .case-card { margin:0; border:1px solid var(--line); border-radius:16px; overflow:hidden; background:#fff; box-shadow:0 8px 28px rgba(20,30,55,.06); }
+    .case-card img { display:block; width:100%; aspect-ratio:3/2; object-fit:cover; background:#000; }
+    .case-card figcaption { padding:1rem 1.2rem; font-size:.9rem; color:var(--ink-soft); border-top:1px solid var(--line); }
+    @media (max-width:820px){ .case-grid { grid-template-columns:1fr; gap:1.1rem; } }
   </style>
   `
   return Layout({
