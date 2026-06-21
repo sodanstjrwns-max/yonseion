@@ -5,6 +5,7 @@ import { Hono } from 'hono'
 import { html, raw } from 'hono/html'
 import type { Bindings } from '../lib/bindings'
 import { Store, newId, slugify } from '../lib/store'
+import { fireIndexNotify } from '../lib/indexing'
 import {
   getSession, setSessionCookie, clearSession, sessionSecret, adminPassword,
 } from '../lib/auth'
@@ -730,6 +731,8 @@ async function saveCase(c: any, existing?: CaseItem) {
   const idx = (await store.index<any>('cases')).filter((x: any) => x.id !== cs.id)
   idx.unshift({ id: cs.id, slug: cs.slug, title: cs.title, createdAt: cs.createdAt, published: cs.published })
   await store.setIndex('cases', idx)
+  // 발행된 케이스(비포애프터)는 구글에 자동 색인 요청
+  if (cs.published) fireIndexNotify(c, `/cases/${cs.slug}`)
 }
 
 admin.post('/cases/new', async (c) => { await saveCase(c); return c.redirect('/admin/cases') })
@@ -742,8 +745,10 @@ admin.post('/cases/:id', async (c) => {
 admin.post('/cases/:id/delete', async (c) => {
   const id = c.req.param('id')
   const store = new Store(c.env.R2)
+  const cs = await store.getJSON<CaseItem>(`cases/${id}.json`)
   await store.delete(`cases/${id}.json`)
   await store.setIndex('cases', (await store.index<any>('cases')).filter((x: any) => x.id !== id))
+  if (cs?.slug) fireIndexNotify(c, `/cases/${cs.slug}`, 'URL_DELETED')
   return c.redirect('/admin/cases')
 })
 
@@ -893,6 +898,8 @@ async function saveColumn(c: any, existing?: Column) {
   const idx = (await store.index<any>('columns')).filter((x: any) => x.id !== col.id)
   idx.unshift({ id: col.id, slug: col.slug, title: col.title, createdAt: col.createdAt, published: col.published })
   await store.setIndex('columns', idx)
+  // 발행된 칼럼은 구글에 자동 색인 요청
+  if (col.published) fireIndexNotify(c, `/column/${col.slug}`)
 }
 
 admin.post('/columns/new', async (c) => { await saveColumn(c); return c.redirect('/admin/columns') })
@@ -905,8 +912,10 @@ admin.post('/columns/:id', async (c) => {
 admin.post('/columns/:id/delete', async (c) => {
   const id = c.req.param('id')
   const store = new Store(c.env.R2)
+  const col = await store.getJSON<Column>(`columns/${id}.json`)
   await store.delete(`columns/${id}.json`)
   await store.setIndex('columns', (await store.index<any>('columns')).filter((x: any) => x.id !== id))
+  if (col?.slug) fireIndexNotify(c, `/column/${col.slug}`, 'URL_DELETED')
   return c.redirect('/admin/columns')
 })
 
@@ -1002,6 +1011,8 @@ async function saveNotice(c: any, existing?: Notice) {
   const idx = (await store.index<any>('notices')).filter((x: any) => x.id !== n.id)
   idx.unshift({ id: n.id, title: n.title, createdAt: n.createdAt, published: n.published, pinned: n.pinned, popup: n.popup, popupUntil: n.popupUntil })
   await store.setIndex('notices', idx)
+  // 발행된 공지는 구글에 자동 색인 요청
+  if (n.published) fireIndexNotify(c, `/notice/${n.id}`)
 }
 
 admin.post('/notices/new', async (c) => { await saveNotice(c); return c.redirect('/admin/notices') })
@@ -1016,5 +1027,6 @@ admin.post('/notices/:id/delete', async (c) => {
   const store = new Store(c.env.R2)
   await store.delete(`notices/${id}.json`)
   await store.setIndex('notices', (await store.index<any>('notices')).filter((x: any) => x.id !== id))
+  fireIndexNotify(c, `/notice/${id}`, 'URL_DELETED')
   return c.redirect('/admin/notices')
 })

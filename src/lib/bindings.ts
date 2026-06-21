@@ -10,4 +10,7 @@ export type Bindings = {
   GOOGLE_CLIENT_SECRET?: string
   RESEND_API_KEY?: string
   NOTIFICATION_EMAIL?: string
+  // 구글 Indexing API (콘텐츠 자동 색인)
+  GOOGLE_INDEXING_CLIENT_EMAIL?: string
+  GOOGLE_INDEXING_PRIVATE_KEY?: string
 }
