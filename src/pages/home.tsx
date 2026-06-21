@@ -335,7 +335,7 @@ export function HomePage() {
           </div>
           <h2>${lead.name} <span style="font-size:.4em;color:var(--mist);font-family:var(--sans);font-weight:500">${lead.role}</span></h2>
           <p class="muted" style="font-size:.95rem;margin-bottom:1.4rem">${lead.title}</p>
-          <p>${lead.philosophy[0]}</p>
+          <p>안녕하세요, 대표원장 ${lead.name}입니다.<br>제가 생각하는 좋은 치과는, 환자분께서 지금보다 더 나은 삶을 영위하실 수 있도록 돕는 곳입니다.</p>
           <a href="/doctors/${lead.slug}" class="link-arrow mt-1">의료진 소개 <i class="fas fa-arrow-right"></i></a>
         </div>
       </div>
