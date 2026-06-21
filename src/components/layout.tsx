@@ -9,10 +9,14 @@ export interface SeoMeta {
   title: string
   description: string
   path: string            // canonical path, e.g. /treatments/all-on-x
+  keywords?: string       // 페이지별 키워드(선택). 없으면 기본 지역 키워드 사용
   ogImage?: string
   jsonLd?: object | object[]
   breadcrumb?: { name: string; url: string }[]
 }
+
+// 기본 키워드(주로 네이버 대응) — 페이지에서 meta.keywords로 덮어쓸 수 있음
+const DEFAULT_KEYWORDS = '부산치과, 동래구치과, 온천동치과, 온천장역치과, 연세온치과, 임플란트, 심미보철, 생체모방치의학, 부산임플란트, 동래임플란트'
 
 // 미니멀 로고 마크 — 단색 잉크 라인. 'ㅇ'(연세온의 ON) 모티프를 절제된 원으로
 export function logoMark() {
@@ -52,7 +56,7 @@ function Header() {
             <div class="mega-inner">
               ${raw(groups.map((g) => `
                 <div class="mega-col">
-                  <h4>${g}</h4>
+                  <p class="mega-title">${g}</p>
                   ${treatmentsByGroup(g).map((t) => `
                     <a class="mega-item" href="/treatments/${t.slug}">${t.name}${t.category === 'core' ? '<span class="badge">핵심</span>' : ''}</a>
                   `).join('')}
@@ -65,17 +69,17 @@ function Header() {
           <a href="/cases/gallery" class="nav-link">콘텐츠 <i class="fas fa-chevron-down" style="font-size:.6rem;margin-left:2px"></i></a>
           <div class="mega" role="menu">
             <div class="mega-inner">
-              <div class="mega-col"><h4>케이스</h4>
+              <div class="mega-col"><p class="mega-title">케이스</p>
                 <a class="mega-item" href="/cases/gallery">비포 / 애프터</a>
               </div>
-              <div class="mega-col"><h4>지식</h4>
+              <div class="mega-col"><p class="mega-title">지식</p>
                 <a class="mega-item" href="/column">원장 칼럼</a>
                 <a class="mega-item" href="/encyclopedia">치과 백과사전</a>
               </div>
-              <div class="mega-col"><h4>영상</h4>
+              <div class="mega-col"><p class="mega-title">영상</p>
                 <a class="mega-item" href="/video">병원 영상</a>
               </div>
-              <div class="mega-col"><h4>안내</h4>
+              <div class="mega-col"><p class="mega-title">안내</p>
                 <a class="mega-item" href="/pricing">진료비용 안내</a>
                 <a class="mega-item" href="/faq">자주 묻는 질문</a>
                 <a class="mega-item" href="/notice">공지사항</a>
@@ -130,7 +134,7 @@ function Footer() {
           </p>
         </div>
         <div>
-          <h5>바로가기</h5>
+          <p class="foot-title">바로가기</p>
           <a href="/mission">병원미션</a>
           <a href="/biomimetic">생체모방치의학</a>
           <a href="/doctors">의료진</a>
@@ -138,7 +142,7 @@ function Footer() {
           <a href="/cases/gallery">비포/애프터</a>
         </div>
         <div>
-          <h5>안내</h5>
+          <p class="foot-title">안내</p>
           <a href="/directions">오시는 길</a>
           <a href="/pricing">비용 안내</a>
           <a href="/faq">자주 묻는 질문</a>
@@ -148,7 +152,7 @@ function Footer() {
           <a href="/login">로그인</a>
         </div>
         <div>
-          <h5>연락처</h5>
+          <p class="foot-title">연락처</p>
           <a href="tel:${clinic.phoneRaw}"><i class="fas fa-phone" style="font-size:.8rem"></i> ${clinic.phone}</a>
           <a href="mailto:${clinic.email}"><i class="fas fa-envelope" style="font-size:.8rem"></i> ${clinic.email}</a>
           <p style="margin-top:.8rem;color:var(--mist)">${clinic.address}</p>
@@ -186,6 +190,7 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>${meta.title}</title>
   <meta name="description" content="${meta.description}">
+  <meta name="keywords" content="${meta.keywords || DEFAULT_KEYWORDS}">
   <link rel="canonical" href="${canonical}">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <meta name="theme-color" content="${clinic.brand.paper}">

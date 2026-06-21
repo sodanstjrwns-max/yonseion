@@ -171,7 +171,7 @@ em, i, cite, address, var, dfn { font-style: normal; }
 }
 .has-mega:hover .mega { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
 .mega-inner { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.6rem; }
-.mega-col h4 { font-size: .68rem; letter-spacing: .2em; text-transform: uppercase; color: var(--mist); margin-bottom: 1rem; font-weight: 600; }
+.mega-col .mega-title { font-size: .68rem; letter-spacing: .2em; text-transform: uppercase; color: var(--mist); margin-bottom: 1rem; font-weight: 600; }
 .mega-item { display: block; font-size: .9rem; padding: .4rem 0; color: var(--ink-2); transition: color .25s, padding-left .25s var(--ease); }
 .mega-item:hover { color: var(--ink); padding-left: .4rem; }
 .mega-item .badge { font-size: .58rem; letter-spacing: .1em; border: 1px solid var(--line); padding: .1rem .4rem; border-radius: 3px; margin-left: .4rem; color: var(--mist); vertical-align: middle; }
@@ -474,7 +474,7 @@ a:focus-visible, button:focus-visible, .core-feature:focus-visible { outline: 2p
 /* ---------- 18. Footer ---------- */
 .site-footer { background: var(--paper); border-top: 1px solid var(--line); padding-block: clamp(4rem, 8vw, 6rem) 3rem; }
 .footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1.2fr; gap: 3rem; margin-bottom: 4rem; }
-.footer-grid h5 { font-size: .7rem; letter-spacing: .2em; text-transform: uppercase; color: var(--mist); margin-bottom: 1.4rem; font-weight: 600; }
+.footer-grid .foot-title { font-size: .7rem; letter-spacing: .2em; text-transform: uppercase; color: var(--mist); margin-bottom: 1.4rem; font-weight: 600; }
 .footer-grid a { display: block; font-size: .92rem; color: var(--ink-2); padding: .35rem 0; transition: color .25s; }
 .footer-grid a:hover { color: var(--ink); }
 .footer-grid p { color: var(--mist); font-size: .9rem; }
