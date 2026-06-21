@@ -40,6 +40,11 @@ export function HomePage() {
     <!-- 거대 ON — 배경 워터마크 오브제 -->
     <div class="hw-mark" aria-hidden="true">${raw(splitChars('ON'))}</div>
 
+    <!-- 우측 미소 사진 — 메시지를 증명하는 비주얼 (텍스트 가독성 보호용 페더링) -->
+    <figure class="hw-photo" aria-hidden="true">
+      <img src="/static/img/hero-smile.jpg" alt="" loading="eager" fetchpriority="high" decoding="async">
+    </figure>
+
     <!-- 골드 오빗 — 공전하는 벡터 링 (켜다 On 모티프) -->
     <div class="hw-orbit" aria-hidden="true">
       <svg viewBox="0 0 600 600" fill="none">
