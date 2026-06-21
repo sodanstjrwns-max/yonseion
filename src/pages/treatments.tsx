@@ -30,7 +30,7 @@ export function TreatmentsIndex() {
       <div class="grid grid-3">
         ${raw(coreTreatments.map((t, i) => `
           <a href="/treatments/${t.slug}" class="core-card reveal reveal-d${i + 1}">
-            <img src="/static/img/tx-${t.slug}.jpg" alt="${t.name}" loading="lazy" onerror="this.style.display='none'">
+            <img src="/static/img/tx-${t.slug}.jpg?v=20260621b" alt="${t.name}" loading="lazy" onerror="this.style.display='none'">
             <span class="tag">0${i + 1} · ${t.group}</span>
             <h3>${t.name}</h3><p>${t.short}</p>
             <span class="arrow">자세히 보기 <i class="fas fa-arrow-right"></i></span>

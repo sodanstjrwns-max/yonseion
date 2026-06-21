@@ -195,7 +195,7 @@ export function HomePage() {
         ${raw(coreTreatments.map((t, i) =>
           '<a class="core-feature reveal reveal-d' + ((i % 3) + 1) + '" href="/treatments/' + t.slug + '">' +
             '<span class="cf-media">' +
-              '<img src="/static/img/tx-' + t.slug + '.jpg" alt="' + t.name + '" loading="lazy" decoding="async" width="1200" height="900">' +
+              '<img src="/static/img/tx-' + t.slug + '.jpg?v=20260621b" alt="' + t.name + '" loading="lazy" decoding="async" width="1200" height="900">' +
               '<span class="cf-num">0' + (i + 1) + '</span>' +
             '</span>' +
             '<span class="cf-body">' +
