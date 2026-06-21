@@ -27,6 +27,11 @@ export function BiomimeticPage() {
       <h2 class="reveal">생체모방치의학이란?</h2>
       <div class="answer reveal">생체모방치의학(Biomimetic Dentistry)은 자연치아의 구조·물성·기능을 모방하여, 손상된 치아를 최대한 보존하면서 복원하는 치의학 원리입니다.</div>
       <p class="reveal">치아는 한 번 깎으면 다시 자라지 않습니다. 그래서 연세온치과는 "어떻게 하면 최소한으로 삭제하고, 최대한 보존하며, 가장 오래 유지되는 결과를 만들 수 있을까"를 진료의 중심에 둡니다. 주변 치과에서 잘 시행하지 않는 러버댐 방습 하의 레진 빌드업, 온레이·오버레이를 원칙대로 시행하는 이유입니다.</p>
+
+      <figure class="img-reveal reveal" style="margin:2.4rem 0 0;border-radius:16px;overflow:hidden;background:#0d0d0d;box-shadow:0 16px 44px rgba(0,0,0,.22)">
+        <img src="/static/img/biomimetic-restoration.jpg" alt="자연치아의 형태·색조·투명도를 모방해 제작한 생체모방 보철 — 연세온치과" loading="lazy" decoding="async" style="display:block;width:100%;height:auto">
+        <figcaption style="padding:.95rem 1.3rem;font-size:.86rem;color:rgba(255,255,255,.78);background:#141414;line-height:1.6;word-break:keep-all">자연치아의 형태·색조·투명도까지 닮은 생체모방 보철. 단순히 '하얗게'가 아니라, 빛이 통과하는 결까지 자연치를 모방하는 것이 핵심입니다.</figcaption>
+      </figure>
     </div>
   </section>
 
