@@ -9,6 +9,24 @@ import { autoLink } from '../lib/inlink'
 
 const fmt = (iso: string) => (iso || '').slice(0, 10).replace(/-/g, '.')
 
+// 본문 H2에 anchor id 부여 + 목차(TOC) 추출
+function buildToc(htmlStr: string): { html: string; toc: { id: string; text: string }[] } {
+  const toc: { id: string; text: string }[] = []
+  let i = 0
+  const out = htmlStr.replace(/<h2(\s[^>]*)?>([\s\S]*?)<\/h2>/gi, (_m, attr, inner) => {
+    const text = String(inner).replace(/<[^>]+>/g, '').trim()
+    const id = `sec-${++i}`
+    toc.push({ id, text })
+    return `<h2 id="${id}"${attr || ''}>${inner}</h2>`
+  })
+  return { html: out, toc }
+}
+// 읽기 시간 (한글 기준 분당 ~500자)
+function readingMin(htmlStr: string): number {
+  const text = String(htmlStr).replace(/<[^>]+>/g, '')
+  return Math.max(1, Math.round(text.length / 500))
+}
+
 function emptyState(label: string, sub: string) {
   return `<div class="empty-state" data-reveal>
     <i class="far fa-folder-open"></i>
@@ -242,10 +260,13 @@ export function ColumnDetailPage(col: Column) {
   const crumb = [{ name: '홈', url: '/' }, { name: '원장 칼럼', url: '/column' }, { name: col.title, url: `/column/${col.slug}` }]
   const doc = getDoctor(col.authorSlug)
   const related = (col.relatedTreatments || []).map((s) => getTreatment(s)).filter(Boolean)
+  const { html: anchoredHtml, toc } = buildToc(col.contentHtml)
+  const mins = readingMin(col.contentHtml)
+  const updated = col.updatedAt && col.updatedAt.slice(0, 10) !== col.createdAt.slice(0, 10)
   const body = html`
   <section class="page-hero">
     <div class="container">
-      <p class="eyebrow">Column · ${fmt(col.createdAt)}</p>
+      <p class="eyebrow">Column · ${fmt(col.createdAt)}${raw(updated ? ` · 수정 ${fmt(col.updatedAt)}` : '')} · 읽기 ${mins}분</p>
       <h1 style="font-size:var(--t-h2)">${col.title}</h1>
       ${raw(doc ? `<p class="lead" style="font-size:1rem;color:var(--mist)">글 · ${doc.name} ${doc.role} (${doc.title})</p>` : '')}
     </div>
@@ -256,8 +277,8 @@ export function ColumnDetailPage(col: Column) {
     <div class="container">
       <div class="detail-grid">
         <article class="prose" data-reveal>
-          ${raw(col.thumbnail ? `<img src="${col.thumbnail}" alt="${col.title}" style="width:100%;border-radius:4px;margin-bottom:2.5rem">` : '')}
-          ${raw(autoLink(col.contentHtml, 10))}
+          ${raw(col.thumbnail ? `<img src="${col.thumbnail}" alt="${col.metaTitle || col.title}" style="width:100%;border-radius:4px;margin-bottom:2.5rem">` : '')}
+          ${raw(autoLink(anchoredHtml, 10))}
           ${raw(doc ? `
           <div style="border-top:1px solid var(--line);margin-top:3.5rem;padding-top:2rem">
             <p class="muted" style="font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.6rem">Written &amp; Reviewed by</p>
@@ -266,6 +287,11 @@ export function ColumnDetailPage(col: Column) {
           </div>` : '')}
         </article>
         <aside class="sidebar">
+          ${raw(toc.length >= 2 ? `
+          <div class="sidebar-box toc-box">
+            <h4>목차</h4>
+            ${toc.map((t) => `<a href="#${t.id}" class="toc-link">${t.text}</a>`).join('')}
+          </div>` : '')}
           ${raw(related.length ? `
           <div class="sidebar-box">
             <h4>관련 진료</h4>
@@ -280,6 +306,13 @@ export function ColumnDetailPage(col: Column) {
       </div>
     </div>
   </section>
+  <style>
+    .toc-box .toc-link{display:block;font-size:.88rem;line-height:1.4;padding:.35rem 0;color:var(--ink-soft,#4a5364);border-bottom:1px dashed var(--line)}
+    .toc-box .toc-link:last-child{border-bottom:0}
+    .toc-box .toc-link:hover{color:var(--gold,#C59F66)}
+    html{scroll-behavior:smooth}
+    .prose h2{scroll-margin-top:90px}
+  </style>
   <script>fetch('/api/views/column/${col.id}',{method:'POST'}).catch(function(){});</script>
   `
   return Layout({
@@ -290,7 +323,7 @@ export function ColumnDetailPage(col: Column) {
     jsonLd: [
       breadcrumbSchema(crumb),
       articleSchema({
-        title: col.title, description: col.excerpt, path: `/column/${col.slug}`,
+        title: col.metaTitle || col.title, description: col.metaDescription || col.excerpt, path: `/column/${col.slug}`,
         image: col.thumbnail, datePublished: col.createdAt, dateModified: col.updatedAt,
         authorSlug: col.authorSlug, authorName: doc?.name,
       }),

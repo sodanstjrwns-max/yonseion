@@ -90,6 +90,57 @@ textarea{min-height:120px;resize:vertical}
 .switch.accent input:checked+.track{background:#AE8A4C}
 .badge.pin{background:#AE8A4C;color:#fff}.badge.popup{background:#2E5E8A;color:#fff}.badge.off{background:#DDD6C7;color:#7A7361}
 .sub-fields{padding:1rem 1.1rem;border-left:3px solid #E4D9BC;background:#FCFAF3;border-radius:0 8px 8px 0;margin:.3rem 0 .6rem}
+/* ===== 리치 에디터 ===== */
+.rte-wrap{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.rte-toolbar{display:flex;flex-wrap:wrap;gap:.15rem;padding:.5rem .6rem;background:#F6F2E9;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.rte-toolbar button{width:34px;height:32px;border:1px solid transparent;background:none;border-radius:6px;cursor:pointer;color:#3A4356;font-size:.92rem;display:inline-flex;align-items:center;justify-content:center;transition:.12s}
+.rte-toolbar button:hover{background:#fff;border-color:var(--line)}
+.rte-toolbar button.on{background:#14243E;color:#fff}
+.rte-toolbar .sep{width:1px;height:22px;background:#D8D0BD;margin:0 .25rem;align-self:center}
+.rte-toolbar .lbl{font-size:.78rem;font-weight:600;width:auto;padding:0 .55rem;color:#5a6478}
+.rte-editor{min-height:380px;max-height:620px;overflow-y:auto;padding:1.4rem 1.6rem;font-size:1rem;line-height:1.8;color:#1f2937;outline:none}
+.rte-editor:focus{background:#fffdf8}
+.rte-editor.drag{outline:2px dashed #AE8A4C;outline-offset:-6px;background:#FCF7EA}
+.rte-editor h2{font-size:1.45rem;font-weight:700;margin:1.6rem 0 .7rem;color:#14243E;line-height:1.4}
+.rte-editor h3{font-size:1.18rem;font-weight:700;margin:1.3rem 0 .5rem;color:#1f2d44}
+.rte-editor p{margin:0 0 1rem}
+.rte-editor ul,.rte-editor ol{margin:0 0 1rem 1.4rem}
+.rte-editor blockquote{border-left:3px solid #AE8A4C;margin:1.2rem 0;padding:.4rem 0 .4rem 1.2rem;color:#4a5364;font-style:italic;background:#FCFAF3}
+.rte-editor a{color:#1d4ed8;text-decoration:underline}
+.rte-editor hr{border:0;border-top:1px solid var(--line);margin:2rem 0}
+.rte-editor figure{margin:1.4rem 0;position:relative}
+.rte-editor figure img{width:100%;border-radius:8px;display:block}
+.rte-editor figure.is-selected{outline:2px solid #AE8A4C;outline-offset:3px;border-radius:8px}
+.rte-editor figure figcaption{text-align:center;font-size:.85rem;color:#8A93A6;margin-top:.5rem;padding:.2rem;outline:none;border-radius:4px}
+.rte-editor figure figcaption:empty::before{content:'사진 설명을 입력하세요 (선택)';color:#c3bca9}
+.rte-editor figure.align-left{max-width:55%;float:left;margin-right:1.4rem}
+.rte-editor figure.align-right{max-width:55%;float:right;margin-left:1.4rem}
+.rte-editor img.uploading{opacity:.45;filter:grayscale(.5)}
+.rte-editor:empty::before{content:attr(data-ph);color:#b8b09c}
+.rte-status{display:flex;gap:1.2rem;flex-wrap:wrap;padding:.55rem .9rem;background:#FAF8F2;border-top:1px solid var(--line);font-size:.78rem;color:#8A93A6}
+.rte-status b{color:#14243E}
+/* 이미지 컨텍스트 미니바 */
+.img-bar{position:absolute;top:8px;left:8px;display:flex;gap:.2rem;background:rgba(20,36,62,.92);border-radius:7px;padding:.25rem;z-index:6}
+.img-bar button{width:28px;height:26px;border:0;background:none;color:#fff;border-radius:5px;cursor:pointer;font-size:.78rem}
+.img-bar button:hover{background:rgba(255,255,255,.18)}
+.img-bar button.on{background:#AE8A4C}
+/* SEO 패널 */
+.seo-panel{background:#fff;border:1px solid var(--line);border-radius:10px;padding:1.3rem 1.4rem;position:sticky;top:1rem}
+.seo-score{display:flex;align-items:center;gap:.9rem;margin-bottom:1rem}
+.seo-ring{--p:0;width:64px;height:64px;border-radius:50%;background:conic-gradient(var(--ring,#2E7D52) calc(var(--p)*1%),#ECE7D8 0);display:grid;place-items:center;flex:0 0 64px}
+.seo-ring span{width:48px;height:48px;border-radius:50%;background:#fff;display:grid;place-items:center;font-weight:700;font-size:1.05rem;color:#14243E}
+.seo-checks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.45rem}
+.seo-checks li{display:flex;gap:.55rem;font-size:.83rem;line-height:1.45;color:#5a6478;align-items:flex-start}
+.seo-checks li i{margin-top:.18rem;flex:0 0 14px}
+.seo-checks li.ok i{color:#2E7D52}.seo-checks li.warn i{color:#C99A2E}.seo-checks li.bad i{color:#C25B4A}
+.gpreview{border:1px solid var(--line);border-radius:8px;padding:.9rem 1rem;margin-top:1rem;background:#fff}
+.gpreview .g-t{color:#1a0dab;font-size:1.02rem;line-height:1.3;margin-bottom:.15rem;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical}
+.gpreview .g-u{color:#006621;font-size:.8rem;margin-bottom:.2rem}
+.gpreview .g-d{color:#4d5156;font-size:.84rem;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.charcount{font-size:.74rem;color:#8A93A6;text-align:right;margin-top:.2rem}
+.charcount.warn{color:#C99A2E}.charcount.bad{color:#C25B4A}
+.col-layout{display:grid;grid-template-columns:1fr 320px;gap:1.4rem;align-items:start}
+@media(max-width:1100px){.col-layout{grid-template-columns:1fr}.seo-panel{position:static}}
 @media(max-width:860px){.layout{grid-template-columns:1fr}.side{flex-direction:row;flex-wrap:wrap}.side .logout{margin:0}.main{padding:1.4rem}}
 </style>
 </head>
@@ -389,6 +440,203 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>`
 
+// ===== 리치 에디터 + SEO 진단 스크립트 (칼럼 작성용) =====
+const rteScript = `
+<script>
+var ED, SRC, srcMode=false;
+document.addEventListener('DOMContentLoaded', function(){
+  ED = document.getElementById('rteEditor');
+  SRC = document.getElementById('rteSource');
+  if(!ED) return;
+
+  // 툴바 명령
+  document.querySelectorAll('#rteToolbar button[data-cmd]').forEach(function(b){
+    b.addEventListener('mousedown', function(e){ e.preventDefault(); });
+    b.addEventListener('click', function(){ document.execCommand(b.getAttribute('data-cmd'),false,null); ED.focus(); refreshToolbar(); afterChange(); });
+  });
+  ED.addEventListener('keyup', refreshToolbar);
+  ED.addEventListener('mouseup', refreshToolbar);
+  ED.addEventListener('input', afterChange);
+
+  // 단축키
+  ED.addEventListener('keydown', function(e){
+    if((e.ctrlKey||e.metaKey)){
+      var k=e.key.toLowerCase();
+      if(k==='b'||k==='i'||k==='u'){ /* 브라우저 기본 처리 후 갱신 */ setTimeout(refreshToolbar,0); }
+    }
+  });
+
+  // 드래그앤드롭 이미지
+  ['dragenter','dragover'].forEach(function(ev){ ED.addEventListener(ev,function(e){ e.preventDefault(); ED.classList.add('drag'); }); });
+  ['dragleave','dragend'].forEach(function(ev){ ED.addEventListener(ev,function(e){ ED.classList.remove('drag'); }); });
+  ED.addEventListener('drop', function(e){
+    e.preventDefault(); ED.classList.remove('drag');
+    var files = e.dataTransfer && e.dataTransfer.files;
+    if(files && files.length){ placeCaret(e); rteFiles(files); }
+  });
+  // 붙여넣기 이미지
+  ED.addEventListener('paste', function(e){
+    var items = e.clipboardData && e.clipboardData.items; if(!items) return;
+    var imgs=[]; for(var i=0;i<items.length;i++){ if(items[i].type.indexOf('image')===0){ var f=items[i].getAsFile(); if(f) imgs.push(f); } }
+    if(imgs.length){ e.preventDefault(); rteFiles(imgs); }
+  });
+
+  // 이미지 선택 → 미니바
+  ED.addEventListener('click', function(e){
+    var fig = e.target.closest && e.target.closest('figure');
+    document.querySelectorAll('.rte-editor figure.is-selected').forEach(function(f){ if(f!==fig){ f.classList.remove('is-selected'); var bar=f.querySelector('.img-bar'); if(bar) bar.remove(); } });
+    if(fig && e.target.tagName==='IMG'){ selectFigure(fig); }
+  });
+
+  afterChange(); updateSeo();
+});
+
+function placeCaret(e){
+  var r;
+  if(document.caretRangeFromPoint) r=document.caretRangeFromPoint(e.clientX,e.clientY);
+  else if(document.caretPositionFromPoint){ var p=document.caretPositionFromPoint(e.clientX,e.clientY); r=document.createRange(); r.setStart(p.offsetNode,p.offset); }
+  if(r){ var sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(r); }
+}
+
+function refreshToolbar(){
+  ['bold','italic','underline','insertUnorderedList','insertOrderedList'].forEach(function(cmd){
+    var b=document.querySelector('#rteToolbar button[data-cmd="'+cmd+'"]'); if(!b) return;
+    try{ b.classList.toggle('on', document.queryCommandState(cmd)); }catch(_){}
+  });
+}
+function rteBlock(tag){ if(!tag) return; document.execCommand('formatBlock',false, tag==='p'?'p':tag); ED.focus(); afterChange(); }
+function rteLink(){ var url=prompt('링크 주소를 입력하세요 (예: /treatments/implant 또는 https://...)'); if(url){ document.execCommand('createLink',false,url); afterChange(); } }
+function rteHr(){ document.execCommand('insertHTML',false,'<hr>'); afterChange(); }
+
+// 이미지 업로드 후 삽입
+function rteFiles(files){
+  for(var i=0;i<files.length;i++){ (function(f){
+    if(!/^image\\//.test(f.type)) return;
+    var id='up'+Date.now()+Math.floor(Math.random()*999);
+    var figHtml='<figure contenteditable="false"><img id="'+id+'" class="uploading" src="" alt=""><figcaption contenteditable="true"></figcaption></figure><p><br></p>';
+    document.execCommand('insertHTML',false,figHtml);
+    var fd=new FormData(); fd.append('file',f);
+    fetch('/admin/upload',{method:'POST',body:fd}).then(function(r){return r.json();}).then(function(d){
+      var img=document.getElementById(id); if(!img) return;
+      if(d.ok){ img.src=d.url; img.classList.remove('uploading'); }
+      else { var fig=img.closest('figure'); if(fig) fig.remove(); alert('업로드 실패: '+(d.error||'')); }
+      afterChange();
+    }).catch(function(){ var img=document.getElementById(id); if(img){var fig=img.closest('figure'); if(fig) fig.remove();} });
+  })(files[i]); }
+}
+
+// 이미지 미니바 (정렬·alt·삭제)
+function selectFigure(fig){
+  fig.classList.add('is-selected');
+  if(fig.querySelector('.img-bar')) return;
+  var bar=document.createElement('div'); bar.className='img-bar'; bar.contentEditable='false';
+  bar.innerHTML='<button type="button" data-a="" title="기본(가운데)"><i class="fas fa-align-center"></i></button>'+
+    '<button type="button" data-a="align-left" title="왼쪽 정렬"><i class="fas fa-align-left"></i></button>'+
+    '<button type="button" data-a="align-right" title="오른쪽 정렬"><i class="fas fa-align-right"></i></button>'+
+    '<button type="button" data-alt title="대체텍스트(alt) — SEO"><i class="fas fa-tag"></i></button>'+
+    '<button type="button" data-del title="삭제"><i class="fas fa-trash"></i></button>';
+  fig.appendChild(bar);
+  bar.querySelectorAll('button[data-a]').forEach(function(b){ b.addEventListener('click',function(e){ e.stopPropagation();
+    fig.classList.remove('align-left','align-right'); var a=b.getAttribute('data-a'); if(a) fig.classList.add(a);
+    bar.querySelectorAll('button[data-a]').forEach(function(x){x.classList.remove('on');}); b.classList.add('on'); afterChange(); }); });
+  bar.querySelector('[data-alt]').addEventListener('click',function(e){ e.stopPropagation();
+    var img=fig.querySelector('img'); var v=prompt('이미지 대체텍스트(alt) — 검색엔진·접근성에 중요합니다:', img.getAttribute('alt')||''); if(v!==null){ img.setAttribute('alt',v); afterChange(); } });
+  bar.querySelector('[data-del]').addEventListener('click',function(e){ e.stopPropagation(); if(confirm('이미지를 삭제할까요?')){ fig.remove(); afterChange(); } });
+}
+
+// 소스 보기 토글
+function rteToggleSource(){
+  srcMode=!srcMode; var btn=document.getElementById('srcBtn');
+  if(srcMode){ SRC.value=cleanHtml(ED.innerHTML); ED.style.display='none'; SRC.style.display='block'; btn.classList.add('on'); }
+  else { ED.innerHTML=SRC.value; SRC.style.display='none'; ED.style.display='block'; btn.classList.remove('on'); afterChange(); }
+}
+
+// HTML 정리 (저장용) — 미니바·선택표시 제거, 빈 단락 정리
+function cleanHtml(h){
+  var tmp=document.createElement('div'); tmp.innerHTML=h;
+  tmp.querySelectorAll('.img-bar').forEach(function(n){n.remove();});
+  tmp.querySelectorAll('figure').forEach(function(f){ f.classList.remove('is-selected'); f.removeAttribute('contenteditable'); });
+  tmp.querySelectorAll('figcaption').forEach(function(f){ f.removeAttribute('contenteditable'); if(!f.textContent.trim()) f.remove(); });
+  tmp.querySelectorAll('img').forEach(function(im){ im.classList.remove('uploading'); im.removeAttribute('id'); im.setAttribute('loading','lazy'); });
+  tmp.querySelectorAll('[style=""]').forEach(function(n){n.removeAttribute('style');});
+  return tmp.innerHTML.replace(/<p><br><\\/p>\\s*$/,'').trim();
+}
+
+// 통계·SEO 갱신
+function plain(){ return (ED.textContent||'').replace(/\\s+/g,' ').trim(); }
+function afterChange(){
+  var t=plain(); var chars=t.length; var words=t?t.split(/\\s+/).length:0; var imgs=ED.querySelectorAll('img').length;
+  document.getElementById('st-chars').textContent=chars;
+  document.getElementById('st-words').textContent=words;
+  document.getElementById('st-imgs').textContent=imgs;
+  document.getElementById('st-read').textContent=Math.max(1,Math.round(chars/500))+'분';
+  updateSeo();
+}
+
+function cc(elId,val,min,max){
+  var el=document.getElementById(elId); if(!el) return;
+  el.textContent=val+' / 권장 '+min+'~'+max+'자';
+  el.className='charcount'+(val>max||(val>0&&val<min)?' warn':'')+(val>max+15?' bad':'');
+}
+function updateSeo(){
+  var title=(document.getElementById('f-title').value||'').trim();
+  var excerpt=(document.getElementById('f-excerpt').value||'').trim();
+  var mt=(document.getElementById('f-metatitle').value||'').trim();
+  var md=(document.getElementById('f-metadesc').value||'').trim();
+  var thumb=(document.getElementById('thumbnail').value||'').trim();
+  var rel=document.getElementById('f-related').selectedOptions.length;
+  var bodyText=ED?plain():''; var chars=bodyText.length;
+  var h2=ED?ED.querySelectorAll('h2,h3').length:0;
+  var imgs=ED?ED.querySelectorAll('img'):[];
+  var imgNoAlt=0; for(var i=0;i<imgs.length;i++){ if(!(imgs[i].getAttribute('alt')||'').trim()) imgNoAlt++; }
+  var links=ED?ED.querySelectorAll('a').length:0;
+
+  cc('cc-title',title.length,15,35);
+  cc('cc-excerpt',excerpt.length,50,160);
+  cc('cc-metatitle',(mt||title).length,15,60);
+  cc('cc-metadesc',(md||excerpt).length,50,155);
+
+  // 구글 미리보기
+  document.getElementById('gp-t').textContent=(mt||title||'제목을 입력하세요');
+  document.getElementById('gp-d').textContent=(md||excerpt||'요약/메타 설명을 입력하세요');
+  document.getElementById('gp-u').textContent='${esc(clinic.domain)}'.replace(/^https?:\\/\\//,'')+'/column/' + (slugP(title)||'…');
+
+  var checks=[
+    { ok: title.length>=15 && title.length<=40, warn:title.length>0, t:'제목 15~40자 ('+title.length+'자)' },
+    { ok: (md||excerpt).length>=50 && (md||excerpt).length<=155, warn:(md||excerpt).length>0, t:'메타 설명 50~155자' },
+    { ok: chars>=600, warn:chars>0, t:'본문 충분한 분량 (현재 '+chars+'자 / 권장 600+)' },
+    { ok: h2>=2, warn:h2>0, t:'소제목(H2/H3) 2개 이상 ('+h2+'개)' },
+    { ok: imgs.length>=1, warn:false, t:'본문 이미지 1장 이상 ('+imgs.length+'장)' },
+    { ok: imgs.length===0||imgNoAlt===0, warn:imgNoAlt>0, t: imgNoAlt>0?('이미지 alt 누락 '+imgNoAlt+'개 — 채워주세요'):'모든 이미지 alt 입력 완료' },
+    { ok: !!thumb, warn:false, t:'대표 이미지(썸네일·OG) 설정' },
+    { ok: rel>=1, warn:false, t:'관련 진료 연결 — 내부링크 ('+rel+'개)' },
+    { ok: links>=1, warn:false, t:'본문 내 링크 1개 이상 ('+links+'개)' },
+  ];
+  var score=0; checks.forEach(function(c){ score += c.ok?1:0; });
+  var pct=Math.round(score/checks.length*100);
+  var ring=document.getElementById('seoRing'); ring.style.setProperty('--p',pct);
+  ring.style.setProperty('--ring', pct>=80?'#2E7D52':pct>=50?'#C99A2E':'#C25B4A');
+  document.getElementById('seoNum').textContent=pct;
+  document.getElementById('seoGrade').textContent = pct>=80?'훌륭합니다 🎉':pct>=50?'좋아요 — 조금만 더!':'개선이 필요해요';
+  document.getElementById('seoChecks').innerHTML = checks.map(function(c){
+    var cls=c.ok?'ok':(c.warn?'warn':'bad');
+    var ic=c.ok?'fa-circle-check':(c.warn?'fa-circle-exclamation':'fa-circle-xmark');
+    return '<li class="'+cls+'"><i class="fas '+ic+'"></i><span>'+c.t+'</span></li>';
+  }).join('');
+}
+function slugP(s){ return (s||'').toLowerCase().trim().replace(/[^\\w가-힣\\s-]/g,'').replace(/\\s+/g,'-').slice(0,40); }
+
+// 저장 직전 — 에디터 HTML을 hidden 필드에 동기화
+function syncEditor(){
+  if(srcMode){ rteToggleSource(); }
+  document.querySelectorAll('.rte-editor figure.is-selected').forEach(function(f){ f.classList.remove('is-selected'); var b=f.querySelector('.img-bar'); if(b) b.remove(); });
+  var html=cleanHtml(ED.innerHTML);
+  if(plain().length<10){ alert('본문 내용을 입력해 주세요.'); return false; }
+  document.getElementById('contentHtml').value=html;
+  return true;
+}
+</script>`
+
 // ============================================================================
 // 케이스 관리
 // ============================================================================
@@ -520,27 +768,96 @@ admin.get('/columns', async (c) => {
 
 function columnForm(col?: Column) {
   const docOpts = doctors.map((d) => `<option value="${d.slug}" ${col?.authorSlug === d.slug ? 'selected' : ''}>${d.name} ${d.role}</option>`).join('')
-  const txOpts = treatments.map((t) => `<option value="${t.slug}" ${col?.relatedTreatments?.includes(t.slug) ? 'selected' : ''}>${t.name}</option>`).join('')
+  const txOpts = treatments.map((t) => `<option value="${t.slug}" ${col?.relatedTreatments?.includes(t.slug) ? 'selected' : ''}>${esc(t.name)}</option>`).join('')
+  const initial = col?.contentHtml || '<h2>소제목을 입력하세요</h2><p>본문을 입력하세요. 사진은 본문 안으로 끌어다 놓거나 붙여넣으면 바로 삽입됩니다.</p>'
   return `
-  <form class="panel" method="POST">
-    <label>제목 *</label><input name="title" required value="${col?.title || ''}">
-    <label>요약 (목록·메타 설명) *</label><input name="excerpt" required value="${col?.excerpt || ''}" maxlength="160">
-    <label>본문 HTML * <small class="muted">(h2/h3/p/ul 태그 사용 — SEO 구조 유지 / 이미지 파일을 아래 입력란에 끌어다 놓으면 커서 위치에 자동 삽입)</small></label>
-    <textarea id="contentHtml" name="contentHtml" required data-dropzone style="min-height:320px;font-family:monospace;font-size:.85rem">${col?.contentHtml || '<h2>소제목</h2>\n<p>본문…</p>'}</textarea>
-    <div class="row2">
-      <div><label>작성 원장</label><select name="authorSlug">${docOpts}</select></div>
-      <div><label>관련 진료 (다중 선택)</label><select name="relatedTreatments" multiple size="4">${txOpts}</select></div>
+  <form class="col-layout" method="POST" id="colForm" onsubmit="return syncEditor()">
+    <div>
+    <div class="panel" style="margin-bottom:1.2rem">
+      <label style="margin-top:0">제목 *</label><input name="title" id="f-title" required value="${esc(col?.title || '')}" oninput="updateSeo()">
+      <div class="charcount" id="cc-title"></div>
+      <label>요약 / 목록 설명 * <small class="muted">(검색결과 본문에 노출 — 1~2문장)</small></label>
+      <textarea name="excerpt" id="f-excerpt" required maxlength="200" style="min-height:64px" oninput="updateSeo()">${esc(col?.excerpt || '')}</textarea>
+      <div class="charcount" id="cc-excerpt"></div>
     </div>
-    <label>대표 이미지</label>
-    <input type="text" id="thumbnail" name="thumbnail" value="${col?.thumbnail || ''}" placeholder="/api/images/...">
-    <input type="file" accept="image/*" onchange="upload(this,'thumbnail')" style="margin-top:.3rem"><small class="muted"></small>
-    <div class="row2">
-      <div><label>메타 타이틀 (선택)</label><input name="metaTitle" value="${col?.metaTitle || ''}"></div>
-      <div><label>메타 설명 (선택)</label><input name="metaDescription" value="${col?.metaDescription || ''}"></div>
+
+    <div class="panel" style="margin-bottom:1.2rem">
+      <label style="margin-top:0">본문 <small class="muted">— 툴바로 서식 지정 · 사진은 드래그&드롭 또는 붙여넣기(Ctrl+V)로 삽입</small></label>
+      <div class="rte-wrap">
+        <div class="rte-toolbar" id="rteToolbar">
+          <select onchange="rteBlock(this.value);this.selectedIndex=0" title="문단 형식" style="width:auto;height:32px;border:1px solid var(--line);border-radius:6px;font-size:.82rem;padding:0 .4rem">
+            <option value="">형식</option>
+            <option value="p">본문</option>
+            <option value="h2">제목 H2</option>
+            <option value="h3">소제목 H3</option>
+            <option value="blockquote">인용구</option>
+          </select>
+          <span class="sep"></span>
+          <button type="button" data-cmd="bold" title="굵게 (Ctrl+B)"><i class="fas fa-bold"></i></button>
+          <button type="button" data-cmd="italic" title="기울임 (Ctrl+I)"><i class="fas fa-italic"></i></button>
+          <button type="button" data-cmd="underline" title="밑줄 (Ctrl+U)"><i class="fas fa-underline"></i></button>
+          <span class="sep"></span>
+          <button type="button" data-cmd="insertUnorderedList" title="글머리 목록"><i class="fas fa-list-ul"></i></button>
+          <button type="button" data-cmd="insertOrderedList" title="번호 목록"><i class="fas fa-list-ol"></i></button>
+          <span class="sep"></span>
+          <button type="button" onclick="rteLink()" title="링크"><i class="fas fa-link"></i></button>
+          <button type="button" onclick="rteHr()" title="구분선"><i class="fas fa-minus"></i></button>
+          <button type="button" onclick="document.getElementById('rteImgInput').click()" title="사진 삽입"><i class="fas fa-image"></i></button>
+          <input type="file" id="rteImgInput" accept="image/*" multiple style="display:none" onchange="rteFiles(this.files);this.value=''">
+          <span class="sep"></span>
+          <button type="button" onclick="rteToggleSource()" id="srcBtn" title="HTML 소스 보기" class="lbl" style="width:auto"><i class="fas fa-code"></i> 소스</button>
+        </div>
+        <div class="rte-editor" id="rteEditor" contenteditable="true" data-ph="여기에 본문을 작성하세요…">${initial}</div>
+        <textarea id="rteSource" name="_rte_source" style="display:none;min-height:380px;font-family:monospace;font-size:.84rem;border:0;border-radius:0"></textarea>
+        <div class="rte-status">
+          <span>글자수 <b id="st-chars">0</b></span>
+          <span>단어 <b id="st-words">0</b></span>
+          <span>이미지 <b id="st-imgs">0</b></span>
+          <span>예상 읽기 <b id="st-read">0분</b></span>
+        </div>
+      </div>
+      <input type="hidden" name="contentHtml" id="contentHtml">
     </div>
-    <label><input type="checkbox" name="published" style="width:auto;margin-right:.5rem" ${col?.published !== false ? 'checked' : ''}>게시</label>
-    <button class="btn" style="margin-top:1.2rem"><i class="fas fa-floppy-disk"></i> 저장</button>
-  </form>${uploadScript}`
+
+    <div class="panel" style="margin-bottom:1.2rem">
+      <div class="row2">
+        <div><label style="margin-top:0">작성 원장 <small class="muted">(E-E-A-T 저자)</small></label><select name="authorSlug" id="f-author">${docOpts}</select></div>
+        <div><label style="margin-top:0">관련 진료 (다중 선택 — 내부링크)</label><select name="relatedTreatments" id="f-related" multiple size="4" onchange="updateSeo()">${txOpts}</select></div>
+      </div>
+      <label>대표 이미지 (썸네일·OG)</label>
+      <input type="text" id="thumbnail" name="thumbnail" value="${esc(col?.thumbnail || '')}" placeholder="/api/images/..." oninput="updateSeo()">
+      <input type="file" accept="image/*" onchange="upload(this,'thumbnail')" style="margin-top:.3rem"><small class="muted"></small>
+    </div>
+
+    <div class="panel">
+      <strong style="font-size:.95rem">검색엔진(SEO) 설정 <small class="muted">— 비우면 제목·요약을 자동 사용</small></strong>
+      <label>메타 타이틀 (선택)</label>
+      <input name="metaTitle" id="f-metatitle" value="${esc(col?.metaTitle || '')}" maxlength="70" oninput="updateSeo()" placeholder="${esc(col?.title || '검색결과 제목')}">
+      <div class="charcount" id="cc-metatitle"></div>
+      <label>메타 설명 (선택)</label>
+      <textarea name="metaDescription" id="f-metadesc" maxlength="170" style="min-height:60px" oninput="updateSeo()" placeholder="검색결과에 노출될 설명">${esc(col?.metaDescription || '')}</textarea>
+      <div class="charcount" id="cc-metadesc"></div>
+      <label class="switch" style="margin-top:1rem"><input type="checkbox" name="published" ${col?.published !== false ? 'checked' : ''}><span class="track"></span>
+        <span class="sw-text"><b>게시</b><small>체크 해제 시 사이트에 노출되지 않습니다 (임시 저장)</small></span></label>
+    </div>
+
+    <button class="btn" style="margin-top:1.4rem"><i class="fas fa-floppy-disk"></i> 저장하기</button>
+    </div>
+
+    <aside>
+      <div class="seo-panel">
+        <strong style="font-size:.9rem;display:block;margin-bottom:.9rem">SEO 진단</strong>
+        <div class="seo-score">
+          <div class="seo-ring" id="seoRing"><span id="seoNum">0</span></div>
+          <div><div id="seoGrade" style="font-weight:700">작성을 시작하세요</div><div class="muted" style="font-size:.78rem">항목을 채울수록 점수가 올라갑니다</div></div>
+        </div>
+        <ul class="seo-checks" id="seoChecks"></ul>
+        <div style="margin-top:1.1rem"><strong style="font-size:.82rem;color:#5a6478">구글 검색결과 미리보기</strong>
+          <div class="gpreview"><div class="g-u" id="gp-u">${esc(clinic.domain)}/column/…</div><div class="g-t" id="gp-t">제목</div><div class="g-d" id="gp-d">설명</div></div>
+        </div>
+      </div>
+    </aside>
+  </form>${uploadScript}${rteScript}`
 }
 
 admin.get('/columns/new', (c) => c.html(shell('칼럼 작성', `<h1>새 칼럼</h1>${columnForm()}`, '/admin/columns')))
