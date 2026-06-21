@@ -849,28 +849,6 @@ a:focus-visible, button:focus-visible, .core-feature:focus-visible { outline: 2p
   .journey-step .js-num { position: absolute; left: 0; top: 1.2rem; margin: 0; }
 }
 
-/* ---------- 환자 후기 (Patient Voices) ---------- */
-.voices-section { background: var(--paper); }
-.voices-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; margin-top: 3rem; }
-.voice-card {
-  position: relative; margin: 0; padding: 2.6rem 1.9rem 1.9rem; background: #fff;
-  border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
-  transition: transform .4s var(--ease), box-shadow .4s var(--ease);
-}
-.voice-card:hover { transform: translateY(-6px); box-shadow: 0 24px 48px -28px rgba(46,58,75,.32); }
-.voice-card .vc-quote {
-  position: absolute; top: .2rem; left: 1.2rem; font-family: var(--serif);
-  font-size: 4.5rem; line-height: 1; color: var(--gold-light); opacity: .55;
-}
-.voice-card .vc-text {
-  position: relative; margin: 0 0 1.4rem; font-family: var(--serif-kr);
-  font-size: 1.06rem; line-height: 1.8; color: var(--ink); font-weight: 500;
-}
-.voice-card .vc-tag {
-  display: inline-block; font-size: .76rem; letter-spacing: .04em; font-weight: 600;
-  color: var(--gold-2); padding: .3rem .8rem; border: 1px solid var(--gold-light); border-radius: 999px;
-}
-@media (max-width: 860px) { .voices-grid { grid-template-columns: 1fr; gap: 1rem; } }
 
 /* ---- 생체모방 실제 케이스 사진 (가로 3:2 원본) ---- */
 .tooth-photo { border-radius: 4px; aspect-ratio: 4 / 3; }
@@ -966,15 +944,7 @@ a.inlink { color: var(--gold-2); text-decoration: none; border-bottom: 1px dashe
 a.inlink:hover { color: var(--gold); border-bottom-color: var(--gold); }
 
 /* ===== C6 마이크로 인터랙션 고도화 — "비싼 티" 마감 ===== */
-/* 1) voice-card 상단 골드 라인 (호버 시 좌→우로 그려짐) */
-.voice-card::before {
-  content: ''; position: absolute; top: 0; left: 0; height: 3px; width: 100%;
-  background: var(--gold-grad); transform: scaleX(0); transform-origin: left;
-  transition: transform .55s var(--ease);
-}
-.voice-card:hover::before { transform: scaleX(1); }
-
-/* 2) journey-num 진입 시 골드 글로우 미세 펄스 (reveal 직후 1회) */
+/* journey-num 진입 시 골드 글로우 미세 펄스 (reveal 직후 1회) */
 .journey-step.in .js-num { animation: jsPulse 1.6s var(--ease) .2s both; }
 @keyframes jsPulse {
   0% { box-shadow: 0 0 0 0 rgba(197,159,102,0); }
@@ -995,7 +965,6 @@ html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .journey-step.in .js-num { animation: none; }
-  .voice-card::before { transition: none; }
 }
 
 /* 6) 이미지 드래그/선택 방지 (프리미엄 디테일) */
