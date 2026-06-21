@@ -70,7 +70,7 @@ export function HomePage() {
 
     <!-- 콘텐츠 : 태그라인이 주인공 -->
     <div class="hw-content">
-      <span class="hw-eyebrow" data-reveal>안녕하세요, 대표원장 ${lead.name}입니다</span>
+      <span class="hw-eyebrow" data-reveal>${clinic.nameKo}</span>
       <h1 class="hw-tagline" aria-label="${clinic.tagline}">${raw(kinetic('미소의 젊음을'))} <span class="tg-gold">${raw(kinetic('켜는'))}</span> ${raw(kinetic('치과'))}</h1>
       <p class="hw-mission" data-reveal data-reveal-delay="2">${clinic.mission}</p>
       <div class="hw-cta" data-reveal data-reveal-delay="3">
@@ -333,9 +333,10 @@ export function HomePage() {
             <span class="sec-index">03</span>
             <span class="eyebrow">Director</span>
           </div>
+          <p style="font-family:var(--serif-kr);font-size:clamp(1.15rem,1.7vw,1.45rem);color:var(--gold-2);font-weight:600;margin-bottom:.9rem">안녕하세요, 대표원장 ${lead.name}입니다.</p>
           <h2>${lead.name} <span style="font-size:.4em;color:var(--mist);font-family:var(--sans);font-weight:500">${lead.role}</span></h2>
           <p class="muted" style="font-size:.95rem;margin-bottom:1.4rem">${lead.title}</p>
-          <p>안녕하세요, 대표원장 ${lead.name}입니다.<br>제가 생각하는 좋은 치과는, 환자분께서 지금보다 더 나은 삶을 영위하실 수 있도록 돕는 곳입니다.</p>
+          <p>제가 생각하는 좋은 치과는, 환자분께서 지금보다 더 나은 삶을 영위하실 수 있도록 돕는 곳입니다.</p>
           <a href="/doctors/${lead.slug}" class="link-arrow mt-1">의료진 소개 <i class="fas fa-arrow-right"></i></a>
         </div>
       </div>
