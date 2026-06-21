@@ -276,8 +276,8 @@ em, i, cite, address, var, dfn { font-style: normal; }
 .hw-photo {
   position: absolute; z-index: 1; margin: 0; pointer-events: none;
   top: 50%; right: 0; transform: translateY(-50%);
-  width: clamp(40%, 46vw, 56%); height: 86%;
-  border-radius: 22px 0 0 22px; overflow: hidden;
+  width: clamp(28%, 32vw, 40%); height: 62%;
+  border-radius: 20px 0 0 20px; overflow: hidden;
 }
 .hw-photo img {
   width: 100%; height: 100%; object-fit: cover; object-position: center 38%;
