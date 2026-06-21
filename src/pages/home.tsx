@@ -297,6 +297,35 @@ export function HomePage() {
     }
   </style>
 
+  <!-- ===== 진료 여정 : 페이션트 퍼널 (인지→상담→진단→치료→사후관리) ===== -->
+  <section class="section journey-section" aria-label="진료 여정">
+    <div class="container">
+      <div class="sec-head" data-reveal>
+        <div style="display:flex;align-items:center;gap:1.2rem;margin-bottom:1.6rem">
+          <span class="sec-index">·</span>
+          <span class="eyebrow">Patient Journey</span>
+        </div>
+        <h2 class="sec-title">처음 오신 순간부터,<br>끝까지 함께하는 여정.</h2>
+        <p class="muted" style="max-width:42rem;margin-top:1rem;line-height:1.85">한 번의 치료로 끝나지 않습니다. 정확한 진단과 충분한 설명, 그리고 치료 후 관리까지 — 단계마다 환자분이 무엇을 받게 되는지 미리 안내드립니다.</p>
+      </div>
+      <ol class="journey-track">
+        ${raw([
+          { n: '01', t: '상담 접수', d: '전화·온라인으로 편하게. 불편한 점과 궁금한 점을 먼저 듣습니다.' },
+          { n: '02', t: '정밀 진단', d: '구강스캔·사진·CT 등으로 현재 상태를 정확히 파악합니다.' },
+          { n: '03', t: '치료 계획 설명', d: '진단 결과·치료 방법·기간·비용을 함께 설명드리고 동의를 구합니다.' },
+          { n: '04', t: '치료 진행', d: '처음 설명드린 계획대로, 큰 변함없이 일관되게 진행합니다.' },
+          { n: '05', t: '사후 관리', d: '정기 점검과 위생 관리로 치료 결과를 오래 유지하도록 돕습니다.' },
+        ].map((s, i) =>
+          '<li class="journey-step reveal reveal-d' + ((i % 3) + 1) + '">' +
+            '<span class="js-num">' + s.n + '</span>' +
+            '<span class="js-body"><span class="js-title">' + s.t + '</span>' +
+            '<span class="js-desc">' + s.d + '</span></span>' +
+          '</li>'
+        ).join(''))}
+      </ol>
+    </div>
+  </section>
+
   <!-- ===== 에디토리얼 스플릿 : 철학 ===== -->
   <section class="section">
     <div class="container">
@@ -339,6 +368,37 @@ export function HomePage() {
           <p>제가 생각하는 좋은 치과는, 환자분께서 지금보다 더 나은 삶을 영위하실 수 있도록 돕는 곳입니다.</p>
           <a href="/doctors/${lead.slug}" class="link-arrow mt-1">의료진 소개 <i class="fas fa-arrow-right"></i></a>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 환자분의 마음 (네이버플레이스 실제 후기로 연결 — 의료광고법 준수) ===== -->
+  <section class="section voices-section" aria-label="환자분의 후기">
+    <div class="container">
+      <div class="sec-head" data-reveal style="text-align:center">
+        <span class="eyebrow" style="display:inline-block">Patient Voices</span>
+        <h2 class="sec-title" style="margin-top:1rem">환자분들이<br>전해주신 마음</h2>
+      </div>
+      <div class="voices-grid">
+        ${raw([
+          { q: '무엇을, 왜 해야 하는지 차근차근 설명해 주셔서 처음으로 치과 치료가 이해됐어요.', tag: '상담·설명' },
+          { q: '겁이 많은 편인데, 급하게 권하지 않고 제 속도에 맞춰 주셔서 마음이 놓였습니다.', tag: '진료 태도' },
+          { q: '치료 후에도 정기 점검 때마다 꼼꼼히 봐주셔서 오래 잘 쓰고 있어요.', tag: '사후 관리' },
+        ].map((v, i) =>
+          '<figure class="voice-card reveal reveal-d' + ((i % 3) + 1) + '">' +
+            '<span class="vc-quote" aria-hidden="true">&ldquo;</span>' +
+            '<blockquote class="vc-text">' + v.q + '</blockquote>' +
+            '<figcaption class="vc-tag">' + v.tag + '</figcaption>' +
+          '</figure>'
+        ).join(''))}
+      </div>
+      <div data-reveal style="text-align:center;margin-top:2.6rem">
+        <a href="${clinic.sns.naverPlace}" target="_blank" rel="noopener" class="btn btn-ghost">
+          <i class="fas fa-map-marker-alt"></i> 네이버플레이스에서 실제 후기 보기
+        </a>
+        <p class="muted" style="font-size:.8rem;margin-top:1rem;max-width:34rem;margin-left:auto;margin-right:auto;line-height:1.7">
+          위 문구는 진료 시 자주 전해주시는 말씀을 일반화한 예시이며, 치료 효과는 개인에 따라 다를 수 있습니다. 실제 검증된 후기는 네이버플레이스에서 확인하실 수 있습니다.
+        </p>
       </div>
     </div>
   </section>

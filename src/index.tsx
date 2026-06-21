@@ -430,12 +430,42 @@ app.notFound((c) => {
 <html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>페이지를 찾을 수 없습니다 | ${clinic.nameKo}</title>
 <meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="/static/img/favicon.svg">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
-<style>body{font-family:Pretendard,sans-serif;background:#FBF9F1;color:#000000;display:grid;place-items:center;min-height:100vh;margin:0;text-align:center}
-h1{font-size:5rem;margin:0;letter-spacing:-.04em}p{color:#6B6B6B;margin:.8rem 0 2rem}
-a{display:inline-block;background:#000000;color:#FBF9F1;padding:.85rem 1.8rem;border-radius:2px;text-decoration:none;margin:0 .3rem}</style></head>
-<body><div><h1>404</h1><p>찾으시는 페이지가 없습니다.<br>주소가 바뀌었거나 삭제된 페이지일 수 있습니다.</p>
-<a href="/">홈으로</a><a href="/reservation" style="background:transparent;color:#000000;border:1px solid #E3DECE">예약 상담</a></div></body></html>`, 404)
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Noto+Serif+KR:wght@500;600&display=swap">
+<style>
+  :root{--ink:#2E3A4B;--gold:#C59F66;--gold2:#A07F45;--paper:#FBF9F1;--paper2:#F4F0E4;--mist:#6E7681;--line:#E7E0CF}
+  *{box-sizing:border-box}
+  body{font-family:Pretendard,sans-serif;background:radial-gradient(ellipse at 50% -10%,#fff,var(--paper) 60%);color:var(--ink);display:grid;place-items:center;min-height:100vh;margin:0;text-align:center;padding:2rem}
+  .nf{max-width:34rem;position:relative}
+  .nf-mark{font-family:'Fraunces',serif;font-size:clamp(7rem,22vw,12rem);line-height:.9;color:transparent;-webkit-text-stroke:1.5px var(--gold);letter-spacing:-.03em;margin:0;opacity:.85}
+  .nf-on{position:absolute;top:50%;left:50%;transform:translate(-50%,-58%);font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.4rem,4vw,2rem);color:var(--gold2);letter-spacing:.1em}
+  .nf-eyebrow{font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold2);font-weight:600;margin-bottom:.8rem}
+  h1{font-family:'Noto Serif KR',serif;font-size:clamp(1.5rem,4vw,2rem);margin:.4rem 0 .6rem;font-weight:600;letter-spacing:-.01em}
+  p{color:var(--mist);margin:0 0 2.2rem;line-height:1.8;font-size:.98rem}
+  .nf-cta{display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap}
+  a.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.85rem 1.7rem;border-radius:10px;text-decoration:none;font-weight:600;font-size:.95rem;transition:transform .15s ease,box-shadow .25s ease}
+  a.primary{background:linear-gradient(135deg,#C8A86B,#A07F45);color:#fff;box-shadow:0 12px 26px -12px rgba(197,159,102,.6)}
+  a.primary:hover{transform:translateY(-2px)}
+  a.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  a.ghost:hover{border-color:var(--gold)}
+  .nf-links{margin-top:2rem;font-size:.85rem;color:var(--mist)}
+  .nf-links a{color:var(--gold2);text-decoration:none;margin:0 .5rem;font-weight:500}
+  .nf-links a:hover{text-decoration:underline}
+</style></head>
+<body><div class="nf">
+  <p class="nf-mark" aria-hidden="true">404<span class="nf-on">ON</span></p>
+  <p class="nf-eyebrow">${clinic.nameKo}</p>
+  <h1>찾으시는 페이지를 켤 수 없습니다</h1>
+  <p>주소가 바뀌었거나 삭제된 페이지일 수 있습니다.<br>아래에서 필요한 곳으로 바로 이동하실 수 있습니다.</p>
+  <div class="nf-cta">
+    <a class="btn primary" href="/">홈으로 가기</a>
+    <a class="btn ghost" href="/reservation">예약 상담</a>
+  </div>
+  <p class="nf-links">
+    <a href="/treatments">진료안내</a>·<a href="/doctors">의료진</a>·<a href="/directions">오시는 길</a>·<a href="tel:${clinic.phoneRaw}">전화 ${clinic.phone}</a>
+  </p>
+</div></body></html>`, 404)
 })
 
 export default app

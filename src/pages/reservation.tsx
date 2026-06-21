@@ -23,6 +23,13 @@ export function ReservationPage() {
 
   <section class="section--tight">
     <div class="container">
+      <!-- 진행 단계 표시 (퍼널 시각화) -->
+      <ol class="rsv-steps" data-reveal aria-label="상담 진행 단계">
+        <li class="rsv-step is-active"><span class="rs-num">1</span><span class="rs-label">신청서 작성</span></li>
+        <li class="rsv-step"><span class="rs-num">2</span><span class="rs-label">담당자 연락·일정 확정</span></li>
+        <li class="rsv-step"><span class="rs-num">3</span><span class="rs-label">내원·정밀 상담</span></li>
+      </ol>
+
       <div class="rsv-grid">
         <!-- 폼 -->
         <form id="rsv-form" class="form-card" data-reveal>
@@ -42,8 +49,17 @@ export function ReservationPage() {
             </select>
           </div>
           <div class="form-row">
-            <label for="rsv-date">희망 날짜·시간대</label>
-            <input id="rsv-date" name="preferredDate" type="text" maxlength="60" placeholder="예: 다음 주 화요일 저녁 / 토요일 오전">
+            <label>희망 시간대 <span class="muted" style="font-weight:400;font-size:.82rem">(선택)</span></label>
+            <div class="chip-group" id="rsv-timeslot" role="group" aria-label="희망 시간대">
+              <button type="button" class="chip" data-val="평일 오전">평일 오전</button>
+              <button type="button" class="chip" data-val="평일 오후">평일 오후</button>
+              <button type="button" class="chip" data-val="화요일 야간(~20:00)">화 야간</button>
+              <button type="button" class="chip" data-val="토요일 오전">토 오전</button>
+            </div>
+          </div>
+          <div class="form-row">
+            <label for="rsv-date">희망 날짜·추가 메모</label>
+            <input id="rsv-date" name="preferredDate" type="text" maxlength="60" placeholder="예: 다음 주 화요일 / 빠른 날짜 희망">
           </div>
           <div class="form-row">
             <label for="rsv-message">남기실 말씀</label>
@@ -92,14 +108,40 @@ export function ReservationPage() {
   (function () {
     var form = document.getElementById('rsv-form');
     if (!form) return;
+
+    // 희망 시간대 칩 (다중 선택)
+    var slot = '';
+    var chips = form.querySelectorAll('#rsv-timeslot .chip');
+    chips.forEach(function (c) {
+      c.addEventListener('click', function () {
+        c.classList.toggle('is-on');
+        var on = [];
+        chips.forEach(function (x) { if (x.classList.contains('is-on')) on.push(x.getAttribute('data-val')); });
+        slot = on.join(', ');
+      });
+    });
+
+    // 진행 단계 활성화 — 이름·연락처 입력 시 2단계 하이라이트
+    var steps = document.querySelectorAll('.rsv-step');
+    function refreshSteps() {
+      var n = form.querySelector('#rsv-name').value.trim();
+      var p = form.querySelector('#rsv-phone').value.trim();
+      if (steps[1]) steps[1].classList.toggle('is-active', !!(n && p));
+    }
+    form.querySelector('#rsv-name').addEventListener('input', refreshSteps);
+    form.querySelector('#rsv-phone').addEventListener('input', refreshSteps);
+
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
       var btn = document.getElementById('rsv-submit');
       var result = document.getElementById('rsv-result');
       var fd = new FormData(form);
+      // 시간대 칩 + 직접 입력 메모를 preferredDate 한 필드로 합쳐 전송 (API 호환)
+      var dateMemo = (fd.get('preferredDate') || '').toString().trim();
+      var combined = [slot, dateMemo].filter(Boolean).join(' / ');
       var payload = {
         name: fd.get('name'), phone: fd.get('phone'), treatment: fd.get('treatment'),
-        preferredDate: fd.get('preferredDate'), message: fd.get('message'),
+        preferredDate: combined, message: fd.get('message'),
         agreePrivacy: !!fd.get('agreePrivacy')
       };
       btn.disabled = true; btn.style.opacity = '.6';
@@ -114,6 +156,9 @@ export function ReservationPage() {
           result.textContent = '✓ 신청이 접수되었습니다. 진료시간 내 순차적으로 연락드리겠습니다.';
           result.className = 'form-result ok';
           form.reset();
+          chips.forEach(function (x) { x.classList.remove('is-on'); }); slot = '';
+          if (steps[1]) steps[1].classList.add('is-active');
+          if (steps[2]) steps[2].classList.add('is-active');
         } else {
           result.textContent = data.error || '접수에 실패했습니다. 전화로 문의 부탁드립니다.';
           result.className = 'form-result err';

@@ -259,11 +259,33 @@
     setTimeout(function () { imgs.forEach(function (img) { img.classList.add('loaded'); }); }, 1500);
   }
 
+  /* ---- 모바일 플로팅 상담 바 : 스크롤 다운 시 숨김, 업/멈춤 시 노출 ---- */
+  function initStickyCta() {
+    var bar = document.querySelector('.sticky-cta');
+    if (!bar) return;
+    var last = window.pageYOffset || 0, ticking = false, idle = null;
+    function update() {
+      var y = window.pageYOffset || 0;
+      var goingDown = y > last && y > 240;
+      if (goingDown) bar.classList.add('cta-hidden');
+      else bar.classList.remove('cta-hidden');
+      last = y;
+      ticking = false;
+      // 스크롤 멈추면 다시 노출
+      clearTimeout(idle);
+      idle = setTimeout(function () { bar.classList.remove('cta-hidden'); }, 700);
+    }
+    window.addEventListener('scroll', function () {
+      if (!ticking) { window.requestAnimationFrame(update); ticking = true; }
+    }, { passive: true });
+  }
+
   /* ---- init ---- */
   function init() {
     initLenis(); initHeader(); initMobileNav(); initReveal();
     initWordmark(); initHeroWords(); initProgress(); initDraw();
     initFaq(); initCount(); initParallax(); initCompare(); initImgFade();
+    initStickyCta();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();

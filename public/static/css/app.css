@@ -613,17 +613,59 @@ a:focus-visible, button:focus-visible, .core-feature:focus-visible { outline: 2p
 .sticky-cta { display: none; }
 @media (max-width: 860px) {
   .sticky-cta {
-    display: grid; grid-template-columns: 1fr 1fr; position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
-    background: rgba(250,247,241,.92); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-    border-top: 1px solid var(--line); padding: .6rem .8rem calc(.6rem + env(safe-area-inset-bottom));
-    gap: .6rem;
+    display: grid; grid-template-columns: 1fr 1fr 1.5fr; position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
+    background: rgba(250,247,241,.94); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--line); padding: .55rem .7rem calc(.55rem + env(safe-area-inset-bottom));
+    gap: .5rem; box-shadow: 0 -8px 24px -12px rgba(46,58,75,.22);
+    transform: translateY(0); transition: transform .4s var(--ease);
   }
-  .sticky-cta a { display: flex; align-items: center; justify-content: center; gap: .5rem; padding: .8rem; font-size: .92rem; font-weight: 600; border-radius: 4px; }
-  .sticky-cta .call { border: 1px solid var(--ink); color: var(--ink); }
-  .sticky-cta .book { background: var(--gold-grad); color: #fff; }
-  body { padding-bottom: 64px; }
+  .sticky-cta.cta-hidden { transform: translateY(120%); }
+  .sticky-cta a {
+    display: flex; align-items: center; justify-content: center; gap: .4rem; padding: .78rem .4rem;
+    font-size: .9rem; font-weight: 600; border-radius: 9px; transition: transform .15s var(--ease);
+  }
+  .sticky-cta a:active { transform: scale(.96); }
+  .sticky-cta a i { font-size: .95rem; }
+  .sticky-cta .call { border: 1px solid var(--line); color: var(--ink); background: #fff; }
+  .sticky-cta .kakao { background: #FEE500; color: #3C1E1E; }
+  .sticky-cta .book { background: var(--gold-grad); color: #fff; box-shadow: 0 6px 16px -6px rgba(197,159,102,.6); }
+  body { padding-bottom: 70px; }
 }
 @media (max-width: 860px) { .rsv-grid { grid-template-columns: 1fr; } }
+
+/* ---------- 30. 예약 폼 UX — 단계 표시 + 칩 ---------- */
+.rsv-steps {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem;
+  list-style: none; margin: 0 0 2.4rem; padding: 0; counter-reset: none;
+}
+.rsv-step {
+  display: flex; align-items: center; gap: .7rem; padding: .9rem 1rem;
+  border: 1px solid var(--line); border-radius: 12px; background: #fff;
+  transition: all .35s var(--ease);
+}
+.rsv-step .rs-num {
+  flex: none; width: 1.9rem; height: 1.9rem; border-radius: 50%;
+  display: grid; place-items: center; font-weight: 700; font-size: .92rem;
+  background: var(--paper-3); color: var(--mist); transition: all .35s var(--ease);
+}
+.rsv-step .rs-label { font-size: .9rem; font-weight: 600; color: var(--mist); line-height: 1.3; }
+.rsv-step.is-active { border-color: var(--gold); box-shadow: 0 8px 22px -14px rgba(197,159,102,.7); }
+.rsv-step.is-active .rs-num { background: var(--gold-grad); color: #fff; }
+.rsv-step.is-active .rs-label { color: var(--ink); }
+@media (max-width: 640px) {
+  .rsv-steps { grid-template-columns: 1fr; gap: .5rem; }
+  .rsv-step { padding: .75rem .9rem; }
+}
+
+.chip-group { display: flex; flex-wrap: wrap; gap: .5rem; }
+.chip {
+  padding: .55rem 1rem; border: 1px solid var(--line); border-radius: 999px;
+  background: #fff; color: var(--ink-2); font-size: .9rem; font-weight: 500;
+  cursor: pointer; transition: all .18s var(--ease); font-family: inherit;
+}
+.chip:hover { border-color: var(--gold-light); }
+.chip.is-on { background: var(--gold-grad); color: #fff; border-color: transparent; box-shadow: 0 6px 16px -8px rgba(197,159,102,.6); }
+.chip:active { transform: scale(.96); }
 
 /* ---------- 29b. Mobile touch-target & readability tuning ---------- */
 @media (max-width: 860px) {
@@ -775,6 +817,61 @@ a:focus-visible, button:focus-visible, .core-feature:focus-visible { outline: 2p
   .trust-stat:nth-child(2)::after { display: none; }
 }
 
+/* ---------- 진료 여정 (Patient Journey) ---------- */
+.journey-section { background: var(--paper-2); }
+.journey-track {
+  list-style: none; margin: 3rem 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 0;
+  counter-reset: none; position: relative;
+}
+.journey-step {
+  position: relative; padding: 0 1.2rem;
+}
+.journey-step:not(:last-child)::after {
+  content: ''; position: absolute; top: 1.1rem; right: -0; left: calc(50% + 1.4rem); width: calc(100% - 2.8rem); height: 1px;
+  background: linear-gradient(90deg, var(--gold-light), rgba(197,159,102,.25));
+}
+.journey-step .js-num {
+  display: grid; place-items: center; width: 2.2rem; height: 2.2rem; border-radius: 50%;
+  background: #fff; border: 1px solid var(--gold); color: var(--gold-2);
+  font-family: var(--serif); font-size: .95rem; font-weight: 600; margin-bottom: 1.1rem;
+  position: relative; z-index: 1; transition: all .3s var(--ease);
+}
+.journey-step:hover .js-num { background: var(--gold-grad); color: #fff; transform: translateY(-3px); }
+.journey-step .js-title { display: block; font-family: var(--serif-kr); font-size: 1.08rem; font-weight: 600; color: var(--ink); margin-bottom: .5rem; }
+.journey-step .js-desc { display: block; font-size: .88rem; line-height: 1.7; color: var(--mist); }
+@media (max-width: 900px) {
+  .journey-track { grid-template-columns: 1fr; gap: 0; }
+  .journey-step { padding: 1.2rem 0 1.2rem 3.4rem; }
+  .journey-step:not(:last-child)::after {
+    top: 2.2rem; left: 1.05rem; width: 1px; height: calc(100% - 1rem); background: linear-gradient(180deg, var(--gold-light), rgba(197,159,102,.2));
+  }
+  .journey-step .js-num { position: absolute; left: 0; top: 1.2rem; margin: 0; }
+}
+
+/* ---------- 환자 후기 (Patient Voices) ---------- */
+.voices-section { background: var(--paper); }
+.voices-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; margin-top: 3rem; }
+.voice-card {
+  position: relative; margin: 0; padding: 2.6rem 1.9rem 1.9rem; background: #fff;
+  border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
+  transition: transform .4s var(--ease), box-shadow .4s var(--ease);
+}
+.voice-card:hover { transform: translateY(-6px); box-shadow: 0 24px 48px -28px rgba(46,58,75,.32); }
+.voice-card .vc-quote {
+  position: absolute; top: .2rem; left: 1.2rem; font-family: var(--serif);
+  font-size: 4.5rem; line-height: 1; color: var(--gold-light); opacity: .55;
+}
+.voice-card .vc-text {
+  position: relative; margin: 0 0 1.4rem; font-family: var(--serif-kr);
+  font-size: 1.06rem; line-height: 1.8; color: var(--ink); font-weight: 500;
+}
+.voice-card .vc-tag {
+  display: inline-block; font-size: .76rem; letter-spacing: .04em; font-weight: 600;
+  color: var(--gold-2); padding: .3rem .8rem; border: 1px solid var(--gold-light); border-radius: 999px;
+}
+@media (max-width: 860px) { .voices-grid { grid-template-columns: 1fr; gap: 1rem; } }
+
 /* ---- 생체모방 실제 케이스 사진 (가로 3:2 원본) ---- */
 .tooth-photo { border-radius: 4px; aspect-ratio: 4 / 3; }
 .tooth-photo img { object-fit: cover; object-position: center 42%; }
@@ -867,3 +964,39 @@ a:focus-visible, button:focus-visible, .core-feature:focus-visible { outline: 2p
 /* ===== Encyclopedia auto-inlink ===== */
 a.inlink { color: var(--gold-2); text-decoration: none; border-bottom: 1px dashed rgba(174,138,76,.55); transition: border-color .2s, color .2s; }
 a.inlink:hover { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* ===== C6 마이크로 인터랙션 고도화 — "비싼 티" 마감 ===== */
+/* 1) voice-card 상단 골드 라인 (호버 시 좌→우로 그려짐) */
+.voice-card::before {
+  content: ''; position: absolute; top: 0; left: 0; height: 3px; width: 100%;
+  background: var(--gold-grad); transform: scaleX(0); transform-origin: left;
+  transition: transform .55s var(--ease);
+}
+.voice-card:hover::before { transform: scaleX(1); }
+
+/* 2) journey-num 진입 시 골드 글로우 미세 펄스 (reveal 직후 1회) */
+.journey-step.in .js-num { animation: jsPulse 1.6s var(--ease) .2s both; }
+@keyframes jsPulse {
+  0% { box-shadow: 0 0 0 0 rgba(197,159,102,0); }
+  35% { box-shadow: 0 0 0 7px rgba(197,159,102,.16); }
+  100% { box-shadow: 0 0 0 0 rgba(197,159,102,0); }
+}
+
+/* 3) CTA·버튼 active 피드백 통일 (탭 시 살짝 눌림) */
+.sticky-cta a:active { transform: scale(.96); }
+.btn-primary:active { transform: translateY(1px) scale(.99); }
+
+/* 4) 카드/피처 호버 시 골드-go 화살표 일관 모션 */
+.core-feature:hover .cf-go { gap: .85rem; color: var(--gold-2); }
+.core-feature:hover .cf-go i { transform: translateX(5px); }
+
+/* 5) 전역 스크롤 부드러움 (Lenis 미동작 환경 폴백) + 모션 최소화 존중 */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .journey-step.in .js-num { animation: none; }
+  .voice-card::before { transition: none; }
+}
+
+/* 6) 이미지 드래그/선택 방지 (프리미엄 디테일) */
+.cf-media img, .core-card img, .figure img, .tooth-photo img { -webkit-user-drag: none; user-select: none; }

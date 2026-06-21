@@ -242,8 +242,9 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
   <main>${body}</main>
   ${Footer()}
   <nav class="sticky-cta" aria-label="빠른 상담">
-    <a href="tel:${clinic.phoneRaw}" class="call"><i class="fas fa-phone"></i> 전화 상담</a>
-    <a href="/reservation" class="book"><i class="fas fa-calendar-check"></i> 예약 신청</a>
+    <a href="tel:${clinic.phoneRaw}" class="call"><i class="fas fa-phone"></i><span>전화</span></a>
+    <a href="${clinic.sns.kakaoChannel}" target="_blank" rel="noopener" class="kakao"><i class="fas fa-comment"></i><span>카카오</span></a>
+    <a href="/reservation" class="book"><i class="fas fa-calendar-check"></i><span>예약 신청</span></a>
   </nav>
   <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js" defer></script>
   <script src="/static/js/regions.js?v=${ASSET_VER}" defer></script>
