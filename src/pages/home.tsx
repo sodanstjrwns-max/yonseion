@@ -26,8 +26,8 @@ export function HomePage() {
   ]
 
   const meta = {
-    title: `${clinic.nameKo} | ${clinic.tagline}`,
-    description: `${clinic.address} · ${clinic.subway}. 자연치아를 닮은 생체모방치의학으로 미소에 젊음을 더하는 ${clinic.nameKo}. 중장년 심미보철·전체임플란트·접착수복 진료.`,
+    title: `${clinic.nameKo} | 부산 동래구 온천동 치과 (온천장역)`,
+    description: `${clinic.address} · ${clinic.subway}. 자연치아를 닮은 생체모방치의학으로 미소에 젊음을 더하는 부산 동래구 온천동 ${clinic.nameKo}. 중장년 심미보철·전체임플란트·접착수복 진료.`,
     path: '/',
     jsonLd: [organizationSchema(), websiteSchema(), faqSchema(homeFaqs)],
   }
@@ -70,7 +70,7 @@ export function HomePage() {
 
     <!-- 콘텐츠 : 태그라인이 주인공 -->
     <div class="hw-content">
-      <span class="hw-eyebrow" data-reveal>${clinic.nameKo}</span>
+      <span class="hw-eyebrow" data-reveal>부산 동래구 온천동 · ${clinic.nameKo}</span>
       <h1 class="hw-tagline" aria-label="미소의 아름다움을 켜드립니다">${raw(kinetic('미소의 아름다움을'))}<br class="hw-br"><span class="tg-gold">${raw(kinetic('켜드립니다'))}</span></h1>
       <p class="hw-mission" data-reveal data-reveal-delay="2">${clinic.mission}</p>
       <div class="hw-cta" data-reveal data-reveal-delay="3">
