@@ -219,7 +219,7 @@ export function HomePage() {
       <div class="space-head" data-reveal>
         <span class="eyebrow">Our Space</span>
         <h2 class="sec-title">머무는 동안 편안하도록,<br>공간까지 진료의 일부로.</h2>
-        <p class="sec-lead">서울대학교 치과병원과 동일한 진료 시스템 위에, 빛과 동선을 섬세하게 설계했습니다. 진료과목별 공간 구성과 첨단 디지털 장비, 그리고 따뜻한 채광 속에서 진료를 받으실 수 있습니다.</p>
+        <p class="sec-lead">빛과 동선을 섬세하게 설계했습니다. 진료과목별 공간 구성과 첨단 디지털 장비, 그리고 따뜻한 채광 속에서 진료를 받으실 수 있습니다.</p>
       </div>
 
       <div class="mag-grid">
