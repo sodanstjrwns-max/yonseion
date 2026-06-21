@@ -3,7 +3,7 @@ import { clinic } from '../data/clinic'
 import { coreTreatments, treatmentGroups, treatmentsByGroup } from '../data/treatments'
 
 // 정적 CSS 캐시 버스팅용 버전 — app.css 변경 시 이 값을 올리면 엣지/브라우저 캐시가 갱신됨
-const ASSET_VER = '20260621m'
+const ASSET_VER = '20260621o'
 
 export interface SeoMeta {
   title: string
@@ -119,6 +119,7 @@ function Footer() {
   if (clinic.sns.instagram) sns.push(`<a href="${clinic.sns.instagram}" target="_blank" rel="noopener"><i class="fab fa-instagram"></i> 인스타그램</a>`)
   if (clinic.sns.youtube) sns.push(`<a href="${clinic.sns.youtube}" target="_blank" rel="noopener"><i class="fab fa-youtube"></i> 유튜브</a>`)
   if (clinic.sns.blog) sns.push(`<a href="${clinic.sns.blog}" target="_blank" rel="noopener"><i class="fas fa-blog"></i> 블로그</a>`)
+  if (clinic.sns.naverBooking) sns.push(`<a href="${clinic.sns.naverBooking}" target="_blank" rel="noopener"><i class="fas fa-calendar-check"></i> 네이버 예약</a>`)
   if (clinic.sns.naverPlace) sns.push(`<a href="${clinic.sns.naverPlace}" target="_blank" rel="noopener"><i class="fas fa-map-location-dot"></i> 네이버플레이스</a>`)
   if (clinic.sns.kakaoChannel) sns.push(`<a href="${clinic.sns.kakaoChannel}" target="_blank" rel="noopener"><i class="fas fa-comment"></i> 카카오톡 채널</a>`)
   return html`

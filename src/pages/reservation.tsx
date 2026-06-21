@@ -10,6 +10,15 @@ import { breadcrumbSchema } from '../lib/schema'
 export function ReservationPage() {
   const crumb = [{ name: '홈', url: '/' }, { name: '예약 상담', url: '/reservation' }]
   const txOptions = treatments.map((t) => `<option value="${t.name}">${t.name}</option>`).join('')
+  const naverCard = clinic.sns.naverBooking ? `
+          <div class="sidebar-box rsv-naver">
+            <span class="rsv-naver-eyebrow"><i class="fas fa-bolt"></i> 가장 빠른 예약</span>
+            <h4>네이버 예약</h4>
+            <p class="muted" style="font-size:.88rem;margin:.3rem 0 1rem">날짜·시간을 직접 선택해 바로 예약하세요. 대기 없이 즉시 확정됩니다.</p>
+            <a href="${clinic.sns.naverBooking}" target="_blank" rel="noopener" class="rsv-naver-btn">
+              <i class="fas fa-calendar-check"></i> 네이버로 바로 예약하기
+            </a>
+          </div>` : ''
 
   const body = html`
   <section class="page-hero">
@@ -80,6 +89,7 @@ export function ReservationPage() {
 
         <!-- 사이드 정보 -->
         <aside class="rsv-aside" data-reveal data-reveal-delay="2">
+          ${raw(naverCard)}
           <div class="sidebar-box">
             <h4>전화 상담</h4>
             <a href="tel:${clinic.phoneRaw}" class="rsv-phone"><i class="fas fa-phone"></i> ${clinic.phone}</a>

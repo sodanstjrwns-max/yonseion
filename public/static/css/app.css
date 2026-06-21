@@ -561,6 +561,14 @@ a:focus-visible, button:focus-visible, .core-feature:focus-visible { outline: 2p
 .rsv-phone { font-family: var(--serif); font-size: 1.5rem; color: var(--ink); display: inline-flex; gap: .6rem; align-items: center; }
 .rsv-phone i { font-size: 1rem; color: var(--mist); }
 
+/* 네이버 예약 강조 카드 */
+.rsv-naver { border: 1px solid rgba(3,199,90,.35); background: linear-gradient(160deg, rgba(3,199,90,.06), rgba(3,199,90,.015)); position: relative; }
+.rsv-naver-eyebrow { display: inline-flex; align-items: center; gap: .4rem; font-size: .72rem; font-weight: 700; letter-spacing: .04em; color: #03A95C; margin-bottom: .55rem; }
+.rsv-naver h4 { color: var(--ink) !important; font-size: 1.05rem !important; letter-spacing: 0 !important; text-transform: none !important; font-family: var(--serif-kr); border-bottom: 0 !important; padding-bottom: 0 !important; margin-bottom: 0 !important; }
+.rsv-naver-btn { display: flex !important; align-items: center; justify-content: center; gap: .55rem; width: 100%; padding: .95rem 1rem !important; border: 0 !important; border-radius: 8px; background: #03C75A; color: #fff !important; font-weight: 700; font-size: .98rem; box-shadow: 0 12px 26px -12px rgba(3,199,90,.6); transition: transform .2s var(--ease), box-shadow .2s var(--ease), background .2s; }
+.rsv-naver-btn:hover { background: #02b350; transform: translateY(-2px); padding-left: 1rem !important; box-shadow: 0 18px 34px -12px rgba(3,199,90,.7); }
+.rsv-naver-btn i { color: #fff; }
+
 /* ---------- 24. FAQ tabs / filter pills ---------- */
 .faq-tabs { display: flex; gap: .6rem; flex-wrap: wrap; }
 .faq-tab {

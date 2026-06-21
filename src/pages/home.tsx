@@ -126,7 +126,7 @@ export function HomePage() {
           <p class="quote-sub">치아 하나하나의 색조와 형태, 씹는 힘까지 자연이 만든 본래의 모습에 가장 가깝게 되살립니다.</p>
           <cite class="quote-cite"><span class="cite-line"></span><span class="cite-txt">${clinic.nameKo} · 생체모방치의학</span></cite>
         </div>
-        <figure class="quote-portrait quote-portrait--smile img-reveal" data-reveal data-reveal-delay="2">
+        <figure class="quote-smile img-reveal" data-reveal data-reveal-delay="2">
           <img src="/static/img/hero-smile.jpg" alt="자연스러운 형태로 되살린 건강한 미소 — ${clinic.nameKo} 생체모방치의학" loading="lazy">
         </figure>
       </div>
@@ -152,10 +152,11 @@ export function HomePage() {
       box-shadow:0 36px 80px -34px rgba(46,58,75,.5)}
     .quote-portrait::after{content:'';position:absolute;inset:0;border:1px solid rgba(255,255,255,.14);border-radius:16px;pointer-events:none}
     .quote-portrait img{display:block;width:100%;aspect-ratio:5/6;object-fit:cover;object-position:center 18%}
-    /* 미소 사진(분위기 컷): 부드러운 가로형 비율 + 은은한 골드 보더 오버레이 */
-    .quote-portrait--smile{border-radius:18px;box-shadow:0 34px 78px -34px rgba(46,58,75,.46)}
-    .quote-portrait--smile::after{border-color:rgba(197,159,102,.28);border-radius:18px}
-    .quote-portrait--smile img{aspect-ratio:4/5;object-fit:cover;object-position:center 42%}
+    /* 미소 사진(분위기 컷): 카드/테두리/그림자 없이 가장자리를 페이드아웃해 배경에 자연스럽게 녹임 */
+    .quote-smile{margin:0;position:relative}
+    .quote-smile img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;object-position:center 42%;
+      -webkit-mask-image:radial-gradient(72% 66% at 50% 48%, #000 30%, rgba(0,0,0,.45) 66%, transparent 92%);
+              mask-image:radial-gradient(72% 66% at 50% 48%, #000 30%, rgba(0,0,0,.45) 66%, transparent 92%)}
     .quote-portrait figcaption{position:absolute;left:0;right:0;bottom:0;padding:2.6rem 1.7rem 1.4rem;
       color:#fff;letter-spacing:.01em;line-height:1.45;
       background:linear-gradient(to top,rgba(24,31,42,.88) 0%,rgba(24,31,42,.5) 50%,transparent 100%)}

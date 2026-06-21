@@ -76,6 +76,7 @@ export const clinic = {
     blog: 'https://blog.naver.com/ysondent',          // 병원 브랜드블로그
     blogPersonal: 'https://blog.naver.com/ys_ondental', // 원장 개인블로그 (E-E-A-T 저자 시그널)
     naverPlace: 'https://naver.me/FZ8n5qiP',
+    naverBooking: 'https://naver.me/FXwyK7iO',         // 네이버 예약
     kakaoChannel: 'http://pf.kakao.com/_xiPfab',
   },
 
