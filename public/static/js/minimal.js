@@ -247,11 +247,23 @@
     });
   }
 
+  /* ---- 이미지 로드 페이드인 (.cf-media img / .core-card img) ---- */
+  function initImgFade() {
+    var imgs = document.querySelectorAll('.cf-media img, .core-card img');
+    imgs.forEach(function (img) {
+      if (img.complete && img.naturalWidth > 0) { img.classList.add('loaded'); return; }
+      img.addEventListener('load', function () { img.classList.add('loaded'); });
+      img.addEventListener('error', function () { img.classList.add('loaded'); }); // 실패해도 컨테이너 노출
+    });
+    // 안전장치 — 1.5초 후 무조건 노출 (JS/이벤트 누락 대비)
+    setTimeout(function () { imgs.forEach(function (img) { img.classList.add('loaded'); }); }, 1500);
+  }
+
   /* ---- init ---- */
   function init() {
     initLenis(); initHeader(); initMobileNav(); initReveal();
     initWordmark(); initHeroWords(); initProgress(); initDraw();
-    initFaq(); initCount(); initParallax(); initCompare();
+    initFaq(); initCount(); initParallax(); initCompare(); initImgFade();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();

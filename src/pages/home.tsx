@@ -92,6 +92,30 @@ export function HomePage() {
     </div>
   </div>
 
+  <!-- ===== 신뢰 지표 띠 : 핵심 숫자 (의료광고법 준수 — 사실 기반) ===== -->
+  <section class="trust-band" aria-label="병원 한눈에 보기">
+    <div class="container">
+      <ul class="trust-grid">
+        <li class="trust-stat" data-reveal>
+          <span class="ts-num" data-count="6">6</span><span class="ts-suffix">개 과목</span>
+          <span class="ts-label">정밀 진료 운영</span>
+        </li>
+        <li class="trust-stat" data-reveal data-reveal-delay="1">
+          <span class="ts-num">더블</span><span class="ts-suffix">보더</span>
+          <span class="ts-label">보철과·통합치의학과 전문의</span>
+        </li>
+        <li class="trust-stat" data-reveal data-reveal-delay="2">
+          <span class="ts-num" data-count="3">3</span><span class="ts-suffix">분</span>
+          <span class="ts-label">1호선 온천장역 도보</span>
+        </li>
+        <li class="trust-stat" data-reveal data-reveal-delay="3">
+          <span class="ts-num" data-count="12">12</span><span class="ts-suffix">개 지역</span>
+          <span class="ts-label">부산·경남·울산 내원</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
   <!-- ===== 미션 한 줄 + 원장 사진 : 에디토리얼 2단 ===== -->
   <section class="section quote-section" id="home-quote">
     <div class="container">
@@ -167,19 +191,23 @@ export function HomePage() {
         <h2 class="sec-title">세 가지 중심 진료</h2>
         <p class="sec-lead">연세온치과가 가장 깊이 들여다보는 영역입니다. 자연치아를 닮은 결과를 향해, 보존을 우선합니다.</p>
       </div>
-      <div class="index-list">
-        ${raw(coreTreatments.map((t, i) => `
-          <a class="index-row" href="/treatments/${t.slug}" data-reveal data-reveal-delay="${(i % 3) + 1}">
-            <span class="num">0${i + 1}</span>
-            <span>
-              <span class="row-title">${t.name}</span>
-              <span class="row-desc">${t.short}</span>
-            </span>
-            <span class="row-go"><i class="fas fa-arrow-right"></i></span>
-          </a>
-        `).join(''))}
+      <div class="core-grid">
+        ${raw(coreTreatments.map((t, i) =>
+          '<a class="core-feature reveal reveal-d' + ((i % 3) + 1) + '" href="/treatments/' + t.slug + '">' +
+            '<span class="cf-media">' +
+              '<img src="/static/img/tx-' + t.slug + '.jpg" alt="' + t.name + '" loading="lazy" decoding="async" width="1200" height="900">' +
+              '<span class="cf-num">0' + (i + 1) + '</span>' +
+            '</span>' +
+            '<span class="cf-body">' +
+              '<span class="cf-group">' + t.group + '</span>' +
+              '<span class="cf-title">' + t.name + '</span>' +
+              '<span class="cf-desc">' + t.short + '</span>' +
+              '<span class="cf-go">자세히 보기 <i class="fas fa-arrow-right"></i></span>' +
+            '</span>' +
+          '</a>'
+        ).join(''))}
       </div>
-      <div class="mt-3" data-reveal>
+      <div class="mt-3" data-reveal style="text-align:center">
         <a href="/treatments" class="link-arrow">전체 진료 안내 <i class="fas fa-arrow-right"></i></a>
       </div>
     </div>

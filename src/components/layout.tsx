@@ -3,7 +3,7 @@ import { clinic } from '../data/clinic'
 import { coreTreatments, treatmentGroups, treatmentsByGroup } from '../data/treatments'
 
 // 정적 CSS 캐시 버스팅용 버전 — app.css 변경 시 이 값을 올리면 엣지/브라우저 캐시가 갱신됨
-const ASSET_VER = '20260619a'
+const ASSET_VER = '20260621a'
 
 export interface SeoMeta {
   title: string
@@ -245,7 +245,7 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
     <a href="tel:${clinic.phoneRaw}" class="call"><i class="fas fa-phone"></i> 전화 상담</a>
     <a href="/reservation" class="book"><i class="fas fa-calendar-check"></i> 예약 신청</a>
   </nav>
-  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js" defer></script>
   <script src="/static/js/regions.js?v=${ASSET_VER}" defer></script>
   <script src="/static/js/minimal.js?v=${ASSET_VER}" defer></script>
 </body>
