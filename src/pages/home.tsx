@@ -70,7 +70,7 @@ export function HomePage() {
 
     <!-- 콘텐츠 : 태그라인이 주인공 -->
     <div class="hw-content">
-      <span class="hw-eyebrow" data-reveal>${clinic.nameKo}</span>
+      <span class="hw-eyebrow" data-reveal>안녕하세요, 대표원장 ${lead.name}입니다</span>
       <h1 class="hw-tagline" aria-label="${clinic.tagline}">${raw(kinetic('미소의 젊음을'))} <span class="tg-gold">${raw(kinetic('켜는'))}</span> ${raw(kinetic('치과'))}</h1>
       <p class="hw-mission" data-reveal data-reveal-delay="2">${clinic.mission}</p>
       <div class="hw-cta" data-reveal data-reveal-delay="3">
