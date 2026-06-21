@@ -448,6 +448,11 @@ a:focus-visible, button:focus-visible, .core-feature:focus-visible { outline: 2p
 .page-hero h1 { font-family: var(--serif); font-size: var(--t-h1); letter-spacing: -.03em; max-width: 18ch; }
 .page-hero .lead { font-size: var(--t-lead); color: var(--ink-2); margin-top: 1.8rem; max-width: 48ch; }
 
+/* 리드/섹션 리드의 의도적 줄바꿈(<br>)은 좁은 화면에서 숨기고 자동 흐름으로 처리 — 어색한 줄끊김 방지 */
+@media (max-width: 600px) {
+  .lead br, .sec-lead br { display: none; }
+}
+
 /* page-hero 직후 breadcrumb·section 의 과도한 상단 여백 제거 (인덱스 페이지 빈 공간 해결) */
 .page-hero + .container .breadcrumb { padding-top: 1.6rem; padding-bottom: .2rem; }
 .page-hero + .section,

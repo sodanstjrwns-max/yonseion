@@ -17,9 +17,7 @@ export function TreatmentsIndex() {
     <div class="container">
       <p class="eyebrow">Treatments</p>
       <h1>진료 안내</h1>
-      <p class="lead" id="tx-index-answer">${clinic.nameKo}는 생체모방치의학 원칙을 바탕으로, 치아를 최대한 보존하는 진료를 제공합니다.
-      중장년 심미보철·전체임플란트(All-on-X)·접착수복 등 정밀 진료부터 보존·치주, 턱관절 치료까지
-      ${treatments.length}개 진료 과목을 ${clinic.subway} 위치에서 운영합니다.</p>
+      <p class="lead" id="tx-index-answer">${clinic.nameKo}는 생체모방치의학 원칙을 바탕으로, 치아를 최대한 보존하는 진료를 제공합니다.<br>중장년 심미보철·전체임플란트(All-on-X)·접착수복 등 정밀 진료부터 보존·치주, 턱관절 치료까지<br>${treatments.length}개 진료 과목을 ${clinic.subway} 위치에서 운영합니다.</p>
     </div>
   </section>
   ${Breadcrumb(crumb)}

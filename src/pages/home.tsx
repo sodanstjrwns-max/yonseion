@@ -190,7 +190,7 @@ export function HomePage() {
           <span class="eyebrow">Core Treatments</span>
         </div>
         <h2 class="sec-title">세 가지 중심 진료</h2>
-        <p class="sec-lead">“그 치과, 그 치료는 잘하지.” — 친절한 말보다 정직한 결과로 기억되고 싶습니다. 연세온치과는 결과물의 완성도, 유지력, 그리고 <strong>치아를 얼마나 보존하면서 얻어낸 결과인지</strong>를 가장 중요하게 봅니다.</p>
+        <p class="sec-lead">“그 치과, 그 치료 잘하지.”<br>친절한 말보다 정직한 결과로 기억되고 싶습니다.<br>연세온치과는 결과물의 완성도, 유지력, 그리고 <strong>치아를 얼마나 보존하면서 얻어낸 결과인지</strong>를 가장 중요하게 봅니다.</p>
       </div>
       <div class="core-grid">
         ${raw(coreTreatments.map((t, i) =>
@@ -220,7 +220,7 @@ export function HomePage() {
       <div class="space-head" data-reveal>
         <span class="eyebrow">Our Space</span>
         <h2 class="sec-title">머무는 동안 편안하도록,<br>공간까지 진료의 일부로.</h2>
-        <p class="sec-lead">빛과 동선을 섬세하게 설계했습니다. 진료과목별 공간 구성과 첨단 디지털 장비, 그리고 따뜻한 채광 속에서 진료를 받으실 수 있습니다.</p>
+        <p class="sec-lead">빛과 동선을 섬세하게 설계했습니다.<br>진료과목별 공간 구성과 첨단 디지털 장비,<br>그리고 따뜻한 채광 속에서 진료를 받으실 수 있습니다.</p>
       </div>
 
       <div class="mag-grid">

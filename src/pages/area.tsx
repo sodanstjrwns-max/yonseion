@@ -32,8 +32,7 @@ export function AreaIndexPage() {
     <div class="container">
       <p class="eyebrow">Area Guide</p>
       <h1>지역별 진료 안내</h1>
-      <p class="lead" id="area-answer">부산 동래구 온천장에 위치한 ${clinic.nameKo}는 ${clinic.subway} 거리로,
-      동래·금정·연제·부산진구는 물론 양산·김해까지 폭넓게 내원하시는 환자분들을 진료합니다.</p>
+      <p class="lead" id="area-answer">부산 동래구 온천장에 위치한 ${clinic.nameKo}는 ${clinic.subway} 거리로,<br>동래·금정·연제·부산진구는 물론 양산·김해까지<br>폭넓게 내원하시는 환자분들을 진료합니다.</p>
     </div>
   </section>
   ${Breadcrumb(crumb)}
@@ -89,8 +88,7 @@ export function AreaPage(comboSlug: string) {
     <div class="container">
       <p class="eyebrow">${region.full}</p>
       <h1 style="font-size:var(--t-h2)">${title},<br>연세온치과에서</h1>
-      <p class="lead">${region.full}에서 ${treatment.keyword}를 알아보고 계신가요?
-      ${clinic.nameKo}는 ${region.name}에서 ${region.distance} 거리(${region.transit})에 있어 가깝게 내원하실 수 있습니다.</p>
+      <p class="lead">${region.full}에서 ${treatment.keyword}를 알아보고 계신가요?<br>${clinic.nameKo}는 ${region.name}에서 ${region.distance} 거리(${region.transit})에 있어<br>가깝게 내원하실 수 있습니다.</p>
     </div>
   </section>
   ${Breadcrumb(crumb)}
