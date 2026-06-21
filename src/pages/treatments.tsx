@@ -114,6 +114,7 @@ export function TreatmentDetail(slug: string) {
               ${t.compare ? '<li><a href="#tx-compare">비교 한눈에 보기</a></li>' : ''}
               ${t.process?.length ? '<li><a href="#tx-process">진료 과정</a></li>' : ''}
               ${t.aftercare?.length ? '<li><a href="#tx-aftercare">회복·관리</a></li>' : ''}
+              ${t.videos?.length ? '<li><a href="#tx-videos">영상으로 보기</a></li>' : ''}
               ${mergedFaqs.length ? '<li><a href="#tx-faq">자주 묻는 질문</a></li>' : ''}
             </ul>
           </nav>`)}
@@ -187,6 +188,26 @@ export function TreatmentDetail(slug: string) {
                   ${e.note ? `<small class="tx-ev-note">${e.note}</small>` : ''}
                 </div>`).join('')}
             </div>
+          </div>`) : ''}
+
+        ${t.videos?.length ? raw(`
+          <div class="tx-videos reveal" id="tx-videos" style="margin-top:2.8rem">
+            <h2 style="margin-bottom:1.2rem"><i class="fas fa-circle-play" style="color:var(--gold);margin-right:.5rem"></i>영상으로 보는 ${t.name}</h2>
+            <figure style="margin:0 0 1.4rem">
+              <div class="tx-video-frame" style="position:relative;width:100%;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 12px 38px rgba(0,0,0,.18)">
+                <iframe src="https://www.youtube-nocookie.com/embed/${t.videos[0].id}" title="${t.videos[0].title}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>
+              </div>
+              <figcaption style="margin-top:.8rem;font-size:.9rem;color:var(--ink-soft);line-height:1.6"><strong style="color:var(--navy);display:block;margin-bottom:.2rem">${t.videos[0].title}</strong>${t.videos[0].caption}</figcaption>
+            </figure>
+            ${t.videos.length > 1 ? `<div class="tx-video-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.4rem">
+              ${t.videos.slice(1).map((v) => `
+                <figure style="margin:0">
+                  <div class="tx-video-frame" style="position:relative;width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;box-shadow:0 8px 26px rgba(0,0,0,.14)">
+                    <iframe src="https://www.youtube-nocookie.com/embed/${v.id}" title="${v.title}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>
+                  </div>
+                  <figcaption style="margin-top:.6rem;font-size:.84rem;color:var(--ink-soft);line-height:1.55"><strong style="color:var(--navy);display:block;margin-bottom:.15rem">${v.title}</strong>${v.caption}</figcaption>
+                </figure>`).join('')}
+            </div>` : ''}
           </div>`) : ''}
 
         ${t.priceNote || t.caution ? raw(`
@@ -331,6 +352,25 @@ export function TreatmentDetail(slug: string) {
     }))
     if (t.compare) faqEntities.push(compareQaSchema(t.compare))
     jsonLd.push({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqEntities })
+  }
+  // VideoObject — 진료 소개·후기 영상 (구글 동영상 리치결과/AEO 강화)
+  if (t.videos?.length) {
+    t.videos.forEach((v) => {
+      jsonLd.push({
+        '@context': 'https://schema.org',
+        '@type': 'VideoObject',
+        name: v.title,
+        description: v.caption,
+        thumbnailUrl: [`https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`],
+        uploadDate: '2024-01-01',
+        contentUrl: `https://www.youtube.com/watch?v=${v.id}`,
+        embedUrl: `https://www.youtube-nocookie.com/embed/${v.id}`,
+        publisher: {
+          '@type': 'Organization',
+          name: clinic.nameKo,
+        },
+      })
+    })
   }
 
   return Layout({

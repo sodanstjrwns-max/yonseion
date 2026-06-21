@@ -37,6 +37,7 @@ export interface Treatment {
   aftercare?: { phase: string; desc: string }[] // 회복·관리 타임라인
   encyclopediaRefs?: string[]       // 백과사전 슬러그 (내부 링크 메시 강화)
   evidence?: { label: string; value: string; note?: string }[] // 근거·기준 데이터
+  videos?: { id: string; title: string; caption: string }[] // 진료 소개·후기 유튜브 영상 (VideoObject 스키마)
 }
 
 export const treatments: Treatment[] = [
@@ -232,6 +233,23 @@ export const treatments: Treatment[] = [
       { q: '당뇨·골다공증이 있어도 가능한가요?', a: '전신 질환이 있어도 조절 상태가 양호하면 진행하는 경우가 많습니다. 다만 예후에 영향을 줄 수 있어, 정밀 진단과 전신 상태 평가 후 신중히 계획합니다.' },
       { q: '임플란트 개수는 몇 개나 필요한가요?', a: '전체 치열을 소수의 임플란트로 지지하는 설계이며, 골 상태와 보철 형태에 따라 개수가 달라집니다. CT 진단 후 가장 안정적인 개수와 위치를 계획해 안내드립니다.' },
       { q: '오래 쓰려면 어떻게 관리해야 하나요?', a: '임플란트 주위염 예방이 핵심입니다. 전용 칫솔·치간칫솔·구강세정기로 매일 관리하고, 정기 검진에서 보철·교합·잇몸 상태를 점검하는 것이 장기 유지에 중요합니다.' },
+    ],
+    videos: [
+      {
+        id: '8Ac43tnDcas',
+        title: '디지털 풀아치(All-on-X) — 치료 원리와 과정',
+        caption: '다수의 치아를 상실한 경우에도 4~6개의 임플란트로 전체 구강 기능을 회복하는 \u2018디지털 풀아치\u2019 치료법을, 김경희 대표원장이 직접 자세히 설명합니다.',
+      },
+      {
+        id: '-HnfY4u6OpA',
+        title: 'All-on-X 환자 후기 — 안모 개선까지',
+        caption: '심한 치주염과 치아 흔들림으로 고생하시던 환자분의 디지털 풀아치 임플란트 치료 후기와, 원장님의 상세한 시술 설명입니다.',
+      },
+      {
+        id: 'NhJ9OOEYkeY',
+        title: 'All-on-4 증례와 디지털 진료 전문성',
+        caption: '디지털 치과 치료 연구에 앞장서는 연세온치과 김경희 원장의 All-on-4 전체 임플란트 증례와 전문성을 확인해 보세요.',
+      },
     ],
     faqRef: 'implant',
   },
