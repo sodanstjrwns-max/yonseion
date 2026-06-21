@@ -190,6 +190,14 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
   <meta name="robots" content="index, follow, max-image-preview:large">
   <meta name="theme-color" content="${clinic.brand.paper}">
 
+  <!-- 검색엔진 소유권 인증 (Search Engine Verification) -->
+  <!-- 구글 서치콘솔: 발급 코드로 content 값 교체 -->
+  <meta name="google-site-verification" content="">
+  <!-- 네이버 서치어드바이저: 발급 코드로 content 값 교체 -->
+  <meta name="naver-site-verification" content="">
+  <!-- 빙 웹마스터: 발급 코드로 content 값 교체 -->
+  <meta name="msvalidate.01" content="">
+
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="${clinic.nameKo}">
