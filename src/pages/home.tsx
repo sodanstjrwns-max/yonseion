@@ -71,7 +71,7 @@ export function HomePage() {
     <!-- 콘텐츠 : 태그라인이 주인공 -->
     <div class="hw-content">
       <span class="hw-eyebrow" data-reveal>부산 동래구 온천동 · ${clinic.nameKo}</span>
-      <h1 class="hw-tagline" aria-label="미소의 아름다움을 켜드립니다">${raw(kinetic('미소의 아름다움을'))}<br class="hw-br"><span class="tg-gold">${raw(kinetic('켜드립니다'))}</span></h1>
+      <h1 class="hw-tagline" aria-label="미소의 젊음을 켜드립니다">${raw(kinetic('미소의 젊음을'))}<br class="hw-br"><span class="tg-gold">${raw(kinetic('켜드립니다'))}</span></h1>
       <p class="hw-mission" data-reveal data-reveal-delay="2">${clinic.mission}</p>
       <div class="hw-cta" data-reveal data-reveal-delay="3">
         <a href="/reservation" class="btn btn-primary">예약 상담 <i class="fas fa-arrow-right"></i></a>
