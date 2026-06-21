@@ -3,7 +3,7 @@ import { clinic } from '../data/clinic'
 import { coreTreatments, treatmentGroups, treatmentsByGroup } from '../data/treatments'
 
 // 정적 CSS 캐시 버스팅용 버전 — app.css 변경 시 이 값을 올리면 엣지/브라우저 캐시가 갱신됨
-const ASSET_VER = '20260621k'
+const ASSET_VER = '20260621l'
 
 export interface SeoMeta {
   title: string

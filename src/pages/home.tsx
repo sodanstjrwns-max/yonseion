@@ -40,11 +40,6 @@ export function HomePage() {
     <!-- 거대 ON — 배경 워터마크 오브제 -->
     <div class="hw-mark" aria-hidden="true">${raw(splitChars('ON'))}</div>
 
-    <!-- 우측 미소 사진 — 메시지를 증명하는 비주얼 (텍스트 가독성 보호용 페더링) -->
-    <figure class="hw-photo" aria-hidden="true">
-      <img src="/static/img/hero-smile.jpg" alt="" loading="eager" fetchpriority="high" decoding="async">
-    </figure>
-
     <!-- 골드 오빗 — 공전하는 벡터 링 (켜다 On 모티프) -->
     <div class="hw-orbit" aria-hidden="true">
       <svg viewBox="0 0 600 600" fill="none">
@@ -131,12 +126,8 @@ export function HomePage() {
           <p class="quote-sub">치아 하나하나의 색조와 형태, 씹는 힘까지 자연이 만든 본래의 모습에 가장 가깝게 되살립니다.</p>
           <cite class="quote-cite"><span class="cite-line"></span><span class="cite-txt">${clinic.nameKo} · 생체모방치의학</span></cite>
         </div>
-        <figure class="quote-portrait img-reveal" data-reveal data-reveal-delay="2">
-          <img src="/static/img/doctor-kim-hero.jpg" alt="${lead.name} ${lead.role} — ${lead.title}" loading="lazy">
-          <figcaption>
-            <strong>${lead.name}</strong><span class="role-tag">대표원장</span>
-            <span class="cap-title">${lead.title}</span>
-          </figcaption>
+        <figure class="quote-portrait quote-portrait--card img-reveal" data-reveal data-reveal-delay="2">
+          <img src="/static/img/doctor-kim-portrait.jpg" alt="${lead.name} ${lead.role} — ${lead.title}" loading="lazy">
         </figure>
       </div>
     </div>
@@ -161,6 +152,10 @@ export function HomePage() {
       box-shadow:0 36px 80px -34px rgba(46,58,75,.5)}
     .quote-portrait::after{content:'';position:absolute;inset:0;border:1px solid rgba(255,255,255,.14);border-radius:16px;pointer-events:none}
     .quote-portrait img{display:block;width:100%;aspect-ratio:5/6;object-fit:cover;object-position:center 18%}
+    /* 카드형(이름·직책 포함된 완성 이미지): 비율 그대로, 캡션/테두리 오버레이 없음 */
+    .quote-portrait--card{box-shadow:0 30px 70px -34px rgba(46,58,75,.42)}
+    .quote-portrait--card::after{display:none}
+    .quote-portrait--card img{aspect-ratio:auto;height:auto;object-fit:contain;background:#eef0f2}
     .quote-portrait figcaption{position:absolute;left:0;right:0;bottom:0;padding:2.6rem 1.7rem 1.4rem;
       color:#fff;letter-spacing:.01em;line-height:1.45;
       background:linear-gradient(to top,rgba(24,31,42,.88) 0%,rgba(24,31,42,.5) 50%,transparent 100%)}
