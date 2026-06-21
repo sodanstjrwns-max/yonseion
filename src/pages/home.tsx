@@ -154,7 +154,7 @@ export function HomePage() {
     .quote-portrait img{display:block;width:100%;aspect-ratio:5/6;object-fit:cover;object-position:center 18%}
     /* 미소 사진(분위기 컷): 카드/테두리/그림자 없이 가장자리를 페이드아웃해 배경에 자연스럽게 녹임 */
     .quote-smile{margin:0;position:relative}
-    .quote-smile img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;object-position:center 42%;
+    .quote-smile img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;object-position:center 42%;
       -webkit-mask-image:radial-gradient(72% 66% at 50% 48%, #000 30%, rgba(0,0,0,.45) 66%, transparent 92%);
               mask-image:radial-gradient(72% 66% at 50% 48%, #000 30%, rgba(0,0,0,.45) 66%, transparent 92%)}
     .quote-portrait figcaption{position:absolute;left:0;right:0;bottom:0;padding:2.6rem 1.7rem 1.4rem;
