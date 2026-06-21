@@ -26,9 +26,9 @@
 | 콘텐츠 | `/column` `/column/:slug` | 원장 칼럼 (Article 스키마, 작성자 E-E-A-T) |
 | 콘텐츠 | `/notice` `/notice/:id` `/video` | 공지 · 영상 |
 | AEO | `/encyclopedia` `/encyclopedia/:slug` | 치과 백과사전 200용어 (직답형 + FAQPage·DefinedTerm·MedicalWebPage·Speakable) |
-| 지역 SEO | `/area` `/area/:region-:treatment` | **14지역 × 4진료 = 56 랜딩** (지도임베드·hasMap·MedicalBusiness/Dentist+areaServed·지역 인링크 메시) |
+| 지역 SEO | `/area` `/area/:region-:treatment` | **19지역 × 4진료 = 76 랜딩** (지도임베드·hasMap·MedicalBusiness/Dentist+areaServed+openingHours·지역 인링크 메시). 부산 동래·금정·연제·부산진·해운대·수영·남·북·동구 + 양산·김해·울산 |
 | 법적 | `/privacy` `/terms` | 개인정보처리방침 · 이용약관 |
-| 시스템 | `/sitemap.xml`(인덱스 5분할) `/robots.txt` `/llms.txt` `/site.webmanifest` `404` | sitemap index + 5분할 / PWA manifest / AI 크롤러 허용 |
+| 시스템 | `/sitemap.xml`(인덱스 5분할) `/robots.txt` `/llms.txt` `/llms-full.txt` `/site.webmanifest` `404` | sitemap index + 5분할 / PWA manifest / robots(검색봇+AI크롤러 22종) / llms.txt(llmstxt.org 규격) + llms-full.txt(진료·의료진·FAQ 전문 평문) |
 
 ### 관리자 (`/admin` — 쿠키 세션 HMAC 서명)
 - 대시보드(통계) · 예약 관리(상태 변경: 신규→확정→완료/취소)
@@ -90,3 +90,12 @@ curl http://localhost:3000
 - **운영 채널 확인**: 인스타·유튜브·블로그·네이버플레이스·카카오톡 채널 모두 푸터 노출 (원장님 원문과 일치)
 - **커스텀 도메인**: `yonseion.kr` 라이브 (구 `ysondent.com`/`연세온치과.com`은 신규 사이트로 대체 예정)
 - **Last Updated**: 2026-06-17 (칼럼 5편 — 한글 케이스 2편 R2 검증 완료, `/column` 리스트 5편 정상 노출)
+
+## 2026-06-21 업데이트 — 사이트 전체 SEO/AEO 슈퍼 업그레이드
+- **robots.txt 강화**: 검색봇(Googlebot/Yeti/Daumoa/bingbot) + AI 크롤러 22종(GPTBot·OAI-SearchBot·ClaudeBot·anthropic-ai·PerplexityBot·Google-Extended·Applebot·Amazonbot·Bytespider·CCBot·cohere-ai·Meta-ExternalAgent 등) 명시 허용, 24h 캐시
+- **llms.txt 재작성(llmstxt.org 규격)** + **llms-full.txt 신규**: 진료별 Q&A·의료진 자격·진료시간·내원지역을 LLM 인용용 평문으로 동적 생성(R2 칼럼 포함), 출처 표기 안내
+- **지역 SEO 확장**: 13→**19지역**(수영·남·북·동구 + 울산 추가) × 4진료 = **76 랜딩**, `areaServed` 12개 행정구역, 지역 인덱스 그룹 갱신
+- **로컬 스키마 강화**: 전역 `organizationSchema`에 **GeoCircle**(반경 25km 서비스권) + publicAccess/smokingAllowed, 지역 페이지 `areaServiceSchema`에 **openingHoursSpecification** + sameAs 추가
+- **홈 FAQPage**: 검색 의도 높은 6문항 FAQ를 **스키마 + 화면 섹션 동시** 추가(가이드라인 일치), 아코디언 동작
+- **검증**: 홈/지역/진료/의료진 JSON-LD 100% 유효 파싱, 전 페이지 200, JS 에러 0
+- **Last Updated**: 2026-06-21 (SEO/AEO 슈퍼 업그레이드 배포 완료)

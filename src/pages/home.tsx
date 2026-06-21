@@ -3,7 +3,7 @@ import { Layout, kinetic } from '../components/layout'
 import { clinic } from '../data/clinic'
 import { coreTreatments } from '../data/treatments'
 import { doctors } from '../data/doctors'
-import { organizationSchema, websiteSchema } from '../lib/schema'
+import { organizationSchema, websiteSchema, faqSchema } from '../lib/schema'
 
 // 실사진 제공 전 — 외부 placeholder 대신 깨끗한 CSS 톤 블록(.ph) 사용
 // 사진 URL을 받으면 .ph 안의 <img>로 교체만 하면 됨
@@ -16,11 +16,20 @@ function splitChars(text: string): string {
 }
 
 export function HomePage() {
+  const homeFaqs = [
+    { q: '연세온치과는 어디에 있나요?', a: `${clinic.address}에 있습니다. ${clinic.subway} 거리로, 부산 동래·금정·연제·부산진·해운대는 물론 양산·김해·울산에서도 내원하십니다.` },
+    { q: '진료시간과 휴진일은 어떻게 되나요?', a: `${clinic.hoursSummary}입니다. ${clinic.closedDays}. 화요일은 야간 20:00까지 진료합니다.` },
+    { q: '생체모방치의학이 무엇인가요?', a: '자연치아의 형태와 기능을 최대한 보존·복원하는 치료 철학입니다. 손상 부위만 정밀하게 수복하고 건강한 치아 조직은 최대한 남기는 보존적 접근을 우선합니다.' },
+    { q: '연세온치과의 대표원장은 누구인가요?', a: '김경희 대표원장으로, 치과보철과 전문의이자 통합치의학과 전문의(더블보더)입니다.' },
+    { q: '주차가 가능한가요?', a: '건물 주차가 가능합니다. 자세한 주차 안내는 오시는 길 페이지에서 확인하실 수 있습니다.' },
+    { q: '예약은 어떻게 하나요?', a: `홈페이지의 예약 신청 또는 전화(${clinic.phone})로 상담 예약이 가능합니다.` },
+  ]
+
   const meta = {
     title: `${clinic.nameKo} | ${clinic.tagline}`,
     description: `${clinic.address} · ${clinic.subway}. 자연치아를 닮은 생체모방치의학으로 미소에 젊음을 더하는 ${clinic.nameKo}. 중장년 심미보철·전체임플란트·접착수복 진료.`,
     path: '/',
-    jsonLd: [organizationSchema(), websiteSchema()],
+    jsonLd: [organizationSchema(), websiteSchema(), faqSchema(homeFaqs)],
   }
 
   const lead = doctors[0]
@@ -336,6 +345,22 @@ export function HomePage() {
       <div class="mt-3" data-reveal>
         <a href="/directions" class="link-arrow">상세 약도 보기 <i class="fas fa-arrow-right"></i></a>
       </div>
+    </div>
+  </section>
+
+  <!-- ===== 자주 묻는 질문 (AEO — FAQPage 스키마와 일치) ===== -->
+  <section class="section" id="home-faq" aria-label="자주 묻는 질문">
+    <div class="container">
+      <div class="sec-head" data-reveal>
+        <p class="eyebrow">FAQ</p>
+        <h2 class="sec-title">자주 묻는 질문</h2>
+      </div>
+      <div class="faq-list" style="max-width:780px;margin:2rem auto 0">
+        ${raw(homeFaqs.map((f) => '<div class="faq-item"><button class="faq-q" type="button"><span>' + f.q + '</span><i class="fas fa-plus"></i></button><div class="faq-a"><div class="faq-a-inner"><p>' + f.a + '</p></div></div></div>').join(''))}
+      </div>
+      <p style="text-align:center;margin-top:1.6rem" data-reveal>
+        <a href="/faq" class="link-arrow">진료별 전체 FAQ 보기 <i class="fas fa-arrow-right"></i></a>
+      </p>
     </div>
   </section>
 

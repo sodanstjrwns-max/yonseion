@@ -24,8 +24,8 @@ export function AreaIndexPage() {
   // 행정구역별 그룹핑 (로컬 SEO 클러스터 + 가독성)
   const groups: { label: string; regions: typeof seoRegions }[] = [
     { label: '부산 동래구 (병원 소재지)', regions: seoRegions.filter((r) => r.admin === '부산광역시 동래구') },
-    { label: '부산 인접 자치구', regions: seoRegions.filter((r) => ['부산광역시 금정구', '부산광역시 연제구', '부산광역시 부산진구', '부산광역시 해운대구'].includes(r.admin)) },
-    { label: '경남 인근 도시', regions: seoRegions.filter((r) => r.admin.startsWith('경상남도')) },
+    { label: '부산 인접 자치구', regions: seoRegions.filter((r) => ['부산광역시 금정구', '부산광역시 연제구', '부산광역시 부산진구', '부산광역시 해운대구', '부산광역시 수영구', '부산광역시 남구', '부산광역시 북구', '부산광역시 동구'].includes(r.admin)) },
+    { label: '경남·울산 인근 도시', regions: seoRegions.filter((r) => r.admin.startsWith('경상남도') || r.admin.startsWith('울산')) },
   ]
   const body = html`
   <section class="page-hero">

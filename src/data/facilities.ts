@@ -47,9 +47,14 @@ export const seoRegions: SeoRegion[] = [
   { slug: 'yeonje', name: '연제구', full: '부산 연제구', admin: '부산광역시 연제구', transit: '1·3호선 연산역에서 1호선으로 온천장 방면', distance: '지하철 10분', landmark: '부산시청·연산교차로' },
   { slug: 'busanjin', name: '부산진구', full: '부산 부산진구', admin: '부산광역시 부산진구', transit: '1호선 서면역에서 온천장역까지 직통', distance: '지하철 15분', landmark: '서면·부전시장' },
   { slug: 'haeundae', name: '해운대구', full: '부산 해운대구', admin: '부산광역시 해운대구', transit: '해운대에서 차량으로 동래·온천장 방면', distance: '차량 20~25분', landmark: '해운대해수욕장·센텀시티' },
+  { slug: 'suyeong', name: '수영구', full: '부산 수영구', admin: '부산광역시 수영구', transit: '3호선 망미·수영역에서 연산 환승 후 1호선 온천장 방면', distance: '지하철 20분·차량 15분', landmark: '광안리해수욕장·수영교차로' },
+  { slug: 'nam', name: '남구', full: '부산 남구', admin: '부산광역시 남구', transit: '대연·문현에서 2호선 환승 또는 차량으로 동래·온천장', distance: '차량 20분', landmark: '경성대·부경대·대연동' },
+  { slug: 'buk', name: '북구', full: '부산 북구', admin: '부산광역시 북구', transit: '화명·덕천에서 만덕터널 또는 2호선 환승으로 온천장', distance: '차량 15~20분', landmark: '화명신도시·덕천교차로' },
+  { slug: 'dong', name: '동구', full: '부산 동구', admin: '부산광역시 동구', transit: '초량·범일에서 1호선으로 온천장역 직통', distance: '지하철 20분', landmark: '부산역·초량' },
   // --- 인근 시 (원거리 내원) ---
   { slug: 'yangsan', name: '양산', full: '경상남도 양산시', admin: '경상남도 양산시', transit: '양산에서 1호선 또는 차량(노포 방면)으로 온천장', distance: '차량 25~30분', landmark: '양산물금신도시·양산종합운동장' },
   { slug: 'gimhae', name: '김해', full: '경상남도 김해시', admin: '경상남도 김해시', transit: '김해에서 차량(중앙고속도로·만덕터널 방면)으로 동래', distance: '차량 30~40분', landmark: '김해장유·내외동' },
+  { slug: 'ulju', name: '울산', full: '울산광역시', admin: '울산광역시', transit: '울산에서 동해선·차량(노포 방면)으로 동래·온천장', distance: '차량 40~50분', landmark: '울산 남구·울주' },
 ]
 
 // 지역 SEO 대상 진료 (TOP3 중심)

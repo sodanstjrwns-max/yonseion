@@ -35,7 +35,19 @@ export function organizationSchema() {
     geo: { '@type': 'GeoCoordinates', latitude: clinic.geo.lat, longitude: clinic.geo.lng },
     hasMap: clinic.mapUrl,
     // 서비스 제공 지역 — 로컬팩(지도) 진입 핵심 시그널
-    areaServed: clinic.areaServed.map((a) => ({ '@type': 'AdministrativeArea', name: a })),
+    areaServed: [
+      ...clinic.areaServed.map((a) => ({ '@type': 'AdministrativeArea', name: a })),
+      // 서비스 반경(GeoCircle) — 병원 중심 도달 범위 명시
+      {
+        '@type': 'GeoCircle',
+        geoMidpoint: { '@type': 'GeoCoordinates', latitude: clinic.geo.lat, longitude: clinic.geo.lng },
+        geoRadius: String(clinic.serviceRadiusKm * 1000),
+      },
+    ],
+    // 대중교통 접근 — 로컬 SEO 보조
+    publicAccess: true,
+    isAccessibleForFree: false,
+    smokingAllowed: false,
     // 진료 시설 — 휠체어 접근 등 (가능 시 확장)
     availableLanguage: { '@type': 'Language', name: 'Korean' },
     currenciesAccepted: 'KRW',
@@ -240,6 +252,11 @@ export function areaServiceSchema(opts: {
     },
     geo: { '@type': 'GeoCoordinates', latitude: clinic.geo.lat, longitude: clinic.geo.lng },
     hasMap: clinic.mapUrl,
+    openingHoursSpecification: [
+      { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Thursday', 'Friday'], opens: '09:30', closes: '18:30' },
+      { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Tuesday', opens: '09:30', closes: '20:00' },
+      { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Saturday', opens: '09:30', closes: '13:00' },
+    ],
     areaServed: { '@type': 'AdministrativeArea', name: opts.regionAdmin },
     makesOffer: {
       '@type': 'Offer',
@@ -250,6 +267,7 @@ export function areaServiceSchema(opts: {
       },
       areaServed: { '@type': 'AdministrativeArea', name: opts.regionAdmin },
     },
+    sameAs: [clinic.sns.naverPlace, clinic.sns.instagram].filter(Boolean),
   }
 }
 
