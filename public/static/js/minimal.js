@@ -259,6 +259,41 @@
     setTimeout(function () { imgs.forEach(function (img) { img.classList.add('loaded'); }); }, 1500);
   }
 
+  /* ---- 우하단 플로팅 빠른 연결(FAB) : 토글 펼침/접힘 ---- */
+  function initFab() {
+    var fab = document.getElementById('quick-fab');
+    if (!fab) return;
+    var toggle = document.getElementById('fab-toggle');
+    var menu = document.getElementById('fab-menu');
+    function open() {
+      fab.classList.add('open');
+      toggle.setAttribute('aria-expanded', 'true');
+      toggle.setAttribute('aria-label', '빠른 상담 메뉴 닫기');
+      if (menu) menu.setAttribute('aria-hidden', 'false');
+    }
+    function close() {
+      fab.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', '빠른 상담 메뉴 열기');
+      if (menu) menu.setAttribute('aria-hidden', 'true');
+    }
+    toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      fab.classList.contains('open') ? close() : open();
+    });
+    // 메뉴 항목 클릭(전화/외부링크) 후엔 접기
+    fab.querySelectorAll('.fab-item').forEach(function (a) {
+      a.addEventListener('click', function () { setTimeout(close, 80); });
+    });
+    // 바깥 클릭/ESC 로 닫기
+    document.addEventListener('click', function (e) {
+      if (fab.classList.contains('open') && !fab.contains(e.target)) close();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && fab.classList.contains('open')) close();
+    });
+  }
+
   /* ---- 모바일 플로팅 상담 바 : 스크롤 다운 시 숨김, 업/멈춤 시 노출 ---- */
   function initStickyCta() {
     var bar = document.querySelector('.sticky-cta');
@@ -285,7 +320,7 @@
     initLenis(); initHeader(); initMobileNav(); initReveal();
     initWordmark(); initHeroWords(); initProgress(); initDraw();
     initFaq(); initCount(); initParallax(); initCompare(); initImgFade();
-    initStickyCta();
+    initStickyCta(); initFab();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();

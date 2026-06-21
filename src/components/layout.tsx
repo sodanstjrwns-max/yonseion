@@ -3,7 +3,7 @@ import { clinic } from '../data/clinic'
 import { coreTreatments, treatmentGroups, treatmentsByGroup } from '../data/treatments'
 
 // 정적 CSS 캐시 버스팅용 버전 — app.css 변경 시 이 값을 올리면 엣지/브라우저 캐시가 갱신됨
-const ASSET_VER = '20260621o'
+const ASSET_VER = '20260621q'
 
 export interface SeoMeta {
   title: string
@@ -184,6 +184,20 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
   const ogImage = meta.ogImage || clinic.domain + '/static/img/og-default.jpg'
   const jsonLdArr = meta.jsonLd ? (Array.isArray(meta.jsonLd) ? meta.jsonLd : [meta.jsonLd]) : []
 
+  const fabItems = [
+    clinic.sns.naverBooking ? `<a href="${clinic.sns.naverBooking}" target="_blank" rel="noopener" class="fab-item fab-naver" data-label="네이버 예약"><i class="fas fa-calendar-check"></i></a>` : '',
+    clinic.sns.kakaoChannel ? `<a href="${clinic.sns.kakaoChannel}" target="_blank" rel="noopener" class="fab-item fab-kakao" data-label="카카오톡 상담"><i class="fas fa-comment"></i></a>` : '',
+    clinic.sns.naverPlace ? `<a href="${clinic.sns.naverPlace}" target="_blank" rel="noopener" class="fab-item fab-place" data-label="네이버 플레이스"><i class="fas fa-location-dot"></i></a>` : '',
+    `<a href="tel:${clinic.phoneRaw}" class="fab-item fab-tel" data-label="전화 ${clinic.phone}"><i class="fas fa-phone"></i></a>`,
+  ].join('')
+  const fabHtml =
+    `<div class="fab" id="quick-fab">` +
+      `<div class="fab-menu" id="fab-menu" aria-hidden="true">${fabItems}</div>` +
+      `<button type="button" class="fab-toggle" id="fab-toggle" aria-expanded="false" aria-controls="fab-menu" aria-label="빠른 상담 메뉴 열기">` +
+        `<i class="fas fa-headset fab-ic-open"></i><i class="fas fa-xmark fab-ic-close"></i>` +
+      `</button>` +
+    `</div>`
+
   return html`<!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -260,6 +274,9 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
     <a href="${clinic.sns.kakaoChannel}" target="_blank" rel="noopener" class="kakao"><i class="fas fa-comment"></i><span>카카오</span></a>
     <a href="/reservation" class="book"><i class="fas fa-calendar-check"></i><span>예약 신청</span></a>
   </nav>
+
+  <!-- 우하단 플로팅 빠른 연결 (데스크톱·태블릿) -->
+  ${raw(fabHtml)}
   <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js" defer></script>
   <script src="/static/js/regions.js?v=${ASSET_VER}" defer></script>
   <script src="/static/js/minimal.js?v=${ASSET_VER}" defer></script>

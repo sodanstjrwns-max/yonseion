@@ -641,6 +641,62 @@ a:focus-visible, button:focus-visible, .core-feature:focus-visible { outline: 2p
 }
 @media (max-width: 860px) { .rsv-grid { grid-template-columns: 1fr; } }
 
+/* ---------- 29-b. 우하단 플로팅 빠른 연결 (FAB) ---------- */
+.fab { position: fixed; right: 22px; bottom: 24px; z-index: 95; display: flex; flex-direction: column; align-items: center; }
+/* 모바일에서는 기존 하단 sticky-cta 사용 → FAB 숨김 */
+@media (max-width: 860px) { .fab { display: none; } }
+.fab-toggle {
+  width: 58px; height: 58px; border-radius: 50%; border: 0; cursor: pointer;
+  background: var(--gold-grad); color: #fff; position: relative;
+  box-shadow: 0 14px 30px -8px rgba(197,159,102,.65), 0 4px 10px -4px rgba(46,58,75,.3);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .3s var(--ease), box-shadow .3s var(--ease);
+}
+.fab-toggle:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 20px 38px -8px rgba(197,159,102,.75); }
+.fab-toggle i { font-size: 1.4rem; position: absolute; transition: opacity .25s, transform .35s var(--ease); }
+.fab-ic-close { opacity: 0; transform: rotate(-90deg) scale(.6); }
+.fab.open .fab-ic-open { opacity: 0; transform: rotate(90deg) scale(.6); }
+.fab.open .fab-ic-close { opacity: 1; transform: rotate(0) scale(1); }
+/* 미오픈 시 살짝 펄스로 주목 유도 */
+.fab:not(.open) .fab-toggle::after {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(197,159,102,.5); animation: fab-pulse 2.6s var(--ease) infinite;
+}
+@keyframes fab-pulse { 0% { box-shadow: 0 0 0 0 rgba(197,159,102,.45); } 70% { box-shadow: 0 0 0 16px rgba(197,159,102,0); } 100% { box-shadow: 0 0 0 0 rgba(197,159,102,0); } }
+@media (prefers-reduced-motion: reduce) { .fab:not(.open) .fab-toggle::after { animation: none; } }
+
+.fab-menu { display: flex; flex-direction: column; align-items: center; gap: .8rem; margin-bottom: .9rem; }
+.fab-item {
+  width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 1.18rem; position: relative; text-decoration: none;
+  box-shadow: 0 10px 24px -8px rgba(46,58,75,.45);
+  opacity: 0; transform: translateY(14px) scale(.7); pointer-events: none;
+  transition: opacity .3s var(--ease), transform .3s var(--ease);
+}
+.fab.open .fab-item { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+/* 순차 등장 */
+.fab.open .fab-item:nth-child(1) { transition-delay: .04s; }
+.fab.open .fab-item:nth-child(2) { transition-delay: .09s; }
+.fab.open .fab-item:nth-child(3) { transition-delay: .14s; }
+.fab.open .fab-item:nth-child(4) { transition-delay: .19s; }
+.fab-item:hover { transform: translateY(-2px) scale(1.08); }
+.fab-naver { background: #03C75A; }
+.fab-kakao { background: #FEE500; color: #3C1E1E; }
+.fab-place { background: #2DB400; }
+.fab-tel { background: var(--ink); }
+/* 라벨 툴팁 (왼쪽으로) */
+.fab-item::before {
+  content: attr(data-label); position: absolute; right: calc(100% + 12px); top: 50%; transform: translateY(-50%);
+  background: var(--ink); color: #fff; font-size: .8rem; font-weight: 600; white-space: nowrap;
+  padding: .42rem .7rem; border-radius: 6px; opacity: 0; pointer-events: none; transition: opacity .2s;
+  box-shadow: 0 6px 16px -8px rgba(46,58,75,.5);
+}
+.fab-item::after {
+  content: ''; position: absolute; right: calc(100% + 6px); top: 50%; transform: translateY(-50%);
+  border: 5px solid transparent; border-left-color: var(--ink); opacity: 0; transition: opacity .2s;
+}
+.fab-item:hover::before, .fab-item:hover::after { opacity: 1; }
+
 /* ---------- 30. 예약 폼 UX — 단계 표시 + 칩 ---------- */
 .rsv-steps {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem;
