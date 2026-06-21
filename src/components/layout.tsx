@@ -3,7 +3,7 @@ import { clinic } from '../data/clinic'
 import { coreTreatments, treatmentGroups, treatmentsByGroup } from '../data/treatments'
 
 // 정적 CSS 캐시 버스팅용 버전 — app.css 변경 시 이 값을 올리면 엣지/브라우저 캐시가 갱신됨
-const ASSET_VER = '20260621c'
+const ASSET_VER = '20260621d'
 
 export interface SeoMeta {
   title: string
@@ -194,7 +194,7 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
   <!-- 구글 서치콘솔: 발급 코드로 content 값 교체 -->
   <meta name="google-site-verification" content="">
   <!-- 네이버 서치어드바이저: 발급 코드로 content 값 교체 -->
-  <meta name="naver-site-verification" content="">
+  <meta name="naver-site-verification" content="5f2e390bb9247da01f5983bfa2664e4003b21289">
   <!-- 빙 웹마스터: 발급 코드로 content 값 교체 -->
   <meta name="msvalidate.01" content="">
 

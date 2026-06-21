@@ -226,6 +226,11 @@ app.get('/sitemap-content.xml', async (c) => {
   return c.text(smXml(urls), 200, { 'Content-Type': 'application/xml; charset=utf-8' })
 })
 
+// --- 네이버 서치어드바이저 소유확인 (HTML 파일 방식) ---
+app.get('/naver3bc6810af11b42a00b0184d0bfc74731.html', (c) =>
+  c.html('<html><body>naver-site-verification: naver3bc6810af11b42a00b0184d0bfc74731.html</body></html>'),
+)
+
 // --- robots.txt (검색봇 + AI 크롤러 정책) ---
 app.get('/robots.txt', (c) => {
   const base = clinic.domain
