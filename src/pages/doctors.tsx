@@ -84,6 +84,26 @@ export function DoctorDetail(slug: string) {
     </div>
   </section>
 
+  ${d.greeting ? html`
+  <section class="section greeting-sec" id="greeting" style="background:linear-gradient(180deg,var(--paper2,#f6f1e6),#fff)">
+    <div class="container" style="max-width:880px">
+      <div class="greeting-card reveal">
+        <span class="greeting-eyebrow"><i class="fas fa-quote-left"></i> 대표원장 인사말</span>
+        <h2 class="greeting-headline">
+          ${raw(d.greeting.headline.map((line) =>
+            d.greeting!.headlineAccent && line.includes(d.greeting!.headlineAccent)
+              ? line.replace(d.greeting!.headlineAccent, `<span class="gx-accent">${d.greeting!.headlineAccent}</span>`)
+              : line
+          ).join('<br>'))}
+        </h2>
+        <div class="greeting-body">
+          ${raw(d.greeting.paragraphs.map((p) => `<p>${p}</p>`).join(''))}
+        </div>
+        <p class="greeting-sign"><span class="gx-sign-rule"></span>${d.greeting.sign}</p>
+      </div>
+    </div>
+  </section>` : ''}
+
   ${myTreatments.length ? html`
   <section class="section bg-paper2">
     <div class="container">
@@ -99,7 +119,21 @@ export function DoctorDetail(slug: string) {
       <p style="margin-top:2rem" class="reveal"><a href="/cases/gallery?doctor=${d.slug}" class="btn btn-outline">${d.name} 원장 비포/애프터 <i class="fas fa-images"></i></a></p>
     </div>
   </section>` : ''}
-  <style>@media (max-width:820px){ .doc-grid{ grid-template-columns:1fr !important } }</style>
+  <style>
+    @media (max-width:820px){ .doc-grid{ grid-template-columns:1fr !important } }
+    /* 대표원장 인사말 */
+    .greeting-card{ position:relative;background:#fff;border:1px solid var(--line);border-radius:20px;padding:3.2rem 3.4rem;box-shadow:0 18px 50px rgba(46,58,75,.08) }
+    .greeting-card::before{ content:'';position:absolute;left:0;top:2.6rem;bottom:2.6rem;width:4px;background:linear-gradient(180deg,var(--gold),transparent);border-radius:0 4px 4px 0 }
+    .greeting-eyebrow{ display:inline-block;font-size:.82rem;font-weight:700;letter-spacing:.06em;color:var(--gold-2,var(--gold));margin-bottom:1.3rem }
+    .greeting-eyebrow i{ margin-right:.4rem;opacity:.7 }
+    .greeting-headline{ font-family:var(--serif-kr);font-size:clamp(1.5rem,3.2vw,2.1rem);line-height:1.45;color:var(--navy);margin:0 0 1.8rem;word-break:keep-all }
+    .greeting-headline .gx-accent{ color:var(--gold-2,var(--gold)) }
+    .greeting-body p{ font-size:1rem;line-height:1.95;color:var(--ink-soft);margin:0 0 1.2rem;word-break:keep-all }
+    .greeting-body p:last-child{ margin-bottom:0 }
+    .greeting-sign{ display:flex;align-items:center;justify-content:flex-end;gap:1rem;margin:2.4rem 0 0;font-family:var(--serif-kr);font-size:1.15rem;color:var(--navy) }
+    .gx-sign-rule{ flex:0 0 56px;height:1px;background:var(--gold);opacity:.6 }
+    @media (max-width:560px){ .greeting-card{ padding:2.2rem 1.6rem } .greeting-card::before{ left:-1px } }
+  </style>
   `
   return Layout({
     title: `${d.name} ${d.role} | ${d.title} · ${clinic.nameKo}`,
