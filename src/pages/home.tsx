@@ -86,7 +86,7 @@ export function HomePage() {
   <div class="marquee" aria-hidden="true">
     <div class="marquee-track">
       ${raw(Array(2).fill(
-        ['Biomimetic Dentistry', '치과보철과 전문의', 'Esthetic Prosthetics', '자연치아 보존', 'All-on-X', '미소의 젊음을 켜다']
+        ['Biomimetic Dentistry', '치과보철과 전문의', '중장년 심미보철', '자연치아 보존', 'All-on-X · 안모 라인 회복', '미소의 젊음을 켜다']
           .map((w) => `<span class="mq-item">${w}</span><span class="mq-dot">◆</span>`).join('')
       ).join(''))}
     </div>
@@ -189,7 +189,7 @@ export function HomePage() {
           <span class="eyebrow">Core Treatments</span>
         </div>
         <h2 class="sec-title">세 가지 중심 진료</h2>
-        <p class="sec-lead">연세온치과가 가장 깊이 들여다보는 영역입니다. 자연치아를 닮은 결과를 향해, 보존을 우선합니다.</p>
+        <p class="sec-lead">“그 치과, 그 치료는 잘하지.” — 친절한 말보다 정직한 결과로 기억되고 싶습니다. 연세온치과는 결과물의 완성도, 유지력, 그리고 <strong>치아를 얼마나 보존하면서 얻어낸 결과인지</strong>를 가장 중요하게 봅니다.</p>
       </div>
       <div class="core-grid">
         ${raw(coreTreatments.map((t, i) =>
@@ -343,6 +343,7 @@ export function HomePage() {
           </div>
           <h2>자연이 만든 형태를<br>가장 가까이 닮게.</h2>
           <p>생체모방치의학은 자연치아의 구조와 물성을 모방하는 접근입니다. 무조건 깎아내기보다, 남은 치아를 살리고 본래의 기능과 형태를 회복하는 것을 우선합니다.</p>
+          <p>특히 닳고 무너진 중장년의 앞니 — 그리고 치아·교합이 무너지며 짧아진 안모(얼굴 라인)까지, 전체 치열을 적절히 회복하면 인상의 개선에 도움을 줄 수 있습니다.</p>
           <p>화려한 수치 대신, 오래 쓰는 정직한 치료. 그것이 미소의 젊음을 오래 지키는 길이라 믿습니다.</p>
           <a href="/biomimetic" class="link-arrow mt-1">더 알아보기 <i class="fas fa-arrow-right"></i></a>
         </div>
@@ -367,6 +368,7 @@ export function HomePage() {
           <h2>${lead.name} <span style="font-size:.4em;color:var(--mist);font-family:var(--sans);font-weight:500">${lead.role}</span></h2>
           <p class="muted" style="font-size:.95rem;margin-bottom:1.4rem">${lead.title}</p>
           <p>제가 생각하는 좋은 치과는, 환자분께서 지금보다 더 나은 삶을 영위하실 수 있도록 돕는 곳입니다.</p>
+          <p class="muted" style="font-size:.92rem;line-height:1.8;margin-top:.9rem;padding-left:1rem;border-left:3px solid var(--gold)">저 역시 13세 외상으로 앞니를 다쳐 오래 보철과 함께 살아왔습니다. 앞니 하나가 인상과 자신감에 주는 무게를, 환자의 입장에서 잘 알고 있습니다.</p>
           <a href="/doctors/${lead.slug}" class="link-arrow mt-1">의료진 소개 <i class="fas fa-arrow-right"></i></a>
         </div>
       </div>

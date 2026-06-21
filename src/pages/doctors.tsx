@@ -77,6 +77,9 @@ export function DoctorDetail(slug: string) {
 
         <h3 style="color:var(--navy);margin-top:2rem;font-size:1.2rem"><i class="fas fa-heart text-gold"></i> 진료 철학</h3>
         ${raw(d.philosophy.map((p) => `<p style="color:var(--ink-soft);padding-left:1rem;border-left:3px solid var(--gold);margin:.8rem 0">${p}</p>`).join(''))}
+        ${d.personalNote ? raw(`
+        <h3 style="color:var(--navy);margin-top:2rem;font-size:1.2rem"><i class="fas fa-comment-medical text-gold"></i> 환자의 마음을 아는 이유</h3>
+        <blockquote style="margin:1rem 0 0;padding:1.4rem 1.6rem;background:var(--paper2,#f5f1e6);border-radius:12px;border-left:4px solid var(--gold);color:var(--ink-soft);line-height:1.85;font-size:.98rem;word-break:keep-all">${d.personalNote}</blockquote>`) : ''}
       </div>
     </div>
   </section>
