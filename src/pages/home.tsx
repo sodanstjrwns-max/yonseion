@@ -310,14 +310,15 @@ export function HomePage() {
       </div>
       <ol class="journey-track">
         ${raw([
-          { n: '01', t: '상담 접수', d: '전화·온라인으로 편하게. 불편한 점과 궁금한 점을 먼저 듣습니다.' },
-          { n: '02', t: '정밀 진단', d: '구강스캔·사진·CT 등으로 현재 상태를 정확히 파악합니다.' },
-          { n: '03', t: '치료 계획 설명', d: '진단 결과·치료 방법·기간·비용을 함께 설명드리고 동의를 구합니다.' },
-          { n: '04', t: '치료 진행', d: '처음 설명드린 계획대로, 큰 변함없이 일관되게 진행합니다.' },
-          { n: '05', t: '사후 관리', d: '정기 점검과 위생 관리로 치료 결과를 오래 유지하도록 돕습니다.' },
+          { n: '01', ic: 'fa-comments', t: '상담 접수', d: '전화·온라인으로 편하게. 불편한 점과 궁금한 점을 먼저 듣습니다.' },
+          { n: '02', ic: 'fa-tooth', t: '정밀 진단', d: '구강스캔·사진·CT 등으로 현재 상태를 정확히 파악합니다.' },
+          { n: '03', ic: 'fa-clipboard-list', t: '치료 계획 설명', d: '진단 결과·치료 방법·기간·비용을 함께 설명드리고 동의를 구합니다.' },
+          { n: '04', ic: 'fa-hand-holding-medical', t: '치료 진행', d: '처음 설명드린 계획대로, 큰 변함없이 일관되게 진행합니다.' },
+          { n: '05', ic: 'fa-heart', t: '사후 관리', d: '정기 점검과 위생 관리로 치료 결과를 오래 유지하도록 돕습니다.' },
         ].map((s, i) =>
           '<li class="journey-step reveal reveal-d' + ((i % 3) + 1) + '">' +
-            '<span class="js-num">' + s.n + '</span>' +
+            '<span class="js-step">STEP ' + s.n + '</span>' +
+            '<span class="js-icon"><i class="fas ' + s.ic + '"></i></span>' +
             '<span class="js-body"><span class="js-title">' + s.t + '</span>' +
             '<span class="js-desc">' + s.d + '</span></span>' +
           '</li>'
