@@ -484,7 +484,7 @@ export function HomePage() {
       function render(){
         var p = items[i];
         var cta = '<a class="np-cta" href="'+ (p.link || ('/notice/'+p.id)) +'">자세히 보기 <i class="fas fa-arrow-right"></i></a>';
-        var img = p.image ? '<img class="np-img" src="'+p.image+'" alt="">' : '';
+        var img = p.image ? '<img class="np-img" src="'+p.image+'" alt="'+ (p.title ? p.title.replace(/"/g,'&quot;') : '연세온치과의원 공지') +'">' : '';
         var dots = items.length>1 ? '<div class="np-dots">'+items.map(function(_,k){return '<span class="'+(k===i?'on':'')+'" data-k="'+k+'"></span>';}).join('')+'</div>' : '';
         ov.innerHTML = '<div class="np-card" role="dialog" aria-modal="true" aria-label="공지 팝업">'+
           img +
