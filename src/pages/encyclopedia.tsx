@@ -175,16 +175,16 @@ export function EncyclopediaDetail(slug: string) {
         <aside class="sidebar">
           ${raw(related.length ? `
           <div class="sidebar-box">
-            <h4>관련 진료</h4>
+            <h3>관련 진료</h3>
             ${related.map((t) => `<a href="/treatments/${t!.slug}">${t!.name}</a>`).join('')}
           </div>` : '')}
           ${raw(others.length ? `
           <div class="sidebar-box">
-            <h4>같은 분류의 용어</h4>
+            <h3>같은 분류의 용어</h3>
             ${others.map((e) => `<a href="/encyclopedia/${e.slug}">${e.term}</a>`).join('')}
           </div>` : '')}
           <div class="sidebar-box">
-            <h4>상담</h4>
+            <h3>상담</h3>
             <a href="/reservation">예약 상담 신청</a>
             <a href="tel:${clinic.phoneRaw}">${clinic.phone}</a>
           </div>
@@ -254,21 +254,21 @@ export function GlossaryDetail(slug: string) {
         <aside class="sidebar">
           ${raw(related.length ? `
           <div class="sidebar-box">
-            <h4>관련 진료</h4>
+            <h3>관련 진료</h3>
             ${related.map((t) => `<a href="/treatments/${t!.slug}">${t!.name}</a>`).join('')}
           </div>` : '')}
           ${raw(richSame.length ? `
           <div class="sidebar-box">
-            <h4>심층 해설 읽어보기</h4>
+            <h3>심층 해설 읽어보기</h3>
             ${richSame.map((e) => `<a href="/encyclopedia/${e.slug}">${e.term}</a>`).join('')}
           </div>` : '')}
           ${raw(sameCategory.length ? `
           <div class="sidebar-box">
-            <h4>같은 분류의 용어</h4>
+            <h3>같은 분류의 용어</h3>
             ${sameCategory.map((e) => `<a href="/encyclopedia/${e.slug}">${e.term}</a>`).join('')}
           </div>` : '')}
           <div class="sidebar-box">
-            <h4>상담</h4>
+            <h3>상담</h3>
             <a href="/reservation">예약 상담 신청</a>
             <a href="tel:${clinic.phoneRaw}">${clinic.phone}</a>
           </div>

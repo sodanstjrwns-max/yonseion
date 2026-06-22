@@ -77,7 +77,7 @@ export function CasesGalleryPage(items: CaseItem[], filter?: string) {
               ? `<img src="${img}" alt="${cs.title}" loading="lazy">`
               : `<div class="ph" style="height:100%"><span class="ph-label">CASE</span></div>`}</div>
             <span class="tag">${t?.name || cs.treatmentSlug} · ${cs.ageGroup} ${cs.gender}</span>
-            <h3 style="font-size:1.25rem">${cs.title}</h3>
+            <h2 style="font-size:1.25rem">${cs.title}</h2>
             <p>${cs.regionLabel} · 치료기간 ${cs.duration}</p>
           </a>`
         }).join('')}
@@ -183,18 +183,18 @@ export function CaseDetailPage(cs: CaseItem, isMember = false) {
         <aside class="sidebar">
           ${raw(doc ? `
           <div class="sidebar-box">
-            <h4>담당 의료진</h4>
+            <h3>담당 의료진</h3>
             <p style="font-weight:600;color:var(--ink)">${doc.name} ${doc.role}</p>
             <p class="muted" style="font-size:.85rem;margin:.4rem 0 .8rem">${doc.title}</p>
             <a href="/doctors/${doc.slug}" class="link-arrow" style="font-size:.88rem">의료진 소개 <i class="fas fa-arrow-right"></i></a>
           </div>` : '')}
           ${raw(t ? `
           <div class="sidebar-box">
-            <h4>관련 진료</h4>
+            <h3>관련 진료</h3>
             <a href="/treatments/${t.slug}">${t.name}</a>
           </div>` : '')}
           <div class="sidebar-box">
-            <h4>상담</h4>
+            <h3>상담</h3>
             <a href="/reservation">예약 상담 신청</a>
             <a href="tel:${clinic.phoneRaw}">${clinic.phone}</a>
           </div>
@@ -289,16 +289,16 @@ export function ColumnDetailPage(col: Column) {
         <aside class="sidebar">
           ${raw(toc.length >= 2 ? `
           <div class="sidebar-box toc-box">
-            <h4>목차</h4>
+            <h3>목차</h3>
             ${toc.map((t) => `<a href="#${t.id}" class="toc-link">${t.text}</a>`).join('')}
           </div>` : '')}
           ${raw(related.length ? `
           <div class="sidebar-box">
-            <h4>관련 진료</h4>
+            <h3>관련 진료</h3>
             ${related.map((t) => `<a href="/treatments/${t!.slug}">${t!.name}</a>`).join('')}
           </div>` : '')}
           <div class="sidebar-box">
-            <h4>상담</h4>
+            <h3>상담</h3>
             <a href="/reservation">예약 상담 신청</a>
             <a href="tel:${clinic.phoneRaw}">${clinic.phone}</a>
           </div>

@@ -13,7 +13,7 @@ export function ReservationPage() {
   const naverCard = clinic.sns.naverBooking ? `
           <div class="sidebar-box rsv-naver">
             <span class="rsv-naver-eyebrow"><i class="fas fa-bolt"></i> 가장 빠른 예약</span>
-            <h4>네이버 예약</h4>
+            <h3>네이버 예약</h3>
             <p class="muted" style="font-size:.88rem;margin:.3rem 0 1rem">날짜·시간을 직접 선택해 바로 예약하세요. 대기 없이 즉시 확정됩니다.</p>
             <a href="${clinic.sns.naverBooking}" target="_blank" rel="noopener" class="rsv-naver-btn">
               <i class="fas fa-calendar-check"></i> 네이버로 바로 예약하기
@@ -42,6 +42,7 @@ export function ReservationPage() {
       <div class="rsv-grid">
         <!-- 폼 -->
         <form id="rsv-form" class="form-card" data-reveal>
+          <h2 class="rsv-form-title">상담 신청서</h2>
           <div class="form-row">
             <label for="rsv-name">성함 <em>*</em></label>
             <input id="rsv-name" name="name" type="text" required maxlength="30" placeholder="홍길동" autocomplete="name">
@@ -91,19 +92,19 @@ export function ReservationPage() {
         <aside class="rsv-aside" data-reveal data-reveal-delay="2">
           ${raw(naverCard)}
           <div class="sidebar-box">
-            <h4>전화 상담</h4>
+            <h3>전화 상담</h3>
             <a href="tel:${clinic.phoneRaw}" class="rsv-phone"><i class="fas fa-phone"></i> ${clinic.phone}</a>
             <p class="muted" style="font-size:.88rem;margin-top:.6rem">${clinic.hoursSummary}</p>
             <p class="muted" style="font-size:.88rem">${clinic.closedDays}</p>
           </div>
           <div class="sidebar-box">
-            <h4>오시는 길</h4>
+            <h3>오시는 길</h3>
             <p style="font-size:.92rem;line-height:1.7">${clinic.address}</p>
             <p class="muted" style="font-size:.88rem;margin-top:.5rem">${clinic.directions}</p>
             <a href="/directions" class="link-arrow" style="margin-top:.8rem;display:inline-block;font-size:.9rem">상세 약도 <i class="fas fa-arrow-right"></i></a>
           </div>
           <div class="sidebar-box">
-            <h4>상담 안내</h4>
+            <h3>상담 안내</h3>
             <p style="font-size:.9rem;line-height:1.8;color:var(--ink-2)">
               정밀 진단 후 치료계획과 비용을 함께 설명드리고, 동의하신 계획대로 진행합니다.
               처음 설명드린 계획과 큰 변함없이 흘러가는 치료를 지향합니다.

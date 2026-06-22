@@ -25,7 +25,7 @@ export function DoctorsIndex() {
               <img src="${d.photo}" alt="${d.name} ${d.role}" loading="lazy" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<i class=&quot;fas fa-user-md&quot; style=&quot;font-size:4rem;color:var(--gold)&quot;></i>'">
             </div>
             <div style="padding:1.8rem">
-              <h3 style="margin-top:0">${d.name} <span style="font-size:1rem;color:var(--muted);font-weight:500">${d.role}</span></h3>
+              <h2 style="margin-top:0;font-size:1.25rem">${d.name} <span style="font-size:1rem;color:var(--muted);font-weight:500">${d.role}</span></h2>
               <p style="color:var(--gold);font-weight:600;font-size:.92rem">${d.title}</p>
               <span class="arrow" style="justify-content:center">프로필 보기 <i class="fas fa-arrow-right"></i></span>
             </div>
@@ -65,20 +65,20 @@ export function DoctorDetail(slug: string) {
         <p style="color:var(--gold);font-weight:700;font-size:1.15rem">${d.title}</p>
         <p class="lead" style="margin-top:1.5rem">${raw(d.intro)}</p>
 
-        <h3 style="color:var(--navy);margin-top:2.2rem;font-size:1.2rem"><i class="fas fa-certificate text-gold"></i> 전문의 자격 · 경력</h3>
+        <h2 style="color:var(--navy);margin-top:2.2rem;font-size:1.2rem"><i class="fas fa-certificate text-gold"></i> 전문의 자격 · 경력</h2>
         <ul style="margin-top:.8rem">
           ${raw([...d.licenses, ...d.career].map((c) => `<li style="padding:.45rem 0;color:var(--ink-soft);border-bottom:1px solid var(--line)"><i class="fas fa-check text-gold" style="font-size:.75rem;margin-right:.6rem"></i>${c}</li>`).join(''))}
         </ul>
 
-        <h3 style="color:var(--navy);margin-top:2rem;font-size:1.2rem"><i class="fas fa-users text-gold"></i> 학회 활동</h3>
+        <h2 style="color:var(--navy);margin-top:2rem;font-size:1.2rem"><i class="fas fa-users text-gold"></i> 학회 활동</h2>
         <ul style="margin-top:.8rem">
           ${raw(d.memberships.map((m) => `<li style="padding:.45rem 0;color:var(--ink-soft);border-bottom:1px solid var(--line)"><i class="fas fa-check text-gold" style="font-size:.75rem;margin-right:.6rem"></i>${m}</li>`).join(''))}
         </ul>
 
-        <h3 style="color:var(--navy);margin-top:2rem;font-size:1.2rem"><i class="fas fa-heart text-gold"></i> 진료 철학</h3>
+        <h2 style="color:var(--navy);margin-top:2rem;font-size:1.2rem"><i class="fas fa-heart text-gold"></i> 진료 철학</h2>
         ${raw(d.philosophy.map((p) => `<p style="color:var(--ink-soft);padding-left:1rem;border-left:3px solid var(--gold);margin:.8rem 0">${p}</p>`).join(''))}
         ${d.personalNote ? raw(`
-        <h3 style="color:var(--navy);margin-top:2rem;font-size:1.2rem"><i class="fas fa-comment-medical text-gold"></i> 환자의 마음을 아는 이유</h3>
+        <h2 style="color:var(--navy);margin-top:2rem;font-size:1.2rem"><i class="fas fa-comment-medical text-gold"></i> 환자의 마음을 아는 이유</h2>
         <blockquote style="margin:1rem 0 0;padding:1.4rem 1.6rem;background:var(--paper2,#f5f1e6);border-radius:12px;border-left:4px solid var(--gold);color:var(--ink-soft);line-height:1.85;font-size:.98rem;word-break:keep-all">${d.personalNote}</blockquote>`) : ''}
       </div>
     </div>
