@@ -419,6 +419,10 @@ a:focus-visible, button:focus-visible, .core-feature:focus-visible { outline: 2p
 
 /* ---------- 12. Prose ---------- */
 .prose { max-width: 68ch; }
+/* 모바일 본문 넘침 방지: 본문 내부 미디어/표가 화면폭을 넘지 않도록 */
+.prose img, .prose video, .prose iframe { max-width: 100%; height: auto; }
+.prose pre, .prose code { white-space: pre-wrap; word-break: break-word; }
+.prose table { display: block; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .prose h2 { font-family: var(--serif); font-size: var(--t-h3); margin: 3rem 0 1.2rem; }
 .prose h3 { font-size: 1.25rem; margin: 2.2rem 0 .8rem; }
 .prose p { margin-bottom: 1.3rem; color: var(--ink-2); }

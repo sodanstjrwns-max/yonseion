@@ -272,6 +272,10 @@ export function TreatmentDetail(slug: string) {
   </section>
 
   <style>
+    /* 그리드 트랙이 콘텐츠 최소폭에 밀려 넘치지 않도록 자식에 min-width:0 (CSS Grid 오버플로우 표준 해법) */
+    .tx-grid > *{ min-width:0 }
+    .prose{ max-width:100%;overflow-wrap:break-word;word-break:keep-all }
+    .prose img,.prose video,.prose iframe{ max-width:100% }
     @media (max-width:900px){ .tx-grid{ grid-template-columns:1fr !important } aside{ position:static !important } }
     .tx-steps{ list-style:none;padding:0;margin:1.4rem 0 0 }
     .tx-steps li{ position:relative;display:flex;gap:1.1rem;padding:0 0 1.7rem;align-items:flex-start }

@@ -52,7 +52,7 @@ export function DoctorDetail(slug: string) {
   const body = html`
   ${Breadcrumb(crumb)}
   <section class="section">
-    <div class="container" style="display:grid;grid-template-columns:380px 1fr;gap:3.5rem;align-items:start" class="doc-grid">
+    <div class="container doc-grid" style="display:grid;grid-template-columns:380px 1fr;gap:3.5rem;align-items:start">
       <div class="reveal">
         <div style="aspect-ratio:3/4;border-radius:18px;overflow:hidden;background:linear-gradient(135deg,var(--paper-2),var(--line));display:grid;place-items:center">
           <img src="${d.photo}" alt="${d.name} ${d.role} ${d.title}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<i class=&quot;fas fa-user-md&quot; style=&quot;font-size:5rem;color:var(--gold)&quot;></i>'">
