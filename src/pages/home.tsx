@@ -168,14 +168,19 @@ export function HomePage() {
     @media (max-width:860px){
       .quote-split{grid-template-columns:1fr;gap:2.8rem}
       .quote-portrait{max-width:440px;justify-self:center;width:100%}
-      .quote{text-align:center;display:flex;flex-direction:column;align-items:center}
-      #home-quote .quote-big{font-size:clamp(2rem,6.6vw,2.8rem)}
+      .quote{text-align:center;display:flex;flex-direction:column;align-items:center;width:100%}
+      #home-quote .quote-big{font-size:clamp(2rem,6.6vw,2.8rem);text-align:center}
       #home-quote .quote-big::before{left:50%;transform:translateX(-50%);top:-.62em}
       #home-quote .quote-cite{justify-content:center}
       #home-quote .quote-sub{margin-left:auto;margin-right:auto}
     }
+    /* 모바일: 문장 단위 2줄 유지 — 폰트를 화면폭에 맞춰 줄여 각 문장이 한 줄에 들어가게 함 */
     @media (max-width:560px){
-      #home-quote .quote-big span{white-space:normal;word-break:keep-all}
+      #home-quote .quote-big{font-size:clamp(1.7rem,8vw,2.3rem);letter-spacing:-.02em}
+      #home-quote .quote-big span{white-space:nowrap}
+    }
+    @media (max-width:380px){
+      #home-quote .quote-big{font-size:7.4vw}
     }
   </style>
 
