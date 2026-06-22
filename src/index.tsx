@@ -293,8 +293,11 @@ Allow: /
 User-agent: Meta-ExternalAgent
 Allow: /
 
-# 사이트맵 + LLM 안내
+# 사이트맵
 Sitemap: ${base}/sitemap.xml
+
+# LLM 친화 안내 (llmstxt.org 규격) — 생성형 검색/AI 답변 엔진용 요약
+# ${base}/llms.txt
 `, 200, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'public, max-age=86400' })
 })
 

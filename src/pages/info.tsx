@@ -212,7 +212,7 @@ export function PrivacyPage() {
   `
   return Layout({
     title: `개인정보처리방침 | ${clinic.nameKo}`,
-    description: `${clinic.nameKo} 개인정보처리방침`,
+    description: `${clinic.nameKo} 개인정보처리방침 — 수집하는 개인정보 항목, 이용 목적, 보유 기간, 파기 절차 및 정보주체의 권리·의무와 행사 방법을 안내드립니다.`,
     path: '/privacy',
     jsonLd: [breadcrumbSchema(crumb)],
   }, body)
@@ -242,7 +242,7 @@ export function TermsPage() {
   `
   return Layout({
     title: `이용약관 | ${clinic.nameKo}`,
-    description: `${clinic.nameKo} 이용약관`,
+    description: `${clinic.nameKo} 이용약관 — 본 웹사이트의 이용 조건, 서비스 제공 범위, 이용자의 까 및 책임, 면책 조항 등을 안내하는 약관 페이지입니다.`,
     path: '/terms',
     jsonLd: [breadcrumbSchema(crumb)],
   }, body)

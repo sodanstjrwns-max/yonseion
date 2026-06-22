@@ -92,7 +92,7 @@ export function CasesGalleryPage(items: CaseItem[], filter?: string) {
   `
   return Layout({
     title: `비포/애프터 케이스 | ${clinic.nameKo}`,
-    description: `${clinic.nameKo} 치료 전후 케이스 — 심미보철, 전체임플란트, 접착수복 실제 치료 기록.`,
+    description: `${clinic.nameKo} 치료 전후(비포/애프터) 케이스 — 심미보철, All-on-X 전체임플란트, 접착수복 등 생체모방치의학 기반 실제 치료 기록을 ${clinic.addressLocality}에서 투명하게 공개합니다.`,
     path: '/cases/gallery',
     jsonLd: [breadcrumbSchema(crumb)],
   }, body)
@@ -250,7 +250,7 @@ export function ColumnsPage(items: Column[]) {
   `
   return Layout({
     title: `원장 칼럼 | ${clinic.nameKo}`,
-    description: `${clinic.nameKo} 원장 칼럼 — 생체모방치의학, 심미보철, 임플란트에 대한 전문의의 깊이 있는 이야기.`,
+    description: `${clinic.nameKo} 원장 칼럼 — 생체모방치의학, 심미보철, 임플란트(All-on-X), 충치·턱관절 치료에 대한 전문의의 깊이 있는 이야기를 ${clinic.addressLocality} 온천장역 연세온치과에서 전합니다.`,
     path: '/column',
     jsonLd: [breadcrumbSchema(crumb)],
   }, body)
@@ -388,7 +388,7 @@ export function NoticeDetailPage(n: Notice) {
   `
   return Layout({
     title: `${n.title} | 공지사항 | ${clinic.nameKo}`,
-    description: n.title,
+    description: `${n.title} — ${clinic.nameKo} 공지사항. ${clinic.subway}. ${(n.contentHtml || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 100) || '진료 일정과 병원 소식을 안내드립니다.'}`,
     path: `/notice/${n.id}`,
     jsonLd: [breadcrumbSchema(crumb)],
   }, body)
@@ -416,7 +416,7 @@ export function VideoPage() {
   `
   return Layout({
     title: `병원 영상 | ${clinic.nameKo}`,
-    description: `${clinic.nameKo} 병원 소개 영상.`,
+    description: `${clinic.nameKo} 병원 소개 영상 — 진료실·수술실·장비, 생체모방치의학 진료 과정과 ${clinic.addressLocality} 온천장역 인근 병원 환경을 영상으로 안내합니다.`,
     path: '/video',
     jsonLd: [breadcrumbSchema(crumb)],
   }, body)
