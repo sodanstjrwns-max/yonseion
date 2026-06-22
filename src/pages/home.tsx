@@ -192,7 +192,7 @@ export function HomePage() {
   <section class="section">
     <div class="container">
       <div class="sec-head" data-reveal>
-        <div style="display:flex;align-items:center;gap:1.2rem;margin-bottom:1.6rem">
+        <div class="sec-index-row">
           <span class="sec-index">01</span>
           <span class="eyebrow">Core Treatments</span>
         </div>
@@ -309,7 +309,7 @@ export function HomePage() {
   <section class="section journey-section" aria-label="진료 여정">
     <div class="container">
       <div class="sec-head" data-reveal>
-        <div style="display:flex;align-items:center;gap:1.2rem;margin-bottom:1.6rem">
+        <div class="sec-index-row">
           <span class="sec-index">·</span>
           <span class="eyebrow">Patient Journey</span>
         </div>
@@ -345,7 +345,7 @@ export function HomePage() {
           <figcaption>실제 진료 케이스 — 옆 치아와 자연스럽게 어우러지는 색조·형태 재현</figcaption>
         </figure>
         <div class="split-text" data-reveal data-reveal-delay="2">
-          <div style="display:flex;align-items:center;gap:1.2rem;margin-bottom:1.6rem">
+          <div class="sec-index-row">
             <span class="sec-index">02</span>
             <span class="eyebrow">Our Philosophy</span>
           </div>
@@ -368,7 +368,7 @@ export function HomePage() {
           <span class="figure-float">${lead.name} · ${lead.role}</span>
         </div>
         <div class="split-text" data-reveal data-reveal-delay="2">
-          <div style="display:flex;align-items:center;gap:1.2rem;margin-bottom:1.6rem">
+          <div class="sec-index-row">
             <span class="sec-index">03</span>
             <span class="eyebrow">Director</span>
           </div>
@@ -387,7 +387,7 @@ export function HomePage() {
   <section class="section">
     <div class="container">
       <div class="sec-head" data-reveal>
-        <div style="display:flex;align-items:center;gap:1.2rem;margin-bottom:1.6rem">
+        <div class="sec-index-row">
           <span class="sec-index">04</span>
           <span class="eyebrow">Visit</span>
         </div>
