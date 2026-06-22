@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:,">
+<title>연세온치과의원 홈페이지 납품 안내서</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#2E3A4B; --navy2:#3a4a5f; --gold:#C59F66; --gold-soft:#dab884;
+    --ink:#2E3A4B; --muted:#5d6b78; --line:#e6e0d6; --bg:#FBF9F1; --paper:#ffffff;
+    --soft:#f4efe2;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Noto Sans KR',sans-serif; color:var(--ink); background:var(--bg);
+    line-height:1.75; font-weight:300; -webkit-font-smoothing:antialiased;
+  }
+  .doc{max-width:820px; margin:0 auto; background:var(--paper); box-shadow:0 10px 60px rgba(46,58,75,.08);}
+  h1,h2,h3,h4,.serif{font-family:'Noto Serif KR',serif;}
+
+  /* 표지 */
+  .cover{
+    background:linear-gradient(160deg,var(--navy) 0%,var(--navy2) 100%);
+    color:#fff; padding:80px 56px 64px; position:relative; overflow:hidden;
+  }
+  .cover::after{
+    content:""; position:absolute; right:-80px; top:-80px; width:300px; height:300px;
+    border:1px solid rgba(197,159,102,.35); border-radius:50%;
+  }
+  .cover::before{
+    content:""; position:absolute; right:-30px; top:-30px; width:200px; height:200px;
+    border:1px solid rgba(197,159,102,.25); border-radius:50%;
+  }
+  .cover .eyebrow{letter-spacing:.35em; font-size:12px; color:var(--gold-soft); font-weight:500; margin-bottom:24px;}
+  .cover h1{font-size:38px; font-weight:700; line-height:1.3; margin-bottom:18px; position:relative; z-index:1;}
+  .cover h1 .accent{color:var(--gold-soft);}
+  .cover .sub{font-size:15px; color:rgba(255,255,255,.78); font-weight:300; max-width:480px;}
+  .cover .meta{margin-top:40px; padding-top:24px; border-top:1px solid rgba(255,255,255,.15); font-size:13px; color:rgba(255,255,255,.6);}
+  .cover .meta b{color:#fff; font-weight:500;}
+
+  /* 본문 */
+  .body{padding:56px 56px 48px;}
+  .lead{font-size:15.5px; color:var(--muted); background:var(--soft); border-left:3px solid var(--gold);
+        padding:22px 26px; border-radius:0 8px 8px 0; margin-bottom:48px;}
+  .lead b{color:var(--ink); font-weight:500;}
+
+  section{margin-bottom:52px;}
+  .sec-num{font-family:'Noto Serif KR',serif; font-size:13px; letter-spacing:.2em; color:var(--gold); font-weight:600; margin-bottom:6px;}
+  h2{font-size:25px; font-weight:700; color:var(--navy); margin-bottom:8px; line-height:1.3;}
+  h2 .em{color:var(--gold);}
+  .sec-desc{font-size:14px; color:var(--muted); margin-bottom:26px;}
+
+  h3{font-size:18px; font-weight:600; color:var(--navy); margin:28px 0 12px; display:flex; align-items:center; gap:10px;}
+  .badge{display:inline-flex; align-items:center; justify-content:center; min-width:30px; height:30px; padding:0 9px;
+         background:var(--navy); color:#fff; border-radius:8px; font-size:14px; font-weight:700; font-family:'Noto Serif KR',serif;}
+
+  p{margin-bottom:14px; font-size:14.5px;}
+  ul{margin:0 0 16px; padding-left:0; list-style:none;}
+  li{position:relative; padding-left:22px; margin-bottom:9px; font-size:14.5px;}
+  li::before{content:""; position:absolute; left:4px; top:11px; width:6px; height:6px; background:var(--gold); border-radius:50%;}
+  strong{font-weight:700; color:var(--navy);}
+  .hl{background:linear-gradient(transparent 58%, rgba(197,159,102,.30) 58%); font-weight:500;}
+  code{background:#fff;border:1px solid var(--line);padding:2px 8px;border-radius:5px;font-size:13px;color:var(--gold);font-family:monospace;}
+
+  .note{background:var(--soft); border-radius:10px; padding:18px 22px; margin:18px 0; font-size:14px; color:var(--muted);}
+  .note b{color:var(--ink);}
+
+  .callout{border:1px solid var(--line); border-left:4px solid var(--gold); background:#fffdf9;
+           border-radius:0 10px 10px 0; padding:20px 24px; margin:22px 0;}
+  .callout .title{font-weight:700; color:var(--navy); font-size:15px; margin-bottom:8px; font-family:'Noto Serif KR',serif;}
+  .callout em{font-style:normal; background:var(--soft); padding:2px 8px; border-radius:5px; color:var(--navy); font-weight:500;}
+
+  .warn{border:1px solid #e3c79f; background:#fdf6ec; border-radius:10px; padding:20px 24px; margin:22px 0;}
+  .warn .title{font-weight:700; color:#9c7a3a; font-size:15px; margin-bottom:8px;}
+  .warn code{background:#fff;border:1px solid #e3c79f;color:#9c7a3a;}
+
+  /* 표 */
+  table{width:100%; border-collapse:collapse; margin:18px 0; font-size:13.5px;}
+  th,td{text-align:left; padding:12px 14px; border-bottom:1px solid var(--line); vertical-align:top;}
+  th{background:var(--soft); color:var(--navy); font-weight:700; font-size:13px;}
+  td:first-child{font-weight:500; color:var(--navy); white-space:nowrap; width:38%;}
+  tr:last-child td{border-bottom:none;}
+
+  /* 통계 카드 */
+  .stats{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:22px 0;}
+  .stat{background:linear-gradient(160deg,var(--navy),var(--navy2)); color:#fff; border-radius:12px; padding:22px 18px; text-align:center;}
+  .stat .num{font-family:'Noto Serif KR',serif; font-size:32px; font-weight:700; color:var(--gold-soft); line-height:1;}
+  .stat .lbl{font-size:12px; color:rgba(255,255,255,.75); margin-top:8px; font-weight:300;}
+
+  /* 흐름도 */
+  .flow{background:var(--soft); border-radius:12px; padding:24px 26px; margin:20px 0;}
+  .flow .step{display:flex; align-items:center; gap:12px; font-size:14.5px; color:var(--navy); font-weight:500; padding:7px 0;}
+  .flow .step .dot{flex:0 0 26px; height:26px; border-radius:50%; background:var(--gold); color:#fff; display:grid; place-items:center; font-size:12px; font-weight:700; font-family:'Noto Serif KR',serif;}
+  .flow .arrow{color:var(--gold); font-size:13px; margin-left:12px; opacity:.6;}
+  .flow .step small{color:var(--muted); font-weight:300; margin-left:4px;}
+
+  /* 결제 박스 */
+  .pay{background:linear-gradient(160deg,var(--navy),var(--navy2)); color:#fff; border-radius:14px; padding:32px 34px; margin:14px 0;}
+  .pay h3{color:#fff; margin-top:0;}
+  .pay .acct{background:rgba(255,255,255,.08); border:1px solid rgba(197,159,102,.45); border-radius:10px; padding:20px 24px; margin:18px 0; text-align:center;}
+  .pay .acct .bank{font-size:13px; color:var(--gold-soft); letter-spacing:.1em; margin-bottom:6px;}
+  .pay .acct .no{font-family:'Noto Serif KR',serif; font-size:26px; font-weight:700; letter-spacing:.02em; color:#fff;}
+  .pay .acct .holder{font-size:14px; color:rgba(255,255,255,.85); margin-top:8px;}
+  .pay ul li{color:rgba(255,255,255,.85);}
+  .pay ul li::before{background:var(--gold-soft);}
+  .pay strong{color:#fff;}
+
+  /* 마무리 */
+  .closing{background:var(--navy); color:#fff; padding:44px 56px; text-align:center;}
+  .closing .q{font-family:'Noto Serif KR',serif; font-size:20px; font-weight:600; line-height:1.6; margin-bottom:10px;}
+  .closing .q .em{color:var(--gold-soft);}
+  .closing .sign{margin-top:28px; padding-top:22px; border-top:1px solid rgba(255,255,255,.15); font-size:13px; color:rgba(255,255,255,.7);}
+  .closing .sign b{color:#fff; font-weight:500;}
+
+  a{color:var(--gold); text-decoration:none; border-bottom:1px solid rgba(197,159,102,.4);}
+
+  /* 인쇄 */
+  @media print{
+    body{background:#fff;}
+    .doc{box-shadow:none; max-width:100%;}
+    section{page-break-inside:avoid;}
+    .cover,.closing,.pay,.stat{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+  }
+  @media (max-width:600px){
+    .cover{padding:54px 28px 44px;} .cover h1{font-size:28px;}
+    .body{padding:36px 26px;} .closing{padding:36px 28px;}
+    .stats{grid-template-columns:1fr;} .pay{padding:24px;}
+    td:first-child{width:auto;}
+  }
+</style>
+</head>
+<body>
+<div class="doc">
+
+  <!-- 표지 -->
+  <header class="cover">
+    <div class="eyebrow">WEBSITE HANDOVER DOCUMENT</div>
+    <h1>연세온치과의원<br><span class="accent">공식 홈페이지</span> 납품 안내서</h1>
+    <p class="sub">광고비에 기대지 않고, 시간이 지날수록 환자가 스스로 찾아오는<br>‘검색되는 자산’으로서의 홈페이지를 전해 드립니다.</p>
+    <div class="meta">
+      <b>도메인</b> yonseion.kr &nbsp;·&nbsp; <b>받는 분</b> 김경희 대표원장님 &nbsp;·&nbsp; <b>제작</b> 문석준
+    </div>
+  </header>
+
+  <div class="body">
+
+    <p class="lead">
+      안녕하세요, 김경희 원장님. <b>연세온치과의원 공식 홈페이지(yonseion.kr)</b> 납품을 완료했습니다.
+      단순히 ‘예쁜 홈페이지’ 하나가 아니라, <b>시간이 지날수록 광고비 없이도 환자가 찾아오는 자산</b>을 만들어 드렸습니다.
+      아래에서 이 홈페이지의 진짜 가치와 사용법, 그리고 결제 안내를 정리해 드립니다.
+    </p>
+
+    <!-- 백미 -->
+    <section>
+      <div class="sec-num">HIGHLIGHTS</div>
+      <h2>이 홈페이지의 <span class="em">백미</span> — 세 가지 핵심 가치</h2>
+      <p class="sec-desc">단순 디자인이 아니라 ‘검색·신뢰·전환’을 설계한 결과물입니다.</p>
+
+      <h3><span class="badge">1</span> SEO·AEO로 무장한 ‘검색되는 홈페이지’ 그 자체</h3>
+      <p>요즘 환자들은 “온천장 임플란트 잘하는 곳”을 네이버·구글, 그리고 <strong>챗GPT에게</strong> 묻습니다. 이 홈페이지는 그 모든 경로에 잡히도록 설계됐습니다.</p>
+      <ul>
+        <li><strong>검색엔진 최적화(SEO)</strong> — 모든 페이지에 고유한 제목·설명·대표주소(canonical)가 들어가, 구글·네이버·빙이 페이지 하나하나를 정확히 이해합니다.</li>
+        <li><strong>AI 답변엔진 최적화(AEO)</strong> — ChatGPT(GPTBot)·Claude·Perplexity 등 <span class="hl">AI 검색봇 18종을 명시적으로 환영</span>하도록 설정했고, AI가 읽기 좋은 전용 지식파일(<code>llms.txt</code>, <code>llms-full.txt</code>)까지 따로 만들어 두었습니다. → <strong>‘AI에게 추천받는 치과’</strong>가 되는 기반입니다.</li>
+        <li><strong>구조화 데이터(Schema)</strong> — 진료시간·위치·전화·의료진·진료항목·FAQ·치료절차(HowTo)·영상을 검색엔진이 바로 이해하는 형식으로 심어, 검색결과에 진료시간·지도·Q&amp;A가 풍부하게 노출될 토대를 만들었습니다.</li>
+        <li><strong>음성검색·AI 낭독 대응</strong> — Speakable 데이터로 AI 스피커·음성검색이 우리 글을 ‘읽어줄’ 수 있게 표시했습니다.</li>
+        <li><strong>진료 페이지의 압도적 자세함</strong> — 진료 항목별 페이지가 ‘증상 → 진단 → 치료 과정 → 결과 → FAQ’ 구조로, 그 페이지 하나만으로도 검색에 걸리고 환자가 신뢰하도록 구성했습니다.</li>
+      </ul>
+
+      <h3><span class="badge">2</span> 색인 최적화된 ‘비포&애프터 + 칼럼 에디터’ — 채우실수록 강해집니다</h3>
+      <p>여기가 <strong>원장님이 직접 운영하셔야 하는 핵심</strong>입니다. 글을 올리면 <span class="hl">자동으로 새 URL 생성 → 사이트맵 등록 → 검색·AI용 구조화 데이터</span>까지 붙습니다.</p>
+      <ul>
+        <li><strong>비포&애프터(치료사례)</strong> — 나이대·치료기간·진료분류·담당원장·지역까지 태그하여 “부산 동래 50대 임플란트 후기” 같은 <strong>구체적 검색</strong>에 정확히 걸립니다. (의료법 §56 — 환자 동의 체크 의무화)</li>
+        <li><strong>칼럼 에디터</strong> — 단순 글쓰기가 아니라, 글을 쓰면서 <span class="hl">SEO 설정(검색용 제목·설명·관련진료 연결)까지 입력</span>하는 전문가용 에디터입니다. 글 하나하나가 새로운 검색 유입 통로가 됩니다.</li>
+        <li><strong>저자 표시(E-E-A-T)</strong> — 작성 원장을 지정해 ‘누가 쓴 글인지’를 검색엔진에 알려, 의료 콘텐츠 신뢰도를 높입니다.</li>
+      </ul>
+      <div class="callout">
+        <div class="title">💡 가장 중요한 핵심</div>
+        이 두 가지(사례·칼럼)는 <strong>꾸준히 업데이트하실수록 검색 노출이 기하급수적으로 늘어납니다.</strong> 이 안내서에서 드리는 가장 중요한 당부입니다.
+      </div>
+
+      <h3><span class="badge">3</span> 환자의 심리 흐름을 따라가는 콘텐츠 배열</h3>
+      <p>페이지 구성이 임의가 아닙니다. <strong>인지 → 신뢰 → 결심 → 예약</strong>으로 이어지는 환자의 심리 여정(페이션트 퍼널)을 따라 콘텐츠가 배열돼 있습니다.</p>
+      <div class="flow">
+        <div class="step"><span class="dot">1</span> 미소의 젊음을 켜드립니다 <small>— 첫인상·감성 후킹</small></div>
+        <div class="step"><span class="dot">2</span> 우리가 다른 이유 <small>— 생체모방치의학·차별점</small></div>
+        <div class="step"><span class="dot">3</span> “닳고 무너진 치아에, 다시 자연의 형태를” <small>— 미소사진·공감</small></div>
+        <div class="step"><span class="dot">4</span> 중심 진료 <small>— 정직한 결과로 기억되고 싶습니다</small></div>
+        <div class="step"><span class="dot">5</span> 진료 공간 <small>— 안심·시설</small></div>
+        <div class="step"><span class="dot">6</span> 의료진 <small>— 누가 하는가(E-E-A-T)</small></div>
+        <div class="step"><span class="dot">7</span> 예약 상담 신청 <small>— 행동 유도</small></div>
+      </div>
+    </section>
+
+    <!-- 규모 & 숨은 자랑 -->
+    <section>
+      <div class="sec-num">SPECS &amp; HIDDEN GEMS</div>
+      <h2>말하지 않으면 모를 <span class="em">자랑들</span> 😎</h2>
+      <p class="sec-desc">압도적 규모와, 겉으론 안 보이지만 강력한 기능들입니다.</p>
+
+      <div class="stats">
+        <div class="stat"><div class="num">약 800</div><div class="lbl">검색 색인 가능 페이지</div></div>
+        <div class="stat"><div class="num">697</div><div class="lbl">치과 백과사전 페이지</div></div>
+        <div class="stat"><div class="num">76</div><div class="lbl">지역 × 진료 조합 페이지</div></div>
+      </div>
+
+      <table>
+        <tr><th>항목</th><th>내용</th></tr>
+        <tr><td>총 페이지 수</td><td><strong>약 800개</strong> — 검색엔진에 등록된 색인 가능 URL 기준 (일반 치과 홈페이지의 약 40배)</td></tr>
+        <tr><td>🦷 치과 백과사전</td><td><strong>697개 용어 페이지</strong> — 환자가 어떤 치과 용어를 검색해도 우리 사이트가 답을 줍니다. 페이지 수 폭증의 핵심 자산</td></tr>
+        <tr><td>지역×진료 페이지</td><td><strong>76개</strong> (온천·동래·금정·연제 등 × 임플란트·심미보철·접착수복) — “○○ 임플란트” 검색을 동네별로 다 잡습니다</td></tr>
+        <tr><td>자주 묻는 질문(FAQ)</td><td><strong>100개 Q&amp;A</strong> — 구글 검색결과에 Q&amp;A 펼침으로 직접 노출</td></tr>
+        <tr><td>진료 안내 페이지</td><td>진료 과목별 상세 페이지 8개 (논문급 깊이)</td></tr>
+        <tr><td>음성검색 대응</td><td>Speakable 데이터로 AI 스피커·음성검색 대응</td></tr>
+        <tr><td>예약 문의 집계</td><td>홈페이지 예약 신청 → 관리자 대시보드 실시간 집계 + 신규 알림 뱃지</td></tr>
+        <tr><td>공지 팝업 기능</td><td>공지를 홈 팝업으로 띄우고, 노출 종료일·연결링크까지 설정 가능</td></tr>
+        <tr><td>빠른 연결 버튼</td><td>우하단 플로팅(네이버예약·카톡·플레이스·전화) + 모바일 하단 고정 바</td></tr>
+        <tr><td>모바일 완벽 대응</td><td>화면 크기에 따라 줄바꿈까지 자동 조절되는 반응형 + PWA 기반</td></tr>
+        <tr><td>속도·안정성</td><td>Cloudflare 엣지 서버 — 어디서 접속해도 빠르고, 다운 거의 없음</td></tr>
+        <tr><td>보안</td><td>관리자 영역 검색 차단(noindex) + 비인증 접근 자동 차단, 전 구간 HTTPS</td></tr>
+      </table>
+    </section>
+
+    <!-- 관리자 사용법 -->
+    <section>
+      <div class="sec-num">ADMIN GUIDE</div>
+      <h2>관리자 페이지 <span class="em">사용법</span></h2>
+      <p class="sec-desc">원장님이 직접 콘텐츠를 운영하실 수 있도록 정리했습니다.</p>
+
+      <h3>들어가는 방법</h3>
+      <ul>
+        <li>브라우저에서 <strong>https://yonseion.kr/admin</strong> 접속</li>
+        <li>관리자 비밀번호 입력 → 로그인</li>
+      </ul>
+
+      <div class="warn">
+        <div class="title">⚠️ 납품 후 가장 먼저 하실 일 (보안 중요!)</div>
+        관리자 비밀번호는 보안상 이 문서에 적지 않고 <strong>별도로 안전하게 전달</strong>해 드립니다.
+        받으신 뒤 <strong>반드시 변경</strong>하시길 권장합니다. 안전하게 설정해 드리니 제작자(문석준)에게 요청 주세요.
+        (Cloudflare 환경변수 <code>ADMIN_PASSWORD</code>로 관리됩니다.)
+      </div>
+
+      <h3>관리자에서 할 수 있는 것</h3>
+      <ul>
+        <li>📊 <strong>대시보드</strong> — 전체 현황 한눈에 (신규 예약·팝업 노출 현황·누적 통계)</li>
+        <li>📅 <strong>예약 관리</strong> — 홈페이지로 들어온 예약 문의 확인 / 상태변경 / 삭제</li>
+        <li>👥 <strong>회원 관리</strong> — 가입 환자 조회</li>
+        <li>🖼️ <strong>비포&애프터(치료사례)</strong> — 가장 중요! 새로 등록·삭제</li>
+        <li>✍️ <strong>칼럼</strong> — 작성·수정·삭제 (SEO 최적화 글쓰기)</li>
+        <li>📢 <strong>공지사항</strong> — 작성·수정·삭제, 팝업 띄우기</li>
+      </ul>
+
+      <div class="callout">
+        <div class="title">📌 비포&애프터 올리는 법</div>
+        <em>관리자 → 케이스 → 케이스 등록</em> → 제목·나이대·성별·치료기간·진료분류·지역·담당원장·설명(내원계기 → 진단 → 과정 → 결과) 입력 + 사진 업로드
+        <br>→ ⚠️ <strong>환자 동의 체크 필수</strong>(의료법 §56 — 동일 환자·동일 부위 확인) → <strong>‘게시’ 체크</strong> 후 저장.
+        <br><small style="color:var(--muted)">💡 진료분류·지역·나이대를 정확히 넣을수록 구체적 검색에 잘 걸립니다.</small>
+      </div>
+
+      <div class="callout">
+        <div class="title">📌 칼럼 쓰는 법</div>
+        <em>관리자 → 칼럼 → 새 칼럼</em> → 제목(필수)·요약(필수, 200자)·본문·작성원장·관련진료·썸네일 입력
+        <br>→ <strong>SEO 제목·설명</strong>은 비워두면 자동, 직접 쓰면 검색결과 문구를 조정할 수 있습니다.
+        <br>→ <strong>‘게시’ 토글 ON</strong> 후 저장해야 공개됩니다. (OFF로 저장 시 비공개 임시저장)
+      </div>
+
+      <div class="callout">
+        <div class="title">📌 공지·팝업 띄우는 법</div>
+        <em>관리자 → 공지 → 새 공지</em> → 제목·내용·이미지 입력
+        <ul style="margin-top:8px;margin-bottom:0">
+          <li><strong>상단 고정</strong> 체크 → 공지 목록 맨 위 고정</li>
+          <li><strong>팝업</strong> 체크 → 홈 접속 시 팝업으로 노출 (환자가 “오늘 하루 보지 않기” 누르면 그날 안 뜸)</li>
+          <li><strong>팝업 종료일·연결링크</strong> 설정 가능 → 그 날짜까지만 자동 노출</li>
+        </ul>
+        <small style="color:var(--muted)">💡 휴진 안내·이벤트·신규 장비 도입 등에 활용하세요.</small>
+      </div>
+    </section>
+
+    <!-- 색인 고지 -->
+    <section>
+      <div class="sec-num">IMPORTANT</div>
+      <h2>가장 중요한 당부 — <span class="em">“검색 색인은 시간이 걸립니다”</span></h2>
+      <p>새 홈페이지가 검색엔진에 <strong>풍부하게 색인되기까지는 시간이 필요합니다.</strong> 이건 광고가 아니라 ‘농사’입니다.</p>
+      <div class="callout">
+        <div class="title">⏳ 예상 소요 기간</div>
+        <span class="hl">빠르면 약 2개월, 늦으면 6개월 정도</span> 걸릴 수 있습니다. (홈페이지마다 편차 있음)
+        <br>검색엔진이 신규 사이트를 신뢰하고 상위에 올리는 데에는 절대적인 시간과 <strong>‘꾸준한 콘텐츠 축적’</strong>이 필요하기 때문입니다.
+      </div>
+      <p>✅ <strong>그래서 가장 중요한 것은</strong>, 이 색인 기간 안에 <strong>비포&애프터와 칼럼을 최대한 많이 쌓아두시는 것</strong>입니다.</p>
+      <ul>
+        <li>사례·글이 많을수록 → 색인되는 페이지가 많아지고 → 검색 유입 경로가 폭발적으로 늘어납니다.</li>
+        <li>처음 몇 달의 꾸준함이 1년 뒤 <strong>광고비 없이 들어오는 환자 수</strong>를 결정합니다.</li>
+      </ul>
+      <div class="note">
+        <b>한 줄 요약:</b> “지금 심으면 6개월 뒤 수확합니다. <b>오늘부터 글 한 편, 사례 하나씩</b> 채워주세요. 🌱”
+      </div>
+    </section>
+
+    <!-- 결제 안내 -->
+    <section>
+      <div class="sec-num">PAYMENT</div>
+      <h2>결제 <span class="em">안내</span></h2>
+      <p class="sec-desc">아래 계좌로 이체해 주시면, 세금계산서를 발급해 드립니다.</p>
+
+      <div class="pay">
+        <h3>💳 입금 계좌 안내</h3>
+        <div class="acct">
+          <div class="bank">NH 농협</div>
+          <div class="no">1085-02-007634</div>
+          <div class="holder">예금주 : 문석준</div>
+        </div>
+        <ul>
+          <li><strong>결제 방법</strong> — 계좌이체로 부탁드립니다.</li>
+          <li><strong>세금계산서</strong> — 입금 확인 후 <strong>2주 이내</strong>로 발급해 드립니다.</li>
+          <li>카드 및 기타 결제수단이 준비되어 있지 않은 점, 너그러운 양해 부탁드립니다. 🙏</li>
+        </ul>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- 마무리 -->
+  <footer class="closing">
+    <div class="q">“좋은 홈페이지는 <span class="em">광고가 아니라 자산</span>입니다.<br>오늘 심은 콘텐츠가 6개월 뒤 환자가 되어 돌아옵니다.”</div>
+    <div class="sign">
+      <b>연세온치과의원</b> · yonseion.kr<br>
+      제작 · 문석준 &nbsp;|&nbsp; 받는 분 · 김경희 대표원장님
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

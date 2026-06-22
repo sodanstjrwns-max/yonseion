@@ -429,6 +429,9 @@ app.get('/site.webmanifest', (c) => {
   return c.json(manifest, 200, { 'Content-Type': 'application/manifest+json; charset=utf-8', 'Cache-Control': 'public, max-age=86400' })
 })
 
+// --- 납품 안내서 (내부용·noindex). 깔끔한 루트 경로 → 정적 파일로 연결 ---
+app.get('/handover-yeonseon-2026.html', (c) => c.redirect('/static/handover-yeonseon-2026', 302))
+
 // --- 404 ---
 app.notFound((c) => {
   return c.html(`<!DOCTYPE html>
