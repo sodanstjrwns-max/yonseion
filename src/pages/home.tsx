@@ -174,13 +174,13 @@ export function HomePage() {
       #home-quote .quote-cite{justify-content:center}
       #home-quote .quote-sub{margin-left:auto;margin-right:auto}
     }
-    /* 모바일: 문장 단위 2줄 유지 — 폰트를 화면폭에 맞춰 줄여 각 문장이 한 줄에 들어가게 함 */
+    /* 모바일: 문장 단위 2줄 유지 — 인용구가 컨테이너 폭을 넘지 않게 폰트를 조정해 다른 섹션과 동일한 좌측 거터에 정렬 */
     @media (max-width:560px){
-      #home-quote .quote-big{font-size:clamp(1.7rem,8vw,2.3rem);letter-spacing:-.02em}
+      #home-quote .quote-big{width:100%;font-size:clamp(1.5rem,6.9vw,2.1rem);letter-spacing:-.02em;text-align:center}
       #home-quote .quote-big span{white-space:nowrap}
     }
     @media (max-width:380px){
-      #home-quote .quote-big{font-size:7.4vw}
+      #home-quote .quote-big{font-size:6.6vw}
     }
   </style>
 
