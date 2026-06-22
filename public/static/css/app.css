@@ -387,7 +387,7 @@ a:focus-visible, button:focus-visible, .core-feature:focus-visible { outline: 2p
 }
 .core-feature .cf-body { padding: 1.6rem 1.7rem 1.8rem; display: flex; flex-direction: column; flex: 1; }
 .core-feature .cf-group { font-size: .72rem; letter-spacing: .16em; text-transform: uppercase; color: var(--gold-2); font-weight: 600; }
-.core-feature .cf-title { font-family: var(--serif); font-size: 1.35rem; color: var(--ink); line-height: 1.2; margin: .55rem 0 .7rem; }
+.core-feature .cf-title { font-family: var(--serif); font-size: 1.35rem; font-weight: 600; color: var(--ink); line-height: 1.2; margin: .55rem 0 .7rem; }
 .core-feature .cf-desc { font-size: .92rem; color: var(--mist); line-height: 1.65; flex: 1; }
 .core-feature .cf-go { margin-top: 1.3rem; font-size: .86rem; font-weight: 600; color: var(--ink); display: inline-flex; align-items: center; gap: .5rem; transition: gap .45s var(--ease), color .45s; }
 .core-feature .cf-go i { transition: transform .5s var(--ease); }

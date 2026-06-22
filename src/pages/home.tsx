@@ -27,7 +27,7 @@ export function HomePage() {
 
   const meta = {
     title: `${clinic.nameKo} | 부산 동래구 온천동 치과 (온천장역)`,
-    description: `${clinic.address} · ${clinic.subway}. 자연치아를 닮은 생체모방치의학으로 미소에 젊음을 더하는 부산 동래구 온천동 ${clinic.nameKo}. 중장년 심미보철·전체임플란트·접착수복 진료.`,
+    description: `부산 동래구 온천동 ${clinic.nameKo}(온천장역 도보 3분). 자연치아를 닮은 생체모방치의학으로 중장년 심미보철·전체임플란트·접착수복을 정직하게 진료합니다.`,
     path: '/',
     jsonLd: [organizationSchema(), websiteSchema(), faqSchema(homeFaqs)],
   }
@@ -201,7 +201,7 @@ export function HomePage() {
             '</span>' +
             '<span class="cf-body">' +
               '<span class="cf-group">' + t.group + '</span>' +
-              '<span class="cf-title">' + t.name + '</span>' +
+              '<h3 class="cf-title">' + t.name + '</h3>' +
               '<span class="cf-desc">' + t.short + '</span>' +
               '<span class="cf-go">자세히 보기 <i class="fas fa-arrow-right"></i></span>' +
             '</span>' +
