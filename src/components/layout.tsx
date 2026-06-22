@@ -211,12 +211,9 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
   <meta name="theme-color" content="${clinic.brand.paper}">
 
   <!-- 검색엔진 소유권 인증 (Search Engine Verification) -->
-  <!-- 구글 서치콘솔: 발급 코드로 content 값 교체 -->
-  <meta name="google-site-verification" content="">
-  <!-- 네이버 서치어드바이저: 발급 코드로 content 값 교체 -->
+  <!-- 구글 서치콘솔 · 빙 웹마스터: Cloudflare DNS(TXT) 방식으로 인증 완료 — 메타태그 불필요 -->
+  <!-- 네이버 서치어드바이저: 메타태그 방식 인증 -->
   <meta name="naver-site-verification" content="5f2e390bb9247da01f5983bfa2664e4003b21289">
-  <!-- 빙 웹마스터: 발급 코드로 content 값 교체 -->
-  <meta name="msvalidate.01" content="">
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
