@@ -165,22 +165,24 @@ export function HomePage() {
       font-size:.72rem;letter-spacing:.04em;border:1px solid rgba(224,201,155,.55);border-radius:999px;
       color:var(--gold-light);vertical-align:middle}
     .quote-portrait figcaption .cap-title{display:block;margin-top:.55rem;font-size:.9rem;opacity:.82}
+    /* 모바일: 다른 섹션(OUR SPACE·PATIENT JOURNEY)과 동일하게 좌측 정렬 + 동일 글씨 크기/자간으로 통일 */
     @media (max-width:860px){
       .quote-split{grid-template-columns:1fr;gap:2.8rem}
-      .quote-portrait{max-width:440px;justify-self:center;width:100%}
-      .quote{text-align:center;display:flex;flex-direction:column;align-items:center;width:100%}
-      #home-quote .quote-big{font-size:clamp(2rem,6.6vw,2.8rem);text-align:center}
-      #home-quote .quote-big::before{left:50%;transform:translateX(-50%);top:-.62em}
-      #home-quote .quote-cite{justify-content:center}
-      #home-quote .quote-sub{margin-left:auto;margin-right:auto}
+      .quote-portrait{max-width:440px;width:100%}
+      .quote{text-align:left;display:block;width:100%}
+      #home-quote .quote-eyebrow{text-align:left}
+      #home-quote .quote-big{font-size:2rem;line-height:1.1;letter-spacing:-.025em;text-align:left}
+      #home-quote .quote-big::before{left:-.06em;transform:none;top:-.55em}
+      #home-quote .quote-sub{font-size:1.0625rem;line-height:1.7;text-align:left;margin-left:0;margin-right:0;max-width:none}
+      #home-quote .quote-cite{justify-content:flex-start}
     }
-    /* 모바일: 문장 단위 2줄 유지 — 인용구가 컨테이너 폭을 넘지 않게 폰트를 조정해 다른 섹션과 동일한 좌측 거터에 정렬 */
-    @media (max-width:560px){
-      #home-quote .quote-big{width:100%;font-size:clamp(1.5rem,6.9vw,2.1rem);letter-spacing:-.02em;text-align:center}
-      #home-quote .quote-big span{white-space:nowrap}
+    /* 좁은 화면에서도 두 문장이 각각 한 줄을 유지하도록 폰트만 미세 조정(정렬·자간은 다른 섹션과 동일하게 유지) */
+    @media (max-width:430px){
+      #home-quote .quote-big{font-size:8vw}
     }
-    @media (max-width:380px){
-      #home-quote .quote-big{font-size:6.6vw}
+    @media (max-width:340px){
+      #home-quote .quote-big{font-size:1.7rem}
+      #home-quote .quote-big span{white-space:normal}
     }
   </style>
 
