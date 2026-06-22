@@ -63,7 +63,7 @@ export function DoctorDetail(slug: string) {
         <p class="eyebrow">${d.role}</p>
         <h1 style="font-size:clamp(2rem,4vw,3rem);color:var(--navy);margin:.5rem 0">${d.name}</h1>
         <p style="color:var(--gold);font-weight:700;font-size:1.15rem">${d.title}</p>
-        <p class="lead" style="margin-top:1.5rem">${d.intro}</p>
+        <p class="lead" style="margin-top:1.5rem">${raw(d.intro)}</p>
 
         <h3 style="color:var(--navy);margin-top:2.2rem;font-size:1.2rem"><i class="fas fa-certificate text-gold"></i> 전문의 자격 · 경력</h3>
         <ul style="margin-top:.8rem">
@@ -133,6 +133,8 @@ export function DoctorDetail(slug: string) {
     .greeting-sign{ display:flex;align-items:center;justify-content:flex-end;gap:1rem;margin:2.4rem 0 0;font-family:var(--serif-kr);font-size:1.15rem;color:var(--navy) }
     .gx-sign-rule{ flex:0 0 56px;height:1px;background:var(--gold);opacity:.6 }
     @media (max-width:560px){ .greeting-card{ padding:2.2rem 1.6rem } .greeting-card::before{ left:-1px } }
+    /* 모바일에서는 소개문·인용구의 의미단위 줄바꿈을 자연 흐름으로 */
+    @media (max-width:600px){ .lead br, blockquote br{ display:none } }
   </style>
   `
   return Layout({
