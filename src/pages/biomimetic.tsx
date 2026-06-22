@@ -23,7 +23,7 @@ export function BiomimeticPage() {
   ${Breadcrumb(crumb)}
 
   <section class="section">
-    <div class="container prose" style="max-width:820px">
+    <div class="container container-narrow prose">
       <h2 class="reveal">생체모방치의학이란?</h2>
       <div class="answer reveal">생체모방치의학(Biomimetic Dentistry)은 자연치아의 구조·물성·기능을 모방하여, 손상된 치아를 최대한 보존하면서 복원하는 치의학 원리입니다.</div>
       <p class="reveal">치아는 한 번 깎으면 다시 자라지 않습니다. 그래서 연세온치과는 "어떻게 하면 최소한으로 삭제하고, 최대한 보존하며, 가장 오래 유지되는 결과를 만들 수 있을까"를 진료의 중심에 둡니다. 주변 치과에서 잘 시행하지 않는 러버댐 방습 하의 레진 빌드업, 온레이·오버레이를 원칙대로 시행하는 이유입니다.</p>
@@ -87,7 +87,7 @@ export function BiomimeticPage() {
 
   <!-- 비교 (일반 vs 생체모방) -->
   <section class="section">
-    <div class="container" style="max-width:900px">
+    <div class="container container-narrow">
       <div class="sec-head center"><p class="eyebrow reveal">Comparison</p><h2 class="sec-title reveal reveal-d1">접근 방식의 <span class="gold">차이</span></h2></div>
       <div class="reveal" style="overflow:hidden;border:1px solid var(--line);border-radius:16px">
         <table style="width:100%;border-collapse:collapse;font-size:.98rem">
@@ -117,7 +117,7 @@ export function BiomimeticPage() {
 
   <!-- FAQ -->
   <section class="section bg-paper2">
-    <div class="container" style="max-width:820px">
+    <div class="container container-narrow">
       <div class="sec-head center"><p class="eyebrow reveal">FAQ</p><h2 class="sec-title reveal reveal-d1">자주 묻는 질문</h2></div>
       <div class="reveal">
         ${raw(bioFaqs.map((f) => `

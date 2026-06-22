@@ -86,7 +86,7 @@ export function DoctorDetail(slug: string) {
 
   ${d.greeting ? html`
   <section class="section greeting-sec" id="greeting" style="background:linear-gradient(180deg,var(--paper2,#f6f1e6),#fff)">
-    <div class="container" style="max-width:880px">
+    <div class="container container-narrow">
       <div class="greeting-card reveal">
         <span class="greeting-eyebrow"><i class="fas fa-quote-left"></i> 대표원장 인사말</span>
         <h2 class="greeting-headline">

@@ -119,7 +119,7 @@ export function TreatmentDetail(slug: string) {
 
         ${t.symptoms?.length ? raw(`
           <div class="symptom-box reveal" id="tx-symptoms" style="background:var(--charcoal);border-radius:14px;padding:1.9rem 2.1rem;margin-bottom:2.4rem;box-shadow:0 10px 34px rgba(0,0,0,.16)">
-            <h2 style="margin:0 0 1.2rem;font-size:1.15rem;color:#fff;font-family:var(--serif-kr)"><i class="fas fa-circle-check" style="color:var(--gold-light);margin-right:.5rem"></i>이런 분께 권합니다</h2>
+            <h3 style="margin:0 0 1.2rem;font-size:1.15rem;color:#fff;font-family:var(--serif-kr)"><i class="fas fa-circle-check" style="color:var(--gold-light);margin-right:.5rem"></i>이런 분께 권합니다</h3>
             <ul style="margin:0;padding:0;list-style:none;display:grid;gap:.85rem">
               ${t.symptoms.map((s) => `<li style="display:flex;gap:.8rem;align-items:flex-start;font-size:.96rem;color:rgba(255,255,255,.86);line-height:1.6"><i class="fas fa-check" style="color:var(--gold-light);margin-top:.3rem;flex-shrink:0;font-size:.82rem"></i><span>${s}</span></li>`).join('')}
             </ul>
@@ -253,7 +253,7 @@ export function TreatmentDetail(slug: string) {
 
   ${mergedFaqs.length ? html`
   <section class="section bg-paper2" id="tx-faq">
-    <div class="container" style="max-width:840px">
+    <div class="container container-narrow">
       <div class="sec-head center"><p class="eyebrow reveal">FAQ</p><h2 class="sec-title reveal reveal-d1">${t.name} 자주 묻는 질문</h2></div>
       ${FaqAccordion(mergedFaqs)}
       <p style="text-align:center;margin-top:2rem" class="reveal"><a href="/faq" class="btn btn-outline">전체 FAQ 보기 <i class="fas fa-arrow-right"></i></a></p>

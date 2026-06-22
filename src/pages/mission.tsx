@@ -25,7 +25,7 @@ export function MissionPage() {
 
   <!-- 슬로건 -->
   <section class="section">
-    <div class="container" style="max-width:840px;text-align:center">
+    <div class="container container-narrow" style="text-align:center">
       <p class="eyebrow reveal">Slogan</p>
       <h2 class="font-serif reveal reveal-d1" style="font-size:clamp(2rem,5vw,3.6rem);color:var(--navy);line-height:1.3;margin-top:1rem">
         "미소의 젊음을 켜는 치과<span class="text-gold">."</span>
@@ -134,7 +134,7 @@ export function MissionPage() {
   <!-- 원장 메시지 -->
   <section class="section bg-navy" style="position:relative;overflow:hidden">
     <div data-parallax="0.06" style="position:absolute;left:-6%;bottom:-10%;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(197,165,114,.12),transparent 70%)"></div>
-    <div class="container" style="max-width:860px;position:relative">
+    <div class="container container-narrow" style="position:relative">
       <p class="eyebrow reveal" style="color:var(--gold-light);text-align:center">Director's Message</p>
       <blockquote class="font-serif reveal reveal-d1" style="font-size:clamp(1.4rem,3vw,2.2rem);color:#fff;text-align:center;line-height:1.6;margin-top:1.5rem">
         "제가 생각하는 좋은 치과는,<br>

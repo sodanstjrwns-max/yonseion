@@ -26,6 +26,7 @@
   --gold-grad: linear-gradient(115deg, #D2B07B 0%, #C59F66 45%, #E2CB9C 100%);
 
   --maxw: 1340px;
+  --narrow: 860px;
   --gutter: clamp(1.5rem, 5.5vw, 5.5rem);
 
   /* 타이포 스케일 — 거대하고 정교하게 */
@@ -93,6 +94,8 @@ em, i, cite, address, var, dfn { font-style: normal; }
 
 /* ---------- 2. Layout primitives ---------- */
 .container { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gutter); }
+/* 본문 좁은 컬럼 — 전 페이지 동일한 폭/좌측선으로 통일 (이 값을 인라인 max-width로 덮어쓰지 말 것) */
+.container.container-narrow { max-width: var(--narrow); }
 .section { padding-block: clamp(6rem, 14vw, 13rem); }   /* 거대한 세로 여백 */
 .section--tight { padding-block: clamp(4rem, 8vw, 7rem); }
 .divider { height: 1px; background: var(--line); border: 0; }
