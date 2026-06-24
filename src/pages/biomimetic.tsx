@@ -125,7 +125,7 @@ export function BiomimeticPage() {
             <button class="faq-q" style="width:100%;text-align:left;padding:1.3rem 1.5rem;font-weight:600;color:var(--navy);display:flex;justify-content:space-between;align-items:center;gap:1rem">
               <span>${f.q}</span><i class="fas fa-plus" style="color:var(--gold);transition:transform .3s"></i>
             </button>
-            <div class="faq-a" style="max-height:0;overflow:hidden;transition:max-height .4s var(--ease)"><p style="padding:0 1.5rem 1.3rem;color:var(--ink-soft);margin:0">${f.a}</p></div>
+            <div class="faq-a"><p style="padding:0 1.5rem 1.3rem;color:var(--ink-soft);margin:0">${f.a}</p></div>
           </div>`).join(''))}
       </div>
     </div>
@@ -140,6 +140,7 @@ export function BiomimeticPage() {
   </section>
 
   <style>
+    .faq-a { max-height: 0; overflow: hidden; transition: max-height .4s var(--ease); }
     .faq-item.open .faq-a { max-height: 600px; }
     .faq-item.open .faq-q i { transform: rotate(45deg); }
     .case-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.4rem; margin-top:2.4rem; }

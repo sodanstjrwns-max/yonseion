@@ -164,7 +164,7 @@ export function DirectionsPage() {
         <div class="metric" data-reveal data-reveal-delay="3">
           <div class="l" style="margin-top:0;margin-bottom:.6rem"><i class="fas fa-phone"></i> 연락처</div>
           <p class="text-ink" style="font-size:1.3rem;font-family:var(--serif)"><a href="tel:${clinic.phoneRaw}">${clinic.phone}</a></p>
-          <p class="muted" style="font-size:.88rem;margin-top:.4rem">${clinic.email}</p>
+          <p class="muted" style="font-size:.88rem;margin-top:.4rem">전화 상담 · 네이버 예약 가능</p>
         </div>
       </div>
     </div>
