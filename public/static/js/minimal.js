@@ -13,23 +13,10 @@
              || ('ontouchstart' in window && window.innerWidth <= 1024);
 
   function initLenis() {
-    if (reduce || isTouch || typeof Lenis === 'undefined') {
-      // 데스크톱 비활성 시에도 앵커 링크는 부드럽게 동작하도록 폴백
-      bindAnchors(null);
-      return;
-    }
-    try {
-      var lenis = new Lenis({
-        lerp: 0.12,            // 0~1, 클수록 즉각적 (기존 duration:1.1 → 둔함)
-        wheelMultiplier: 1.15, // 휠 1회당 이동량 살짝 증가 → 가볍게
-        touchMultiplier: 2,
-        smoothWheel: true
-      });
-      function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
-      requestAnimationFrame(raf);
-      window.__lenis = lenis;
-      bindAnchors(lenis);
-    } catch (err) { bindAnchors(null); }
+    // 마우스 휠 가상스크롤(Lenis)은 보간 누적으로 "반응없다 갑자기 연속 스크롤" 현상을
+    // 유발해 비활성화함. 브라우저 네이티브 스크롤이 휠 반응이 가장 즉각적·안정적임.
+    // 앵커(#) 이동만 부드럽게 처리.
+    bindAnchors(null);
   }
 
   // 앵커 링크 부드러운 이동 (Lenis 있으면 사용, 없으면 네이티브 smooth)
@@ -281,17 +268,8 @@
       e.stopPropagation();
       fab.classList.contains('open') ? close() : open();
     });
-    // 메뉴 항목 클릭(전화/외부링크) 후엔 접기
-    fab.querySelectorAll('.fab-item').forEach(function (a) {
-      a.addEventListener('click', function () { setTimeout(close, 80); });
-    });
-    // 바깥 클릭/ESC 로 닫기
-    document.addEventListener('click', function (e) {
-      if (fab.classList.contains('open') && !fab.contains(e.target)) close();
-    });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && fab.classList.contains('open')) close();
-    });
+    // 항상 펼쳐진 상태로 노출 (원장님 요청) — 클릭 없이 외부채널이 바로 보이도록 기본 open
+    open();
   }
 
   /* ---- 모바일 플로팅 상담 바 : 스크롤 다운 시 숨김, 업/멈춤 시 노출 ---- */

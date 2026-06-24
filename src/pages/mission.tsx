@@ -48,8 +48,10 @@ export function MissionPage() {
       <div class="grid grid-3">
         ${raw(clinic.brandStory.meanings.map((m, idx) => `
           <div class="card reveal reveal-d${idx + 1}" style="text-align:center">
-            <p class="fraunces" style="font-size:2.6rem;color:var(--gold)">온</p>
-            <h3 style="margin-top:.6rem">${m.key}</h3>
+            <h3 style="display:flex;align-items:baseline;justify-content:center;gap:.5rem">
+              <span class="fraunces" style="font-size:2.2rem;color:var(--gold);line-height:1">온</span>
+              <span>${m.key}</span>
+            </h3>
             <p style="margin-top:.8rem">${m.desc}</p>
           </div>`).join(''))}
       </div>
@@ -61,7 +63,7 @@ export function MissionPage() {
     <div class="container">
       <div class="sec-head center">
         <p class="eyebrow reveal">Core Values</p>
-        <h2 class="sec-title reveal reveal-d1">우리가 지키는 <span class="gold">치료의 원칙</span></h2>
+        <h2 class="sec-title reveal reveal-d1">우리가 지키는 <span class="gold" style="white-space:nowrap">치료의 원칙</span></h2>
         <p class="sec-desc reveal reveal-d2">친절한 말보다, 정직한 치료의 본질로 신뢰를 드립니다.</p>
       </div>
       <div class="grid grid-3">
@@ -154,15 +156,15 @@ export function MissionPage() {
   <section class="section">
     <div class="container">
       <div class="grid grid-2">
-        <a href="/biomimetic" class="card reveal" style="display:flex;flex-direction:column;justify-content:space-between;min-height:200px">
-          <div><p class="eyebrow">Philosophy</p><h3 style="font-size:1.6rem">생체모방치의학이란?</h3>
-          <p>자연치아를 모방하는 우리의 핵심 진료 철학을 더 자세히 알아보세요.</p></div>
-          <span class="arrow">알아보기 <i class="fas fa-arrow-right"></i></span>
+        <a href="/biomimetic" class="card reveal" style="display:flex;flex-direction:column;justify-content:space-between;min-height:220px;padding-block:1.8rem">
+          <div><p class="eyebrow" style="margin-bottom:.9rem">Philosophy</p><h3 style="font-size:1.6rem">생체모방치의학이란?</h3>
+          <p style="margin-top:.7rem">자연치아를 모방하는 우리의 핵심 진료 철학을 더 자세히 알아보세요.</p></div>
+          <span class="arrow" style="margin-top:1.4rem">알아보기 <i class="fas fa-arrow-right"></i></span>
         </a>
-        <a href="/treatments" class="card reveal reveal-d1" style="display:flex;flex-direction:column;justify-content:space-between;min-height:200px">
-          <div><p class="eyebrow">Treatments</p><h3 style="font-size:1.6rem">진료 안내</h3>
-          <p>중장년 심미보철·전체임플란트·접착수복 등 진료 분야를 확인하세요.</p></div>
-          <span class="arrow">진료 보기 <i class="fas fa-arrow-right"></i></span>
+        <a href="/treatments" class="card reveal reveal-d1" style="display:flex;flex-direction:column;justify-content:space-between;min-height:220px;padding-block:1.8rem">
+          <div><p class="eyebrow" style="margin-bottom:.9rem">Treatments</p><h3 style="font-size:1.6rem">진료 안내</h3>
+          <p style="margin-top:.7rem">중장년 심미보철·전체임플란트·접착수복 등 진료 분야를 확인하세요.</p></div>
+          <span class="arrow" style="margin-top:1.4rem">진료 보기 <i class="fas fa-arrow-right"></i></span>
         </a>
       </div>
     </div>

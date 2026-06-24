@@ -46,7 +46,7 @@ export function BiomimeticPage() {
   <!-- 3원칙 -->
   <section class="section bg-paper2">
     <div class="container">
-      <div class="sec-head center"><p class="eyebrow reveal">Principles</p><h2 class="sec-title reveal reveal-d1">생체모방치료의 <span class="gold">세 가지 원칙</span></h2></div>
+      <div class="sec-head center"><p class="eyebrow reveal">Principles</p><h2 class="sec-title reveal reveal-d1">생체모방치료의 <span class="gold" style="white-space:nowrap">세 가지 원칙</span></h2></div>
       <div class="grid grid-3">
         ${raw([
           { n: '01', t: '최소 삭제 (Minimal Invasion)', d: '건강한 치아 조직은 최대한 남깁니다. 손상된 부위만 정밀하게 제거하고 수복합니다.' },
@@ -67,7 +67,7 @@ export function BiomimeticPage() {
     <div class="container">
       <div class="sec-head center">
         <p class="eyebrow reveal">Clinical Cases</p>
-        <h2 class="sec-title reveal reveal-d1">자연치를 닮은 <span class="gold">실제 진료 케이스</span></h2>
+        <h2 class="sec-title reveal reveal-d1">자연치를 닮은<br><span class="gold">실제 진료 케이스</span></h2>
         <p class="reveal reveal-d1" style="max-width:680px;margin:1rem auto 0;color:var(--ink-soft)">옆 치아와 어우러지는 색조·형태·절단연 투명감까지, 자연치의 구조를 모방해 복원한 연세온치과의 실제 보존·심미 보철 결과입니다.</p>
       </div>
       <div class="case-grid">
@@ -140,7 +140,7 @@ export function BiomimeticPage() {
   </section>
 
   <style>
-    .faq-item.open .faq-a { max-height: 320px; }
+    .faq-item.open .faq-a { max-height: 600px; }
     .faq-item.open .faq-q i { transform: rotate(45deg); }
     .case-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.4rem; margin-top:2.4rem; }
     .case-card { margin:0; border:1px solid var(--line); border-radius:16px; overflow:hidden; background:#fff; box-shadow:0 8px 28px rgba(20,30,55,.06); }

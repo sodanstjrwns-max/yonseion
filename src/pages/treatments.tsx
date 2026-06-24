@@ -130,6 +130,10 @@ export function TreatmentDetail(slug: string) {
             <h2>${s.q}</h2>
             <div class="answer">${s.a}</div>
             ${s.body ? `<p>${s.body}</p>` : ''}
+            ${s.image ? `<figure class="tx-sec-figure">
+              <img src="${s.image.src}" alt="${s.image.alt}" loading="lazy">
+              ${s.image.caption ? `<figcaption>${s.image.caption}</figcaption>` : ''}
+            </figure>` : ''}
           </div>`).join(''), 12))}
 
         ${t.compare ? raw(`
@@ -143,6 +147,19 @@ export function TreatmentDetail(slug: string) {
                 </tbody>
               </table>
             </div>
+          </div>`) : ''}
+
+        ${t.caseImages?.length ? raw(`
+          <div class="tx-cases reveal" id="tx-cases" style="margin-top:2.8rem">
+            <h2 style="margin-bottom:1.2rem"><i class="fas fa-images" style="color:var(--gold);margin-right:.5rem"></i>실제 진료 케이스</h2>
+            <div class="tx-case-grid">
+              ${t.caseImages.map((c) => `
+                <figure class="tx-case-card">
+                  <img src="${c.src}" alt="${c.alt}" loading="lazy">
+                  <figcaption>${c.caption}</figcaption>
+                </figure>`).join('')}
+            </div>
+            <p style="margin-top:1rem;font-size:.82rem;color:var(--muted)">※ 실제 치료 사례이며, 결과는 환자의 구강 상태에 따라 개인차가 있을 수 있습니다.</p>
           </div>`) : ''}
 
         ${t.process?.length ? raw(`
@@ -242,8 +259,8 @@ export function TreatmentDetail(slug: string) {
               <span style="width:42px;height:42px;border-radius:50%;background:var(--paper-2);display:grid;place-items:center;flex-shrink:0"><i class="fas fa-user-md" style="color:var(--gold)"></i></span>
               <span><strong style="color:var(--navy);display:block;font-size:.95rem">${d!.name} ${d!.role}</strong><small style="color:var(--muted)">${d!.title}</small></span>
             </a>`).join(''))}
-          ${related.length ? `<h3 style="font-size:1rem;margin:1.4rem 0 .6rem;color:var(--gold)">관련 진료</h3>
-            ${related.map((r) => `<a href="/treatments/${r.slug}" class="mega-item" style="color:var(--ink-soft)">→ ${r.name}</a>`).join('')}` : ''}
+          ${raw(related.length ? `<h3 style="font-size:1rem;margin:1.4rem 0 .6rem;color:var(--gold)">관련 진료</h3>
+            ${related.map((r) => `<a href="/treatments/${r.slug}" class="mega-item" style="color:var(--ink-soft)">→ ${r.name}</a>`).join('')}` : '')}
           <a href="/cases/gallery?treatment=${t.slug}" class="btn btn-outline" style="width:100%;justify-content:center;margin-top:1.4rem;font-size:.88rem">관련 비포/애프터 <i class="fas fa-images"></i></a>
           <a href="/reservation" class="btn btn-navy" style="width:100%;justify-content:center;margin-top:.6rem;font-size:.88rem">예약 상담 <i class="fas fa-arrow-right"></i></a>
         </div>
@@ -275,6 +292,16 @@ export function TreatmentDetail(slug: string) {
     /* 그리드 트랙이 콘텐츠 최소폭에 밀려 넘치지 않도록 자식에 min-width:0 (CSS Grid 오버플로우 표준 해법) */
     .tx-grid > *{ min-width:0 }
     .prose{ max-width:100%;overflow-wrap:break-word;word-break:keep-all }
+    /* 섹션 본문 케이스 사진 */
+    .tx-sec-figure{ margin:1.6rem 0 0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 8px 26px rgba(20,30,55,.06) }
+    .tx-sec-figure img{ display:block;width:100%;height:auto }
+    .tx-sec-figure figcaption{ padding:.9rem 1.2rem;font-size:.86rem;color:var(--ink-soft);border-top:1px solid var(--line);line-height:1.6 }
+    /* 실제 진료 케이스 갤러리 */
+    .tx-case-grid{ display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem }
+    .tx-case-card{ margin:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 8px 26px rgba(20,30,55,.06) }
+    .tx-case-card img{ display:block;width:100%;aspect-ratio:1/1;object-fit:cover;background:#000 }
+    .tx-case-card figcaption{ padding:.85rem 1rem;font-size:.82rem;color:var(--ink-soft);border-top:1px solid var(--line);line-height:1.55 }
+    @media (max-width:820px){ .tx-case-grid{ grid-template-columns:1fr } }
     .prose img,.prose video,.prose iframe{ max-width:100% }
     @media (max-width:900px){ .tx-grid{ grid-template-columns:1fr !important } aside{ position:static !important } }
     .tx-steps{ list-style:none;padding:0;margin:1.4rem 0 0 }
@@ -294,8 +321,9 @@ export function TreatmentDetail(slug: string) {
 
     /* 비교표 */
     .tx-table-wrap{ overflow-x:auto;border:1px solid var(--line);border-radius:12px }
-    .tx-table{ width:100%;border-collapse:collapse;background:#fff;font-size:.92rem;min-width:480px }
-    .tx-table th,.tx-table td{ padding:.85rem 1rem;text-align:left;border-bottom:1px solid var(--line-soft) }
+    .tx-table{ width:100%;border-collapse:collapse;background:#fff;font-size:.92rem;min-width:480px;table-layout:fixed }
+    .tx-table th,.tx-table td{ padding:.85rem 1rem;text-align:left;border-bottom:1px solid var(--line-soft);vertical-align:top;word-break:keep-all;overflow-wrap:anywhere }
+    .tx-table tbody th[scope=row]{ width:24% }
     .tx-table thead th{ background:var(--charcoal);color:#fff;font-weight:600;font-size:.88rem }
     .tx-table thead th.tx-th-first{ background:var(--navy) }
     .tx-table tbody th[scope=row]{ background:var(--paper-2);color:var(--navy);font-weight:600;white-space:nowrap }

@@ -14,7 +14,8 @@ export interface Treatment {
   keywords: string[]                // SEO 키워드
   hero: string                      // 페이지 인트로 (AEO: 질문 직후 핵심답변형)
   // 본문 섹션 (질문형 H2 + 핵심답변 + 확장)
-  sections: { q: string; a: string; body?: string }[]
+  //  image: 섹션 본문 아래에 표시할 실제 케이스 사진 (선택)
+  sections: { q: string; a: string; body?: string; image?: { src: string; alt: string; caption?: string } }[]
   // 인링크용
   doctorSlugs: string[]
   relatedTreatments: string[]
@@ -38,6 +39,7 @@ export interface Treatment {
   encyclopediaRefs?: string[]       // 백과사전 슬러그 (내부 링크 메시 강화)
   evidence?: { label: string; value: string; note?: string }[] // 근거·기준 데이터
   videos?: { id: string; title: string; caption: string }[] // 진료 소개·후기 유튜브 영상 (VideoObject 스키마)
+  caseImages?: { src: string; alt: string; caption: string }[] // 실제 진료 케이스 사진 갤러리
 }
 
 export const treatments: Treatment[] = [
@@ -75,7 +77,7 @@ export const treatments: Treatment[] = [
       {
         q: '심미보철의 수명과 관리는 어떤가요?',
         a: '재료·구강 위생·교합 습관에 따라 차이가 있으며, 정기 점검과 올바른 관리로 더 오래 사용하실 수 있습니다.',
-        body: '풀지르코니아·이맥스 등 세라믹 보철은 변색에 강하지만, 이갈이·이악물기 같은 과도한 힘은 파절의 원인이 될 수 있습니다. 6개월마다 정기 검진으로 보철 경계부와 교합을 점검하고, 야간 이갈이가 있다면 보호장치를 함께 사용하는 것이 도움이 될 수 있습니다.',
+        body: '풀지르코니아·이맥스 등 세라믹 보철은 변색에 강하지만, 이갈이·이악물기 같은 과도한 힘은 파절의 원인이 될 수 있습니다.<br><br>6개월마다 정기 검진으로 보철 경계부와 교합을 점검하고, 야간 이갈이가 있다면 보호장치를 함께 사용하는 것이 도움이 될 수 있습니다.',
       },
     ],
     doctorSlugs: ['kim-kyunghee'],
@@ -165,6 +167,11 @@ export const treatments: Treatment[] = [
         q: '연세온치과의 All-on-X는 무엇이 다른가요?',
         a: '티타늄 바(bar)를 사용하는 견고한 고정성 보철 설계와, 디지털 가이드를 활용한 정밀 식립을 기반으로 합니다.',
         body: '네비게이션 가이드 임플란트(디오·덴티스)를 통해 계획된 위치에 정밀 식립하고, 필요 시 상악동 거상술·골이식을 병행합니다. 메가젠 BDcuff 등을 활용하며, 전체적인 교합과 심미를 함께 설계합니다.',
+        image: {
+          src: '/static/img/cases/allonx-ti-thimble-bar.jpg',
+          alt: '연세온치과에서 직접 제작한 All-on-X Ti-Thimble bar(티타늄 바) 실제 케이스 — 자연치 형태의 교합면을 정밀 가공한 고정성 보철 프레임',
+          caption: '연세온치과 실제 케이스 — 직접 제작한 Ti-Thimble bar(티타늄 바). 자연치 형태의 교합면까지 정밀 가공한 고정성 보철 프레임입니다.',
+        },
       },
       {
         q: '틀니와 비교하면 어떤 점이 좋은가요?',
@@ -288,7 +295,7 @@ export const treatments: Treatment[] = [
       {
         q: '신경치료 대신 접착수복으로 살릴 수 있나요?',
         a: '충치가 신경에 도달하기 전이라면, 접착수복과 신경 보호(간접 치수 복조 등)로 신경을 살리는 방향을 먼저 시도해볼 수 있습니다.',
-        body: '충치가 깊어도 신경이 노출되지 않았다면, 무리하게 신경치료를 하기보다 남은 건강한 상아질을 보존하며 신경을 보호하는 접근을 우선 고려합니다. 다만 통증·염증이 진행된 경우에는 신경치료가 필요할 수 있으며, 정밀 진단으로 신경 보존 가능 여부를 판단합니다.',
+        body: '충치가 깊어도 신경이 노출되지 않았다면, 무리하게 신경치료를 하기보다 남은 건강한 상아질을 보존하며 신경을 보호하는 접근을 우선 고려합니다.<br><br>다만 통증·염증이 진행된 경우에는 신경치료가 필요할 수 있으며, 정밀 진단으로 신경 보존 가능 여부를 판단합니다.',
       },
     ],
     doctorSlugs: ['kim-kyunghee'],
@@ -339,6 +346,11 @@ export const treatments: Treatment[] = [
       { label: '방습', value: '러버댐', note: '침·습기 차단으로 접착 안정' },
       { label: '진단', value: 'Qray pen', note: '충치·세균막 시각화' },
       { label: '접착 원칙', value: 'IDS 적용', note: '즉시 상아질 봉쇄' },
+    ],
+    caseImages: [
+      { src: '/static/img/cases/adhesive-case-01.jpg', alt: '연세온치과 접착수복 실제 케이스 — 러버댐 방습 하 구치부 충치를 자연 색조로 정밀 수복한 Before/After', caption: '구치부 접착수복 — 러버댐 방습 하 자연 색조 복원 (Before/After)' },
+      { src: '/static/img/cases/adhesive-case-02.jpg', alt: '연세온치과 접착수복 실제 케이스 — 어금니 손상 부위를 자연치 형태로 보존 수복한 Before/After', caption: '어금니 접착수복 — 손상 부위만 정밀 보존 수복 (Before/After)' },
+      { src: '/static/img/cases/adhesive-case-03.jpg', alt: '연세온치과 접착수복 실제 케이스 — 방사선 사진으로 확인한 정밀 접착 수복 결과 Before/After', caption: '접착수복 — 방사선 사진으로 확인한 정밀 적합도 (Before/After)' },
     ],
     encyclopediaRefs: ['composite-resin', 'onlay-overlay', 'inlay-onlay', 'rubber-dam', 'ids', 'biomimetic-dentistry', 'dental-caries', 'root-canal'],
     faqs: [

@@ -7,7 +7,7 @@
 export const clinic = {
   // --- 기본 정보 ---
   nameKo: '연세온치과의원',
-  nameEn: 'Yeonseon On Dental Clinic',
+  nameEn: 'Yonsei On Dental Clinic',
   nameShort: '연세온치과',
   tagline: '미소의 젊음을 켜는 치과',
   mission: '자연치아를 닮은 생체모방치의학으로, 환자의 미소에 젊음을 더한다',
@@ -30,7 +30,7 @@ export const clinic = {
   email: 'ys_ondental@naver.com',
 
   // --- 위치 ---
-  address: '부산광역시 동래구 온천장로 114, 901호(온천동, 허브메디타워)',
+  address: '부산광역시 동래구 온천장로 114, 901호(온천동, 허브메디컬타워)',
   addressRegion: '부산광역시',
   addressLocality: '동래구',
   postalCode: '47734',

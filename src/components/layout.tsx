@@ -3,7 +3,7 @@ import { clinic } from '../data/clinic'
 import { coreTreatments, treatmentGroups, treatmentsByGroup } from '../data/treatments'
 
 // 정적 CSS 캐시 버스팅용 버전 — app.css 변경 시 이 값을 올리면 엣지/브라우저 캐시가 갱신됨
-const ASSET_VER = '20260622z9'
+const ASSET_VER = '20260622z10'
 
 export interface SeoMeta {
   title: string
@@ -155,7 +155,6 @@ function Footer() {
         <div>
           <p class="foot-title">연락처</p>
           <a href="tel:${clinic.phoneRaw}"><i class="fas fa-phone" style="font-size:.8rem"></i> ${clinic.phone}</a>
-          <a href="mailto:${clinic.email}"><i class="fas fa-envelope" style="font-size:.8rem"></i> ${clinic.email}</a>
           <p style="margin-top:.8rem;color:var(--mist)">${clinic.address}</p>
           <p style="color:var(--mist)">${clinic.subway}</p>
           ${sns.length ? raw('<div style="margin-top:1rem;display:flex;flex-direction:column;gap:.2rem">' + sns.join('') + '</div>') : ''}
@@ -274,7 +273,6 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
 
   <!-- 우하단 플로팅 빠른 연결 (데스크톱·태블릿) -->
   ${raw(fabHtml)}
-  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js" defer></script>
   <script src="/static/js/regions.js?v=${ASSET_VER}" defer></script>
   <script src="/static/js/minimal.js?v=${ASSET_VER}" defer></script>
 </body>
