@@ -348,9 +348,9 @@ export const treatments: Treatment[] = [
       { label: '접착 원칙', value: 'IDS 적용', note: '즉시 상아질 봉쇄' },
     ],
     caseImages: [
-      { src: '/static/img/cases/adhesive-case-01.jpg', alt: '연세온치과 접착수복 실제 케이스 — 러버댐 방습 하 구치부 충치를 자연 색조로 정밀 수복한 Before/After', caption: '구치부 접착수복 — 러버댐 방습 하 자연 색조 복원 (Before/After)' },
-      { src: '/static/img/cases/adhesive-case-02.jpg', alt: '연세온치과 접착수복 실제 케이스 — 어금니 손상 부위를 자연치 형태로 보존 수복한 Before/After', caption: '어금니 접착수복 — 손상 부위만 정밀 보존 수복 (Before/After)' },
-      { src: '/static/img/cases/adhesive-case-03.jpg', alt: '연세온치과 접착수복 실제 케이스 — 방사선 사진으로 확인한 정밀 접착 수복 결과 Before/After', caption: '접착수복 — 방사선 사진으로 확인한 정밀 적합도 (Before/After)' },
+      { src: '/static/img/cases/adhesive-onlay.jpg', alt: '연세온치과 접착수복 실제 케이스 — 러버댐 방습 하 온레이로 손상 부위만 최소 삭제로 정밀 수복한 Before/After 및 방사선 사진', caption: '온레이 예시 — 러버댐 방습 하 최소 삭제 정밀 수복 (Before/After·방사선)' },
+      { src: '/static/img/cases/adhesive-overlay.jpg', alt: '연세온치과 접착수복 실제 케이스 — 어금니 교두까지 덮는 오버레이로 자연치 형태를 보존 수복한 Before/After', caption: '오버레이 예시 — 교두까지 덮는 보존 수복 (Before/After)' },
+      { src: '/static/img/cases/adhesive-resin.jpg', alt: '연세온치과 접착수복 실제 케이스 — 러버댐 방습 하 다수 구치부를 직접 레진으로 자연 색조 수복한 Before/After', caption: '레진수복 예시 — 러버댐 방습 하 자연 색조 직접 수복 (Before/After)' },
     ],
     encyclopediaRefs: ['composite-resin', 'onlay-overlay', 'inlay-onlay', 'rubber-dam', 'ids', 'biomimetic-dentistry', 'dental-caries', 'root-canal'],
     faqs: [
