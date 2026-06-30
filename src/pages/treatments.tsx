@@ -140,10 +140,10 @@ export function TreatmentDetail(slug: string) {
           <div class="tx-compare reveal" id="tx-compare" style="margin-top:2.6rem">
             <h2 style="margin-bottom:1.1rem">${t.compare.title}</h2>
             <div class="tx-table-wrap">
-              <table class="tx-table tx-compare-table">
-                <thead><tr>${t.compare.cols.map((c, i) => `<th${i === 0 ? ' class="tx-th-first"' : ''}>${c}</th>`).join('')}</tr></thead>
+              <table class="tx-table tx-compare-table" style="width:100%;table-layout:fixed">
+                <thead><tr>${t.compare.cols.map((c, i) => `<th${i === 0 ? ' class="tx-th-first"' : ''} style="width:${i === 0 ? '20%' : '40%'}">${c}</th>`).join('')}</tr></thead>
                 <tbody>
-                  ${t.compare.rows.map((r) => `<tr>${r.map((cell, i) => i === 0 ? `<th scope="row">${cell}</th>` : `<td>${cell}</td>`).join('')}</tr>`).join('')}
+                  ${t.compare.rows.map((r) => `<tr>${r.map((cell, i) => i === 0 ? `<th scope="row" style="width:20%">${cell}</th>` : `<td style="width:40%">${cell}</td>`).join('')}</tr>`).join('')}
                 </tbody>
               </table>
             </div>
@@ -330,11 +330,9 @@ export function TreatmentDetail(slug: string) {
     .tx-table tbody td{ color:var(--ink-soft) }
     .tx-table tbody tr:last-child th,.tx-table tbody tr:last-child td{ border-bottom:none }
     /* 비교표(인레이/온레이/오버레이 등 3열)는 우측 공백 없이 폭을 꽉 채우도록 균등 분배 */
-    .tx-compare-table{ table-layout:fixed }
-    .tx-compare-table th:first-child,.tx-compare-table td:first-child{ width:20% }
-    .tx-compare-table th:nth-child(2),.tx-compare-table td:nth-child(2),
-    .tx-compare-table th:nth-child(3),.tx-compare-table td:nth-child(3){ width:40% }
-    .tx-compare-table tbody th[scope=row]{ width:20%;white-space:normal }
+    /* .prose table{ display:block } 이 우측 공백을 만들던 원인 → display:table 복구 */
+    .prose .tx-compare-table{ display:table !important;width:100% !important;table-layout:fixed !important;max-width:none !important }
+    .tx-compare-table tbody th[scope=row]{ white-space:normal }
 
     /* 회복 타임라인 */
     .tx-after{ display:grid;gap:.9rem;margin-top:1.2rem }
