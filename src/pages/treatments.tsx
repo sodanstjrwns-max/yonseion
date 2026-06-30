@@ -140,7 +140,7 @@ export function TreatmentDetail(slug: string) {
           <div class="tx-compare reveal" id="tx-compare" style="margin-top:2.6rem">
             <h2 style="margin-bottom:1.1rem">${t.compare.title}</h2>
             <div class="tx-table-wrap">
-              <table class="tx-table">
+              <table class="tx-table tx-compare-table">
                 <thead><tr>${t.compare.cols.map((c, i) => `<th${i === 0 ? ' class="tx-th-first"' : ''}>${c}</th>`).join('')}</tr></thead>
                 <tbody>
                   ${t.compare.rows.map((r) => `<tr>${r.map((cell, i) => i === 0 ? `<th scope="row">${cell}</th>` : `<td>${cell}</td>`).join('')}</tr>`).join('')}
@@ -329,6 +329,12 @@ export function TreatmentDetail(slug: string) {
     .tx-table tbody th[scope=row]{ background:var(--paper-2);color:var(--navy);font-weight:600;white-space:nowrap }
     .tx-table tbody td{ color:var(--ink-soft) }
     .tx-table tbody tr:last-child th,.tx-table tbody tr:last-child td{ border-bottom:none }
+    /* 비교표(인레이/온레이/오버레이 등 3열)는 우측 공백 없이 폭을 꽉 채우도록 균등 분배 */
+    .tx-compare-table{ table-layout:fixed }
+    .tx-compare-table th:first-child,.tx-compare-table td:first-child{ width:20% }
+    .tx-compare-table th:nth-child(2),.tx-compare-table td:nth-child(2),
+    .tx-compare-table th:nth-child(3),.tx-compare-table td:nth-child(3){ width:40% }
+    .tx-compare-table tbody th[scope=row]{ width:20%;white-space:normal }
 
     /* 회복 타임라인 */
     .tx-after{ display:grid;gap:.9rem;margin-top:1.2rem }
