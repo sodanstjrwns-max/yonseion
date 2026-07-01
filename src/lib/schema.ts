@@ -53,8 +53,7 @@ export function organizationSchema() {
     currenciesAccepted: 'KRW',
     paymentAccepted: '현금, 카드',
     openingHoursSpecification: [
-      { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Thursday', 'Friday'], opens: '09:30', closes: '18:30' },
-      { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Tuesday', opens: '09:30', closes: '20:00' },
+      { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Thursday', 'Friday'], opens: '09:30', closes: '18:30' },
       { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Saturday', opens: '09:30', closes: '13:00' },
     ],
     // 핵심 진료 서비스 — makesOffer (검색 의도 매칭)
@@ -253,8 +252,7 @@ export function areaServiceSchema(opts: {
     geo: { '@type': 'GeoCoordinates', latitude: clinic.geo.lat, longitude: clinic.geo.lng },
     hasMap: clinic.mapUrl,
     openingHoursSpecification: [
-      { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Thursday', 'Friday'], opens: '09:30', closes: '18:30' },
-      { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Tuesday', opens: '09:30', closes: '20:00' },
+      { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Thursday', 'Friday'], opens: '09:30', closes: '18:30' },
       { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Saturday', opens: '09:30', closes: '13:00' },
     ],
     areaServed: { '@type': 'AdministrativeArea', name: opts.regionAdmin },

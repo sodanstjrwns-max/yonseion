@@ -63,7 +63,6 @@ export function ReservationPage() {
             <div class="chip-group" id="rsv-timeslot" role="group" aria-label="희망 시간대">
               <button type="button" class="chip" data-val="평일 오전">평일 오전</button>
               <button type="button" class="chip" data-val="평일 오후">평일 오후</button>
-              <button type="button" class="chip" data-val="화요일 야간(~20:00)">화 야간</button>
               <button type="button" class="chip" data-val="토요일 오전">토 오전</button>
             </div>
           </div>
