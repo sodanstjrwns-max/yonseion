@@ -399,7 +399,27 @@ export function NoticeDetailPage(n: Notice) {
 // ============================================================================
 export function VideoPage() {
   const crumb = [{ name: '홈', url: '/' }, { name: '병원 영상', url: '/video' }]
-  const hasVideo = Boolean(clinic.sns.youtube)
+  const videos = clinic.videos ?? []
+  const hasVideos = videos.length > 0
+  const watchUrl = (id: string) => `https://www.youtube.com/watch?v=${id}`
+  // 유튜브 썸네일 자동 생성 (maxresdefault 우선, 실패 시 hqdefault로 fallback)
+  const thumbUrl = (id: string) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`
+
+  const grid = `
+    <div class="video-grid">
+      ${videos.map((v) => `
+        <a class="video-card" href="${watchUrl(v.id)}" target="_blank" rel="noopener" aria-label="유튜브에서 재생: ${v.title}">
+          <div class="video-thumb">
+            <img src="${thumbUrl(v.id)}" alt="${v.title} — 연세온치과 유튜브 영상 썸네일" loading="lazy" width="480" height="360">
+            <span class="video-play" aria-hidden="true"><i class="fas fa-play"></i></span>
+          </div>
+          <p class="video-title">${v.title}</p>
+        </a>`).join('')}
+    </div>
+    <div style="text-align:center;margin-top:2.4rem">
+      <a href="${clinic.sns.youtube}" target="_blank" rel="noopener" class="btn btn-primary">유튜브 채널 전체 보기 <i class="fab fa-youtube"></i></a>
+    </div>`
+
   const body = html`
   <section class="page-hero">
     <div class="container"><p class="eyebrow">Video</p><h1>병원 영상</h1>
@@ -408,11 +428,23 @@ export function VideoPage() {
   ${Breadcrumb(crumb)}
   <section class="section--tight">
     <div class="container">
-      ${raw(hasVideo
-        ? `<a href="${clinic.sns.youtube}" target="_blank" rel="noopener" class="btn btn-primary">유튜브 채널 바로가기 <i class="fab fa-youtube"></i></a>`
-        : emptyState('영상을 준비하고 있습니다', '병원 소개·진료 안내 영상이 곧 게시됩니다.'))}
+      ${raw(hasVideos ? grid : emptyState('영상을 준비하고 있습니다', '병원 소개·진료 안내 영상이 곧 게시됩니다.'))}
     </div>
   </section>
+  <style>
+    .video-grid{ display:grid;grid-template-columns:repeat(3,1fr);gap:1.6rem }
+    .video-card{ display:block;text-decoration:none;color:inherit }
+    .video-thumb{ position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;box-shadow:0 2px 12px rgba(0,0,0,.08) }
+    .video-thumb img{ width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s var(--ease) }
+    .video-card:hover .video-thumb img{ transform:scale(1.05) }
+    .video-play{ position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.18);transition:background .3s var(--ease) }
+    .video-play i{ width:58px;height:58px;border-radius:50%;background:rgba(220,40,40,.92);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;padding-left:4px;box-shadow:0 4px 16px rgba(0,0,0,.3);transition:transform .3s var(--ease) }
+    .video-card:hover .video-play{ background:rgba(0,0,0,.28) }
+    .video-card:hover .video-play i{ transform:scale(1.12) }
+    .video-title{ margin-top:.85rem;font-size:.98rem;font-weight:600;color:var(--navy);line-height:1.5;word-break:keep-all }
+    .video-card:hover .video-title{ color:var(--gold-2) }
+    @media (max-width:820px){ .video-grid{ grid-template-columns:1fr;gap:1.4rem } }
+  </style>
   `
   return Layout({
     title: `병원 영상 | ${clinic.nameKo}`,

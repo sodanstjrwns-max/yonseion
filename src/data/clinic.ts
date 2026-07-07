@@ -80,6 +80,17 @@ export const clinic = {
     kakaoChannel: 'http://pf.kakao.com/_xiPfab',
   },
 
+  // --- 병원 영상 (유튜브) ---
+  // id: 유튜브 영상 ID (watch?v= 뒤 11자리). 썸네일은 id로 자동 생성됩니다.
+  // 새 영상 추가 시 이 배열에 { id, title } 한 줄만 추가하면 됩니다.
+  videos: [
+    { id: 'YO9Z7PWUxw4', title: '틀니 고통에서 해방되세요! 올온엑스 전체 임플란트 | 부산 연세온치과의원' },
+    { id: '-HnfY4u6OpA', title: '60대 환자의 All-on-X 전체임플란트 치료 사례' },
+    { id: '8Ac43tnDcas', title: '[연세온치과 방송출연] 디지털 풀아치의 모든 것 — 조영구의 트렌드 핫이슈 353회' },
+    { id: 'NZCIN9k15cE', title: '[부산 전체임플란트] 만화로 쉽게 이해하는 디지털 풀아치 임플란트' },
+    { id: 'NhJ9OOEYkeY', title: '디지털 전체임플란트 연세온치과' },
+  ],
+
   // --- 브랜드 (차콜블랙 × 샴페인 골드 × 미색 페이퍼) ---
   brand: {
     ink: '#2E3A4B',        // 로고 딥 네이비 (텍스트/주조)
