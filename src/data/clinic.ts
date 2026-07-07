@@ -81,9 +81,13 @@ export const clinic = {
   },
 
   // --- 병원 영상 (유튜브) ---
-  // id: 유튜브 영상 ID (watch?v= 뒤 11자리). 썸네일은 id로 자동 생성됩니다.
-  // 새 영상 추가 시 이 배열에 { id, title } 한 줄만 추가하면 됩니다.
-  videos: [
+  // youtubeChannelId: RSS 자동 반영에 사용하는 채널 ID.
+  //   → 유튜브에 정식 영상을 올리면 홈페이지 '병원 영상'에 자동으로 뜹니다.
+  //   → 해시태그가 많은 쇼츠(#동래치과#부산임플란트…)는 자동으로 제외됩니다.
+  // videosPinned: 항상 상단에 고정 노출할 엄선 영상. (자동 최신 영상은 이 뒤에 붙습니다)
+  //   새 고정 영상 추가 시 이 배열에 { id, title } 한 줄만 추가하면 됩니다.
+  youtubeChannelId: 'UCnqVSFz4muyJmVqkFTDsuIA',
+  videosPinned: [
     { id: 'YO9Z7PWUxw4', title: '틀니 고통에서 해방되세요! 올온엑스 전체 임플란트 | 부산 연세온치과의원' },
     { id: '-HnfY4u6OpA', title: '60대 환자의 All-on-X 전체임플란트 치료 사례' },
     { id: '8Ac43tnDcas', title: '[연세온치과 방송출연] 디지털 풀아치의 모든 것 — 조영구의 트렌드 핫이슈 353회' },

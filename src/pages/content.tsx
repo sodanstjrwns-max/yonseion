@@ -6,6 +6,7 @@ import { getDoctor } from '../data/doctors'
 import { breadcrumbSchema, articleSchema } from '../lib/schema'
 import type { CaseItem, Column, Notice } from '../data/types'
 import { autoLink } from '../lib/inlink'
+import { getMergedVideos } from '../lib/youtube'
 
 const fmt = (iso: string) => (iso || '').slice(0, 10).replace(/-/g, '.')
 
@@ -397,9 +398,10 @@ export function NoticeDetailPage(n: Notice) {
 // ============================================================================
 // 병원 영상
 // ============================================================================
-export function VideoPage() {
+export async function VideoPage() {
   const crumb = [{ name: '홈', url: '/' }, { name: '병원 영상', url: '/video' }]
-  const videos = clinic.videos ?? []
+  // 고정 영상 + 유튜브 RSS 자동 영상(쇼츠 제외) 병합. RSS 실패 시 고정 영상만 표시.
+  const videos = await getMergedVideos(clinic.youtubeChannelId, clinic.videosPinned ?? [], 9)
   const hasVideos = videos.length > 0
   const watchUrl = (id: string) => `https://www.youtube.com/watch?v=${id}`
   // 유튜브 썸네일 자동 생성 (maxresdefault 우선, 실패 시 hqdefault로 fallback)

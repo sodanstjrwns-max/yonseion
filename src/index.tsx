@@ -62,7 +62,7 @@ app.get('/pricing', (c) => c.html(PricingPage()))
 app.get('/directions', (c) => c.html(DirectionsPage()))
 app.get('/privacy', (c) => c.html(PrivacyPage()))
 app.get('/terms', (c) => c.html(TermsPage()))
-app.get('/video', (c) => c.html(VideoPage()))
+app.get('/video', async (c) => c.html(await VideoPage()))
 
 // --- 백과사전 (정적) ---
 app.get('/encyclopedia', (c) => c.html(EncyclopediaIndex()))
