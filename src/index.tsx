@@ -58,7 +58,7 @@ app.get('/doctors/:slug', (c) => {
 // --- 예약·안내 ---
 app.get('/reservation', (c) => c.html(ReservationPage()))
 app.get('/faq', (c) => c.html(FaqPage()))
-app.get('/pricing', (c) => c.html(PricingPage()))
+app.get('/pricing', async (c) => c.html(await PricingPage(c.env.R2)))
 app.get('/directions', (c) => c.html(DirectionsPage()))
 app.get('/privacy', (c) => c.html(PrivacyPage()))
 app.get('/terms', (c) => c.html(TermsPage()))

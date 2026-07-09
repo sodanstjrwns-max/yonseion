@@ -59,7 +59,6 @@ export const priceGroups: { label: string; desc?: string; items: PriceItem[] }[]
       { name: 'PFZ (지르코니아+포세린, 전치)', price: '650,000원' },
       { name: 'PFM (전치)', price: '500,000원' },
       { name: 'PFM (구치)', price: '450,000원' },
-      { name: '메탈 크라운', price: '400,000원' },
       { name: 'Overlay (E-max)', price: '600,000원' },
       { name: 'Maryland Bridge (E-max)', price: '700,000원' },
       { name: '심미 재보철 추가비용', price: '100,000원' },
@@ -70,8 +69,6 @@ export const priceGroups: { label: string; desc?: string; items: PriceItem[] }[]
     label: '틀니',
     desc: '악(顎)당 비용이며, 구강 상태와 재료에 따라 달라질 수 있습니다.',
     items: [
-      { name: '부분 틀니 (악당)', price: '2,000,000원' },
-      { name: '전체 틀니 (악당)', price: '2,000,000원' },
       { name: '임시 틀니 (악당)', price: '400,000원' },
       { name: 'Flipper (3치까지)', price: '200,000원' },
       { name: 'Flipper (4치 이상)', price: '300,000원' },
@@ -82,7 +79,7 @@ export const priceGroups: { label: string; desc?: string; items: PriceItem[] }[]
     label: '심미 · 미백 (미용 치료)',
     desc: '미용 목적 진료는 부가가치세가 별도로 부과됩니다.',
     items: [
-      { name: '라미네이트 (삭제)', price: '550,000원', note: '부가세 별도' },
+      { name: '라미네이트 (삭제)', price: '600,000원', note: '부가세 별도' },
       { name: '라미네이트 (무삭제)', price: '650,000원', note: '부가세 별도' },
       { name: '자가미백 세트', price: '200,000원', note: '부가세 별도' },
       { name: '자가미백약 추가 (2개)', price: '100,000원', note: '부가세 별도' },
@@ -97,10 +94,9 @@ export const priceGroups: { label: string; desc?: string; items: PriceItem[] }[]
     items: [
       { name: '레진 (간단)', price: '70,000원' },
       { name: '레진 (어금니 복잡)', price: '150,000원' },
-      { name: '레진 (어금니 인접면)', price: '200,000원' },
+      { name: '레진 (어금니 인접면)', price: '300,000원' },
       { name: '레진 (앞니, 면당)', price: '150,000원' },
       { name: 'Bondfil 추가비용', price: '20,000원', note: '레진 강화재' },
-      { name: 'Hybrid 인레이', price: '300,000원' },
       { name: 'Onlay (E-max)', price: '400,000원' },
       { name: '치경부마모증 레진수복 — 일반', price: '70,000원' },
       { name: '치경부마모증 레진수복 — Bondfil', price: '90,000원' },

@@ -3,7 +3,7 @@ import { Layout, Breadcrumb } from '../components/layout'
 import { FaqAccordion } from '../components/faq'
 import { clinic } from '../data/clinic'
 import { faqGroups, allFaqs } from '../data/faqs'
-import { priceGroups, pricingNotes } from '../data/pricing'
+import { getPricing } from '../lib/pricing-store'
 import { breadcrumbSchema, faqSchema } from '../lib/schema'
 
 // ============================================================================
@@ -60,8 +60,9 @@ export function FaqPage() {
 }
 
 // ---------- 비용 안내 ----------
-export function PricingPage() {
+export async function PricingPage(r2: R2Bucket) {
   const crumb = [{ name: '홈', url: '/' }, { name: '비용 안내', url: '/pricing' }]
+  const { groups: priceGroups, notes: pricingNotes } = await getPricing(r2)
   const body = html`
   <section class="page-hero">
     <div class="container">

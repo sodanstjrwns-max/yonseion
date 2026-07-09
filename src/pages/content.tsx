@@ -232,22 +232,46 @@ export function ColumnsPage(items: Column[]) {
   <section class="section--tight">
     <div class="container">
       ${raw(list.length ? `
-      <div class="index-list">
+      <div class="col-grid">
         ${list.map((col, i) => {
           const doc = getDoctor(col.authorSlug)
+          const thumb = col.thumbnail
+          const alt = `${col.title}${doc ? ` — ${doc.name} ${doc.role}` : ''}`
+          const media = thumb
+            ? `<span class="col-thumb"><img src="${thumb}" alt="${alt.replace(/"/g, '&quot;')}" loading="lazy"></span>`
+            : `<span class="col-thumb col-thumb--ph" aria-hidden="true"><i class="fas fa-pen-nib"></i></span>`
           return `
-          <a class="index-row" href="/column/${col.slug}" data-reveal data-reveal-delay="${(i % 3) + 1}">
-            <span class="num">${fmt(col.createdAt)}</span>
-            <span>
-              <span class="row-title" style="font-size:clamp(1.2rem,2.2vw,1.8rem)">${col.title}</span>
-              <span class="row-desc">${col.excerpt}${doc ? ` — ${doc.name} ${doc.role}` : ''}</span>
+          <a class="col-card" href="/column/${col.slug}" data-reveal data-reveal-delay="${(i % 3) + 1}">
+            ${media}
+            <span class="col-body">
+              <span class="col-date">${fmt(col.createdAt)}</span>
+              <span class="col-title">${col.title}</span>
+              <span class="col-excerpt">${col.excerpt}</span>
+              ${doc ? `<span class="col-author"><i class="fas fa-user-doctor"></i> ${doc.name} ${doc.role}</span>` : ''}
             </span>
-            <span class="row-go"><i class="fas fa-arrow-right"></i></span>
           </a>`
         }).join('')}
       </div>` : emptyState('칼럼을 준비하고 있습니다', '원장이 직접 쓰는 치아 건강 이야기가 곧 게시됩니다.'))}
     </div>
   </section>
+
+  <style>
+    .col-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:2rem 1.8rem; }
+    .col-card{ display:flex; flex-direction:column; background:var(--paper,#FAF8F2); border:1px solid var(--line,#E1DCCC); border-radius:14px; overflow:hidden; transition:transform .4s var(--ease,ease), box-shadow .4s var(--ease,ease), border-color .4s; }
+    .col-card:hover{ transform:translateY(-5px); box-shadow:0 16px 38px rgba(20,36,62,.12); border-color:#C9BE9E; }
+    .col-thumb{ display:block; aspect-ratio:16/10; overflow:hidden; background:var(--paper-2,#EFEBE1); }
+    .col-thumb img{ width:100%; height:100%; object-fit:cover; transition:transform 1s var(--ease,ease); }
+    .col-card:hover .col-thumb img{ transform:scale(1.06); }
+    .col-thumb--ph{ display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#1a2c4a,#0c1830); color:rgba(224,201,155,.55); font-size:2.4rem; }
+    .col-body{ display:flex; flex-direction:column; gap:.5rem; padding:1.4rem 1.5rem 1.6rem; flex:1; }
+    .col-date{ font-family:var(--serif,serif); font-size:.85rem; color:var(--mist-2,#8A93A6); font-variant-numeric:oldstyle-nums; }
+    .col-title{ font-family:var(--serif-kr,var(--serif,serif)); font-size:1.28rem; line-height:1.35; color:var(--ink,#14243E); letter-spacing:-.01em; }
+    .col-excerpt{ font-size:.92rem; line-height:1.6; color:var(--mist,#6b7280); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .col-author{ margin-top:auto; padding-top:.7rem; font-size:.82rem; color:var(--mist-2,#8A93A6); display:flex; align-items:center; gap:.4rem; }
+    .col-author i{ color:#AE8A4C; }
+    @media (max-width:960px){ .col-grid{ grid-template-columns:repeat(2,1fr); gap:1.6rem; } }
+    @media (max-width:600px){ .col-grid{ grid-template-columns:1fr; } .col-thumb{ aspect-ratio:16/9; } }
+  </style>
   `
   return Layout({
     title: `원장 칼럼 | ${clinic.nameKo}`,

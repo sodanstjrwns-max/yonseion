@@ -5,6 +5,8 @@ import { Hono } from 'hono'
 import { html, raw } from 'hono/html'
 import type { Bindings } from '../lib/bindings'
 import { Store, newId, slugify } from '../lib/store'
+import { getPricing, savePricing, resetPricing } from '../lib/pricing-store'
+import type { PricingData } from '../lib/pricing-store'
 import { fireIndexNotify } from '../lib/indexing'
 import {
   getSession, setSessionCookie, clearSession, sessionSecret, adminPassword,
@@ -33,6 +35,7 @@ function shell(title: string, body: string, active = '') {
     ['/admin/cases', '케이스', 'images'],
     ['/admin/columns', '칼럼', 'pen-nib'],
     ['/admin/notices', '공지', 'bullhorn'],
+    ['/admin/pricing', '진료비용(수가)', 'won-sign'],
   ]
   return html`<!DOCTYPE html>
 <html lang="ko">
@@ -1029,4 +1032,138 @@ admin.post('/notices/:id/delete', async (c) => {
   await store.setIndex('notices', (await store.index<any>('notices')).filter((x: any) => x.id !== id))
   fireIndexNotify(c, `/notice/${id}`, 'URL_DELETED')
   return c.redirect('/admin/notices')
+})
+
+// ============================================================================
+// 진료비용(수가) 관리 — 목록/가격을 관리자가 직접 추가·수정·삭제
+// R2(pricing/data.json)에 저장, 비우면 코드 기본값 사용
+// ============================================================================
+admin.get('/pricing', async (c) => {
+  const data = await getPricing(c.env.R2)
+  const isCustom = !!data.updatedAt
+  // 편집기가 사용할 초기 데이터를 JSON으로 안전하게 주입
+  const dataJson = JSON.stringify(data).replace(/</g, '\\u003c')
+  const body = `
+  <div class="toolbar">
+    <h1 style="margin:0">진료비용(수가) 관리</h1>
+    <div style="display:flex;gap:.6rem">
+      <button type="button" class="btn ghost" onclick="pxAddGroup()"><i class="fas fa-folder-plus"></i> 분류 추가</button>
+      <button type="button" class="btn" onclick="pxSave()"><i class="fas fa-floppy-disk"></i> 전체 저장</button>
+    </div>
+  </div>
+  <p class="muted" style="margin:-.6rem 0 1.2rem">
+    항목명·비용·비고를 직접 수정하고 <b>[전체 저장]</b>을 누르면 홈페이지 비용 안내 페이지에 즉시 반영됩니다.
+    ${isCustom ? `수가는 <b>관리자에서 수정된 값</b>으로 표시 중입니다.` : `현재는 <b>기본 수가표</b>를 표시 중입니다.`}
+  </p>
+
+  <div id="pxGroups"></div>
+
+  <div class="panel" style="margin-top:1.6rem">
+    <label style="margin-top:0"><i class="fas fa-circle-info" style="color:#AE8A4C;margin-right:.4rem"></i>하단 안내 문구 <small class="muted">(비용 안내 페이지 맨 아래 · 한 줄에 하나씩)</small></label>
+    <textarea id="pxNotes" style="min-height:130px">${esc((data.notes || []).join('\n'))}</textarea>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1.6rem;flex-wrap:wrap;gap:1rem">
+    <button type="button" class="btn" onclick="pxSave()"><i class="fas fa-floppy-disk"></i> 전체 저장</button>
+    <form method="POST" action="/admin/pricing/reset" onsubmit="return confirm('관리자에서 수정한 수가를 모두 지우고 기본 수가표로 되돌립니다. 계속할까요?')">
+      <button class="btn ghost danger" style="border-color:#E0BDBD;color:#9C2B2B"><i class="fas fa-rotate-left"></i> 기본 수가표로 초기화</button>
+    </form>
+  </div>
+
+  <form method="POST" action="/admin/pricing" id="pxForm" style="display:none">
+    <input type="hidden" name="payload" id="pxPayload">
+  </form>
+
+  <style>
+    .px-group{background:#fff;border:1px solid var(--line);border-radius:10px;padding:1.2rem 1.3rem;margin-bottom:1.2rem}
+    .px-group-head{display:flex;gap:.7rem;align-items:flex-start;margin-bottom:.9rem}
+    .px-group-head .gh-fields{flex:1;display:grid;gap:.5rem}
+    .px-group-head input{margin:0}
+    .px-group-head .g-label{font-weight:600}
+    .px-item-row{display:grid;grid-template-columns:1fr 150px 1fr 34px;gap:.5rem;align-items:center;margin-bottom:.4rem}
+    .px-item-row input{margin:0;padding:.45rem .6rem;font-size:.88rem}
+    .px-item-head{font-size:.72rem;letter-spacing:.05em;color:var(--mist);text-transform:uppercase;margin-bottom:.3rem}
+    .px-x{width:32px;height:32px;border:1px solid var(--line);background:#FBF6F4;color:#9C2B2B;border-radius:7px;cursor:pointer;font-size:.8rem}
+    .px-x:hover{background:#F3DEDE}
+    .px-group-actions{display:flex;gap:.5rem;margin-top:.6rem;flex-wrap:wrap}
+    @media(max-width:680px){.px-item-row{grid-template-columns:1fr 1fr 34px}.px-item-row .it-note{grid-column:1/3}}
+  </style>
+  <script>
+  var PX = ${dataJson};
+  function pxEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+  function pxRender(){
+    var wrap=document.getElementById('pxGroups'); wrap.innerHTML='';
+    (PX.groups||[]).forEach(function(g,gi){
+      var div=document.createElement('div'); div.className='px-group'; div.dataset.gi=gi;
+      var itemsHtml=(g.items||[]).map(function(it,ii){
+        return '<div class="px-item-row" data-ii="'+ii+'">'+
+          '<input placeholder="항목명" value="'+pxEsc(it.name)+'" oninput="PX.groups['+gi+'].items['+ii+'].name=this.value">'+
+          '<input placeholder="비용 (예: 600,000원)" value="'+pxEsc(it.price)+'" oninput="PX.groups['+gi+'].items['+ii+'].price=this.value">'+
+          '<input class="it-note" placeholder="비고 (선택)" value="'+pxEsc(it.note||'')+'" oninput="PX.groups['+gi+'].items['+ii+'].note=this.value">'+
+          '<button type="button" class="px-x" title="이 항목 삭제" onclick="pxDelItem('+gi+','+ii+')"><i class="fas fa-trash"></i></button>'+
+        '</div>';
+      }).join('');
+      div.innerHTML=
+        '<div class="px-group-head">'+
+          '<div class="gh-fields">'+
+            '<input class="g-label" placeholder="분류명 (예: 임플란트)" value="'+pxEsc(g.label)+'" oninput="PX.groups['+gi+'].label=this.value">'+
+            '<input placeholder="분류 설명 (선택)" value="'+pxEsc(g.desc||'')+'" oninput="PX.groups['+gi+'].desc=this.value">'+
+          '</div>'+
+          '<button type="button" class="px-x" title="분류 전체 삭제" onclick="pxDelGroup('+gi+')"><i class="fas fa-trash"></i></button>'+
+        '</div>'+
+        '<div class="px-item-head px-item-row" style="margin-bottom:.4rem"><span>항목</span><span>비용</span><span>비고</span><span></span></div>'+
+        '<div class="px-items">'+itemsHtml+'</div>'+
+        '<div class="px-group-actions"><button type="button" class="btn sm ghost" onclick="pxAddItem('+gi+')"><i class="fas fa-plus"></i> 항목 추가</button>'+
+          (gi>0?'<button type="button" class="btn sm ghost" onclick="pxMoveGroup('+gi+',-1)"><i class="fas fa-arrow-up"></i> 위로</button>':'')+
+          (gi<(PX.groups.length-1)?'<button type="button" class="btn sm ghost" onclick="pxMoveGroup('+gi+',1)"><i class="fas fa-arrow-down"></i> 아래로</button>':'')+
+        '</div>';
+      wrap.appendChild(div);
+    });
+  }
+  function pxAddGroup(){ PX.groups.push({label:'새 분류',desc:'',items:[{name:'',price:'',note:''}]}); pxRender(); window.scrollTo(0,document.body.scrollHeight); }
+  function pxDelGroup(gi){ if(confirm('"'+(PX.groups[gi].label||'이 분류')+'" 분류와 하위 항목을 모두 삭제할까요?')){ PX.groups.splice(gi,1); pxRender(); } }
+  function pxAddItem(gi){ PX.groups[gi].items.push({name:'',price:'',note:''}); pxRender(); }
+  function pxDelItem(gi,ii){ PX.groups[gi].items.splice(ii,1); pxRender(); }
+  function pxMoveGroup(gi,dir){ var t=gi+dir; if(t<0||t>=PX.groups.length)return; var tmp=PX.groups[gi]; PX.groups[gi]=PX.groups[t]; PX.groups[t]=tmp; pxRender(); }
+  function pxSave(){
+    // 빈 항목(항목명·비용 모두 공백) 자동 제거
+    PX.groups.forEach(function(g){ g.items=(g.items||[]).filter(function(it){ return (it.name||'').trim()||(it.price||'').trim(); }); });
+    PX.groups=PX.groups.filter(function(g){ return (g.label||'').trim() || (g.items&&g.items.length); });
+    PX.notes=(document.getElementById('pxNotes').value||'').split('\\n').map(function(s){return s.trim();}).filter(Boolean);
+    document.getElementById('pxPayload').value=JSON.stringify(PX);
+    document.getElementById('pxForm').submit();
+  }
+  pxRender();
+  </script>`
+  return c.html(shell('진료비용(수가) 관리', body, '/admin/pricing'))
+})
+
+admin.post('/pricing', async (c) => {
+  const f = await c.req.parseBody()
+  try {
+    const parsed = JSON.parse(String(f.payload || '{}')) as PricingData
+    if (!Array.isArray(parsed.groups)) throw new Error('bad')
+    // 정규화 (문자열화·불필요 필드 제거)
+    const clean: PricingData = {
+      groups: parsed.groups.map((g) => ({
+        label: String(g.label || '').trim(),
+        desc: String(g.desc || '').trim() || undefined,
+        items: (Array.isArray(g.items) ? g.items : []).map((it) => ({
+          name: String(it.name || '').trim(),
+          price: String(it.price || '').trim(),
+          note: String(it.note || '').trim() || undefined,
+        })).filter((it) => it.name || it.price),
+      })).filter((g) => g.label || g.items.length),
+      notes: (Array.isArray(parsed.notes) ? parsed.notes : []).map((n) => String(n).trim()).filter(Boolean),
+    }
+    await savePricing(c.env.R2, clean)
+    // 비용 안내 페이지 재색인 요청
+    fireIndexNotify(c, '/pricing')
+  } catch { /* 파싱 실패 시 무시하고 되돌아감 */ }
+  return c.redirect('/admin/pricing')
+})
+
+admin.post('/pricing/reset', async (c) => {
+  await resetPricing(c.env.R2)
+  return c.redirect('/admin/pricing')
 })
