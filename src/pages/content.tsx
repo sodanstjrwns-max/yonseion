@@ -11,14 +11,16 @@ import { getMergedVideos } from '../lib/youtube'
 const fmt = (iso: string) => (iso || '').slice(0, 10).replace(/-/g, '.')
 
 // 본문 H2에 anchor id 부여 + 목차(TOC) 추출
-function buildToc(htmlStr: string): { html: string; toc: { id: string; text: string }[] } {
-  const toc: { id: string; text: string }[] = []
+function buildToc(htmlStr: string): { html: string; toc: { id: string; text: string; level: number }[] } {
+  const toc: { id: string; text: string; level: number }[] = []
   let i = 0
-  const out = htmlStr.replace(/<h2(\s[^>]*)?>([\s\S]*?)<\/h2>/gi, (_m, attr, inner) => {
+  // H2·H3 모두 목차에 포함 (원장/직원 누구나 소제목만 넣으면 목차 자동 생성)
+  const out = htmlStr.replace(/<(h2|h3)(\s[^>]*)?>([\s\S]*?)<\/\1>/gi, (_m, tag, attr, inner) => {
     const text = String(inner).replace(/<[^>]+>/g, '').trim()
+    if (!text) return _m
     const id = `sec-${++i}`
-    toc.push({ id, text })
-    return `<h2 id="${id}"${attr || ''}>${inner}</h2>`
+    toc.push({ id, text, level: tag.toLowerCase() === 'h3' ? 3 : 2 })
+    return `<${tag} id="${id}"${attr || ''}>${inner}</${tag}>`
   })
   return { html: out, toc }
 }
@@ -315,7 +317,7 @@ export function ColumnDetailPage(col: Column) {
           ${raw(toc.length >= 2 ? `
           <div class="sidebar-box toc-box">
             <h3>목차</h3>
-            ${toc.map((t) => `<a href="#${t.id}" class="toc-link">${t.text}</a>`).join('')}
+            ${toc.map((t) => `<a href="#${t.id}" class="toc-link${t.level === 3 ? ' toc-sub' : ''}">${t.text}</a>`).join('')}
           </div>` : '')}
           ${raw(related.length ? `
           <div class="sidebar-box">
@@ -335,8 +337,10 @@ export function ColumnDetailPage(col: Column) {
     .toc-box .toc-link{display:block;font-size:.88rem;line-height:1.4;padding:.35rem 0;color:var(--ink-soft,#4a5364);border-bottom:1px dashed var(--line)}
     .toc-box .toc-link:last-child{border-bottom:0}
     .toc-box .toc-link:hover{color:var(--gold,#C59F66)}
+    .toc-box .toc-sub{padding-left:.9rem;font-size:.8rem;color:var(--ink-soft,#6b7280);position:relative}
+    .toc-box .toc-sub::before{content:'ㄴ';position:absolute;left:0;color:var(--line,#d8dce3);font-size:.72rem}
     html{scroll-behavior:smooth}
-    .prose h2{scroll-margin-top:90px}
+    .prose h2,.prose h3{scroll-margin-top:90px}
   </style>
   <script>fetch('/api/views/column/${col.id}',{method:'POST'}).catch(function(){});</script>
   `

@@ -791,6 +791,16 @@ function columnForm(col?: Column) {
 
     <div class="panel" style="margin-bottom:1.2rem">
       <label style="margin-top:0">본문 <small class="muted">— 툴바로 서식 지정 · 사진은 드래그&드롭 또는 붙여넣기(Ctrl+V)로 삽입</small></label>
+      <div style="background:#FCF7EA;border:1px solid #E4D9BC;border-radius:9px;padding:.9rem 1.1rem;margin:.2rem 0 1rem;font-size:.85rem;line-height:1.7;color:#5a5138">
+        <b style="color:#8A6D2F"><i class="fas fa-lightbulb" style="margin-right:.35rem"></i>글 오른쪽에 &lsquo;목차&rsquo;를 나오게 하려면?</b><br>
+        본문을 소제목으로 나눠주세요. 소제목 줄에 커서를 두고 위 툴바의 <b>[형식] → 제목 H2</b>를 선택하면 됩니다.
+        <b>제목(H2)이 2개 이상</b>이면 오른쪽에 목차가 자동으로 생성되고, 클릭하면 해당 위치로 바로 이동합니다.
+        <br><br>
+        <b style="color:#8A6D2F"><i class="fas fa-link" style="margin-right:.35rem"></i>&lsquo;본문 내 링크&rsquo;는 어떻게?</b><br>
+        ① 링크를 걸 <b>글자를 드래그해서 선택</b>한 뒤 툴바의 <b><i class="fas fa-link"></i> 링크</b> 버튼을 누르고 주소를 넣으세요.
+        추천 링크: 관련 진료 페이지(예: <code>/treatments/implant</code>), 예약(<code>/reservation</code>), 다른 칼럼·비용안내(<code>/pricing</code>) 등 <b>우리 홈페이지 안의 페이지</b>를 연결하면 SEO에 가장 좋습니다.<br>
+        ② 참고: 본문에 &lsquo;임플란트&rsquo;·&lsquo;신경치료&rsquo; 같은 <b>치과 백과사전 용어</b>가 있으면 게시 후 자동으로 백과사전 링크가 걸립니다(그래서 링크를 안 넣어도 &lsquo;1개&rsquo;로 잡히기도 합니다).
+      </div>
       <div class="rte-wrap">
         <div class="rte-toolbar" id="rteToolbar">
           <select onchange="rteBlock(this.value);this.selectedIndex=0" title="문단 형식" style="width:auto;height:32px;border:1px solid var(--line);border-radius:6px;font-size:.82rem;padding:0 .4rem">
