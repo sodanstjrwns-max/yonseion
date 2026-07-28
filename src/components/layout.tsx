@@ -186,6 +186,7 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
   const fabItems = [
     clinic.sns.naverBooking ? `<a href="${clinic.sns.naverBooking}" target="_blank" rel="noopener" class="fab-item fab-naver" data-label="네이버 예약"><i class="fas fa-calendar-check"></i></a>` : '',
     clinic.sns.kakaoChannel ? `<a href="${clinic.sns.kakaoChannel}" target="_blank" rel="noopener" class="fab-item fab-kakao" data-label="카카오톡 상담"><i class="fas fa-comment"></i></a>` : '',
+    clinic.sns.youtube ? `<a href="${clinic.sns.youtube}" target="_blank" rel="noopener" class="fab-item fab-youtube" data-label="유튜브"><i class="fab fa-youtube"></i></a>` : '',
     clinic.sns.naverPlace ? `<a href="${clinic.sns.naverPlace}" target="_blank" rel="noopener" class="fab-item fab-place" data-label="네이버 플레이스"><i class="fas fa-location-dot"></i></a>` : '',
     `<a href="tel:${clinic.phoneRaw}" class="fab-item fab-tel" data-label="전화 ${clinic.phone}"><i class="fas fa-phone"></i></a>`,
   ].join('')

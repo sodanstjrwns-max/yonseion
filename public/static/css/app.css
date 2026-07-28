@@ -699,9 +699,11 @@ a:focus-visible, button:focus-visible, .core-feature:focus-visible { outline: 2p
 .fab.open .fab-item:nth-child(2) { transition-delay: .09s; }
 .fab.open .fab-item:nth-child(3) { transition-delay: .14s; }
 .fab.open .fab-item:nth-child(4) { transition-delay: .19s; }
+.fab.open .fab-item:nth-child(5) { transition-delay: .24s; }
 .fab-item:hover { transform: translateY(-2px) scale(1.08); }
 .fab-naver { background: #03C75A; }
 .fab-kakao { background: #FEE500; color: #3C1E1E; }
+.fab-youtube { background: #FF0000; }
 .fab-place { background: #2DB400; }
 .fab-tel { background: var(--ink); }
 /* 라벨 툴팁 (왼쪽으로) */
