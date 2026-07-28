@@ -20,7 +20,11 @@ function buildToc(htmlStr: string): { html: string; toc: { id: string; text: str
     if (!text) return _m
     const id = `sec-${++i}`
     toc.push({ id, text, level: tag.toLowerCase() === 'h3' ? 3 : 2 })
-    return `<${tag} id="${id}"${attr || ''}>${inner}</${tag}>`
+    // 외부 복붙으로 제목 태그·내부 span에 인라인 글자크기가 박혀 있으면 제거해
+    // 사이트의 제목 스타일(크게·굵게)이 항상 적용되도록 함
+    const cleanAttr = String(attr || '').replace(/\sstyle\s*=\s*("[^"]*"|'[^']*')/gi, '')
+    const cleanInner = String(inner).replace(/\s(?:style|face|color|size)\s*=\s*("[^"]*"|'[^']*')/gi, '')
+    return `<${tag} id="${id}"${cleanAttr}>${cleanInner}</${tag}>`
   })
   return { html: out, toc }
 }

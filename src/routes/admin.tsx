@@ -480,9 +480,14 @@ document.addEventListener('DOMContentLoaded', function(){
   });
   // 붙여넣기 이미지
   ED.addEventListener('paste', function(e){
-    var items = e.clipboardData && e.clipboardData.items; if(!items) return;
+    var cd = e.clipboardData; if(!cd) return;
+    var items = cd.items || [];
     var imgs=[]; for(var i=0;i<items.length;i++){ if(items[i].type.indexOf('image')===0){ var f=items[i].getAsFile(); if(f) imgs.push(f); } }
-    if(imgs.length){ e.preventDefault(); rteFiles(imgs); }
+    if(imgs.length){ e.preventDefault(); rteFiles(imgs); return; }
+    // 서식 붙여넣기: 외부에서 복사한 글자 크기·색상 등 인라인 스타일을 제거해
+    // 나중에 [형식→제목]을 눌러도 크기가 정상 반영되도록 함
+    var html = cd.getData && cd.getData('text/html');
+    if(html){ e.preventDefault(); document.execCommand('insertHTML', false, cleanPastedHtml(html)); afterChange(); updateSeo(); }
   });
 
   // 이미지 선택 → 미니바
@@ -508,7 +513,42 @@ function refreshToolbar(){
     try{ b.classList.toggle('on', document.queryCommandState(cmd)); }catch(_){}
   });
 }
-function rteBlock(tag){ if(!tag) return; document.execCommand('formatBlock',false, tag==='p'?'p':tag); ED.focus(); afterChange(); }
+// 외부 복사 HTML 정리: 인라인 style/색상/폰트 태그 제거, 허용 태그만 유지
+function cleanPastedHtml(html){
+  var tmp=document.createElement('div'); tmp.innerHTML=html;
+  // 위험/불필요 요소 제거
+  tmp.querySelectorAll('style,script,meta,link,o\\\\:p').forEach(function(n){ n.remove(); });
+  var allow={A:1,P:1,BR:1,H2:1,H3:1,UL:1,OL:1,LI:1,B:1,STRONG:1,I:1,EM:1,U:1,BLOCKQUOTE:1,HR:1};
+  var all=tmp.querySelectorAll('*');
+  for(var i=all.length-1;i>=0;i--){
+    var el=all[i], tag=el.tagName;
+    // 모든 인라인 스타일/클래스/폰트 속성 제거 (글자 크기 고정 방지)
+    el.removeAttribute('style'); el.removeAttribute('class'); el.removeAttribute('face'); el.removeAttribute('color'); el.removeAttribute('size'); el.removeAttribute('align'); el.removeAttribute('lang'); el.removeAttribute('id');
+    if(tag==='A'){ var href=el.getAttribute('href')||''; el.setAttribute('href',href); continue; }
+    if(!allow[tag]){
+      // 허용 안 된 태그(SPAN/DIV/FONT 등)는 껍데기만 벗기고 내용은 보존
+      var parent=el.parentNode; if(!parent) continue;
+      while(el.firstChild) parent.insertBefore(el.firstChild, el);
+      parent.removeChild(el);
+    }
+  }
+  return tmp.innerHTML;
+}
+function rteBlock(tag){
+  if(!tag) return;
+  document.execCommand('formatBlock',false, tag==='p'?'p':tag);
+  // formatBlock 후, 방금 만든 블록 안에 남아있는 인라인 글자크기/폰트를 제거해
+  // 제목(H2/H3) 스타일이 항상 적용되도록 함
+  try{
+    var sel=window.getSelection();
+    if(sel && sel.anchorNode){
+      var node=sel.anchorNode.nodeType===1?sel.anchorNode:sel.anchorNode.parentNode;
+      var block=node && node.closest ? node.closest('h2,h3,p,blockquote') : null;
+      if(block){ block.querySelectorAll('[style],font,[size],[color]').forEach(function(x){ x.removeAttribute('style'); x.removeAttribute('size'); x.removeAttribute('color'); x.removeAttribute('face'); }); }
+    }
+  }catch(_){}
+  ED.focus(); afterChange();
+}
 function rteLink(){ var url=prompt('링크 주소를 입력하세요 (예: /treatments/implant 또는 https://...)'); if(url){ document.execCommand('createLink',false,url); afterChange(); } }
 function rteHr(){ document.execCommand('insertHTML',false,'<hr>'); afterChange(); }
 
