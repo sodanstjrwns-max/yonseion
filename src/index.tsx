@@ -32,6 +32,18 @@ import { getSession, sessionSecret } from './lib/auth'
 
 const app = new Hono<{ Bindings: Bindings }>()
 
+// --- A4 canonical 통일: www → 비(非)www 301 리다이렉트 ---
+// 같은 페이지가 www / 비www 두 주소로 존재하면 SEO 점수가 분산됩니다.
+// 대표 주소(yonseion.kr)로 영구 이동(301) 처리해 색인을 하나로 모읍니다.
+app.use('*', async (c, next) => {
+  const url = new URL(c.req.url)
+  if (url.hostname.startsWith('www.')) {
+    url.hostname = url.hostname.slice(4)
+    return c.redirect(url.toString(), 301)
+  }
+  await next()
+})
+
 app.route('/api', api)
 app.route('/admin', admin)
 app.route('/', member)   // /signup /login /logout

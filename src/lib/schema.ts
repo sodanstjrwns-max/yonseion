@@ -369,3 +369,27 @@ export function speakableSchema(cssSelectors: string[]) {
     speakable: { '@type': 'SpeakableSpecification', cssSelector: cssSelectors },
   }
 }
+
+// --- ReserveAction (AI 에이전트 예약 시대 대응 · E1 만점 조건) ---
+// AI 비서/검색 에이전트가 "예약해줘"를 실행할 수 있도록 예약 진입점을 구조화합니다.
+export function reserveActionSchema() {
+  const targets = [BASE + '/reservation']
+  if (clinic.sns?.naverBooking) targets.push(clinic.sns.naverBooking)
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ReserveAction',
+    name: `${clinic.nameKo} 진료 예약`,
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: BASE + '/reservation',
+      inLanguage: 'ko',
+      actionPlatform: [
+        'https://schema.org/DesktopWebPlatform',
+        'https://schema.org/MobileWebPlatform',
+      ],
+    },
+    result: { '@type': 'Reservation', name: '치과 진료 예약' },
+    provider: { '@id': BASE + '/#clinic' },
+    potentialAction: targets.map((t) => ({ '@type': 'EntryPoint', urlTemplate: t })),
+  }
+}

@@ -25,7 +25,7 @@ export function ReservationPage() {
     <div class="container">
       <p class="eyebrow">Reservation</p>
       <h1>예약 상담 신청</h1>
-      <p class="lead">남겨주시면 진료시간 내 순차적으로 연락드립니다.<br>급하신 경우 전화가 가장 빠릅니다.</p>
+      <p class="lead"><strong>접수 후 진료시간 기준 24시간 이내</strong> 담당자가 순차적으로 연락드립니다.<br>급하신 경우 전화(${clinic.phone})가 가장 빠릅니다.</p>
     </div>
   </section>
   ${Breadcrumb(crumb)}
@@ -163,7 +163,7 @@ export function ReservationPage() {
         });
         var data = await res.json();
         if (res.ok && data.ok) {
-          result.textContent = '✓ 신청이 접수되었습니다. 진료시간 내 순차적으로 연락드리겠습니다.';
+          result.textContent = '✓ 신청이 접수되었습니다. 진료시간 기준 24시간 이내 순차적으로 연락드리겠습니다.';
           result.className = 'form-result ok';
           form.reset();
           chips.forEach(function (x) { x.classList.remove('is-on'); }); slot = '';

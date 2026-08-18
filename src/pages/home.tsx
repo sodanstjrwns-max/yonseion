@@ -3,7 +3,7 @@ import { Layout, kinetic } from '../components/layout'
 import { clinic } from '../data/clinic'
 import { coreTreatments } from '../data/treatments'
 import { doctors } from '../data/doctors'
-import { organizationSchema, websiteSchema, faqSchema } from '../lib/schema'
+import { organizationSchema, websiteSchema, faqSchema, breadcrumbSchema, personSchema, reserveActionSchema } from '../lib/schema'
 
 // 실사진 제공 전 — 외부 placeholder 대신 깨끗한 CSS 톤 블록(.ph) 사용
 // 사진 URL을 받으면 .ph 안의 <img>로 교체만 하면 됨
@@ -29,7 +29,15 @@ export function HomePage() {
     title: `${clinic.nameKo} | 부산 동래구 온천동 치과 (온천장역)`,
     description: `부산 동래구 온천동 ${clinic.nameKo}(온천장역 도보 3분). 자연치아를 닮은 생체모방치의학으로 중장년 심미보철·전체임플란트·접착수복을 정직하게 진료합니다.`,
     path: '/',
-    jsonLd: [organizationSchema(), websiteSchema(), faqSchema(homeFaqs)],
+    jsonLd: [
+      organizationSchema(),
+      websiteSchema(),
+      faqSchema(homeFaqs),
+      // B1 리치 스키마 확장: 원장(Person) + 예약 액션(ReserveAction) + 홈 브레드크럼
+      personSchema(doctors[0]),
+      reserveActionSchema(),
+      breadcrumbSchema([{ name: '홈', url: '/' }]),
+    ],
   }
 
   const lead = doctors[0]
