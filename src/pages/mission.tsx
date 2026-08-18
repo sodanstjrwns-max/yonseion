@@ -1,5 +1,5 @@
 import { html, raw } from 'hono/html'
-import { Layout, Breadcrumb } from '../components/layout'
+import { Layout, Breadcrumb, picture } from '../components/layout'
 import { clinic } from '../data/clinic'
 import { breadcrumbSchema, speakableSchema } from '../lib/schema'
 
@@ -94,13 +94,13 @@ export function MissionPage() {
       </div>
       <div class="grid grid-3" style="gap:1.2rem">
         <figure class="reveal" style="margin:0;aspect-ratio:4/3;border-radius:14px;overflow:hidden">
-          <img src="/static/img/consult-explain.jpg" alt="${clinic.business.owner} 대표원장이 치아 모형으로 치료를 설명하는 상담 장면" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+          ${raw(picture(`/static/img/consult-explain.jpg`, `alt="${clinic.business.owner} 대표원장이 치아 모형으로 치료를 설명하는 상담 장면" loading="lazy" style="width:100%;height:100%;object-fit:cover"`))}
         </figure>
         <figure class="reveal reveal-d1" style="margin:0;aspect-ratio:4/3;border-radius:14px;overflow:hidden">
-          <img src="/static/img/treatment-digital.jpg" alt="구강스캐너로 디지털 인상을 채득하며 진행하는 정밀 진료" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+          ${raw(picture(`/static/img/treatment-digital.jpg`, `alt="구강스캐너로 디지털 인상을 채득하며 진행하는 정밀 진료" loading="lazy" style="width:100%;height:100%;object-fit:cover"`))}
         </figure>
         <figure class="reveal reveal-d2" style="margin:0;aspect-ratio:4/3;border-radius:14px;overflow:hidden">
-          <img src="/static/img/treatment-scene.jpg" alt="확대경(루페)을 착용하고 정밀하게 진행하는 보철 진료" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+          ${raw(picture(`/static/img/treatment-scene.jpg`, `alt="확대경(루페)을 착용하고 정밀하게 진행하는 보철 진료" loading="lazy" style="width:100%;height:100%;object-fit:cover"`))}
         </figure>
       </div>
     </div>
@@ -116,16 +116,16 @@ export function MissionPage() {
       </div>
       <div class="grid" style="grid-template-columns:1.4fr 1fr;gap:1.2rem" id="practice-gallery">
         <figure class="img-reveal reveal" style="position:relative;border-radius:16px;overflow:hidden;aspect-ratio:3/2;margin:0">
-          <img src="/static/img/consult-explain.jpg" alt="${clinic.business.owner} 대표원장이 환자에게 치료 계획을 설명하는 상담 장면" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+          ${raw(picture(`/static/img/consult-explain.jpg`, `alt="${clinic.business.owner} 대표원장이 환자에게 치료 계획을 설명하는 상담 장면" loading="lazy" style="width:100%;height:100%;object-fit:cover"`))}
           <figcaption style="position:absolute;left:1.1rem;bottom:1rem;color:#fff;font-size:.85rem;font-weight:600;text-shadow:0 1px 8px rgba(0,0,0,.5)">충분한 상담 · 명확한 설명</figcaption>
         </figure>
         <div style="display:grid;grid-template-rows:1fr 1fr;gap:1.2rem">
           <figure class="img-reveal reveal reveal-d1" style="position:relative;border-radius:16px;overflow:hidden;margin:0">
-            <img src="/static/img/treatment-digital.jpg" alt="구강 스캐너와 3D 디지털 임프레션을 활용한 디지털 진료" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+            ${raw(picture(`/static/img/treatment-digital.jpg`, `alt="구강 스캐너와 3D 디지털 임프레션을 활용한 디지털 진료" loading="lazy" style="width:100%;height:100%;object-fit:cover"`))}
             <figcaption style="position:absolute;left:1.1rem;bottom:.9rem;color:#fff;font-size:.82rem;font-weight:600;text-shadow:0 1px 8px rgba(0,0,0,.5)">디지털 정밀 진단</figcaption>
           </figure>
           <figure class="img-reveal reveal reveal-d2" style="position:relative;border-radius:16px;overflow:hidden;margin:0">
-            <img src="/static/img/treatment-scene.jpg" alt="확대경(루페)을 착용하고 정밀하게 진행하는 진료 장면" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+            ${raw(picture(`/static/img/treatment-scene.jpg`, `alt="확대경(루페)을 착용하고 정밀하게 진행하는 진료 장면" loading="lazy" style="width:100%;height:100%;object-fit:cover"`))}
             <figcaption style="position:absolute;left:1.1rem;bottom:.9rem;color:#fff;font-size:.82rem;font-weight:600;text-shadow:0 1px 8px rgba(0,0,0,.5)">루페 정밀 진료</figcaption>
           </figure>
         </div>

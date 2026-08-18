@@ -18,6 +18,17 @@ export interface SeoMeta {
 // 기본 키워드(주로 네이버 대응) — 페이지에서 meta.keywords로 덮어쓸 수 있음
 const DEFAULT_KEYWORDS = '부산치과, 동래구치과, 온천동치과, 온천장역치과, 연세온치과, 임플란트, 심미보철, 생체모방치의학, 부산임플란트, 동래임플란트'
 
+// WebP 전송 헬퍼 — 원본 <img> 옆에 동일 이름 .webp 소스를 우선 제공(F2/F3 개선).
+// Cloudflare Pages는 정적파일을 Worker보다 먼저 서빙하므로 미들웨어 협상이 불가 → <picture>로 처리.
+// src에 붙은 쿼리(?v=...)는 그대로 두고 확장자만 .webp로 치환.
+export function picture(src: string, attrs = ''): string {
+  // /static/img/foo.jpg?v=1 → /static/img/foo.webp?v=1
+  const webp = src.replace(/\.(jpe?g|png)(\?[^"']*)?$/i, '.webp$2')
+  // 이미 webp이거나 확장자 매칭 실패 시엔 그냥 img만
+  if (webp === src) return `<img src="${src}" ${attrs}>`
+  return `<picture><source srcset="${webp}" type="image/webp"><img src="${src}" ${attrs}></picture>`
+}
+
 // 미니멀 로고 마크 — 단색 잉크 라인. 'ㅇ'(연세온의 ON) 모티프를 절제된 원으로
 export function logoMark() {
   // 네이비 링 + 골드 코어 — "켜다(On)" 스위치 모티프. 로드 시 스트로크 드로잉.

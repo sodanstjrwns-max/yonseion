@@ -1,5 +1,5 @@
 import { html, raw } from 'hono/html'
-import { Layout, kinetic } from '../components/layout'
+import { Layout, kinetic, picture } from '../components/layout'
 import { clinic } from '../data/clinic'
 import { coreTreatments } from '../data/treatments'
 import { doctors } from '../data/doctors'
@@ -135,7 +135,7 @@ export function HomePage() {
           <cite class="quote-cite"><span class="cite-line"></span><span class="cite-txt">${clinic.nameKo} · 생체모방치의학</span></cite>
         </div>
         <figure class="quote-smile img-reveal" data-reveal data-reveal-delay="2">
-          <img src="/static/img/hero-smile.jpg" alt="자연스러운 형태로 되살린 건강한 미소 — ${clinic.nameKo} 생체모방치의학" loading="lazy">
+          ${raw(picture(`/static/img/hero-smile.jpg`, `alt="자연스러운 형태로 되살린 건강한 미소 — ${clinic.nameKo} 생체모방치의학" loading="lazy"`))}
         </figure>
       </div>
     </div>
@@ -211,7 +211,7 @@ export function HomePage() {
         ${raw(coreTreatments.map((t, i) =>
           '<a class="core-feature reveal reveal-d' + ((i % 3) + 1) + '" href="/treatments/' + t.slug + '">' +
             '<span class="cf-media">' +
-              '<img src="/static/img/tx-' + t.slug + '.jpg?v=20260621b" alt="' + t.name + '" loading="lazy" decoding="async" width="1200" height="900">' +
+              picture('/static/img/tx-' + t.slug + '.jpg?v=20260621b', 'alt="' + t.name + '" loading="lazy" decoding="async" width="1200" height="900"') +
               '<span class="cf-num">0' + (i + 1) + '</span>' +
             '</span>' +
             '<span class="cf-body">' +
@@ -240,37 +240,37 @@ export function HomePage() {
 
       <div class="mag-grid">
         <figure class="mag-cell mag-hero img-reveal" data-reveal>
-          <img src="/static/img/photos/clinic_15.jpg" alt="${clinic.nameKo} 리셉션 — 로고 사인이 새겨진 메인 데스크" loading="lazy" decoding="async">
+          ${raw(picture(`/static/img/photos/clinic_15.jpg`, `alt="${clinic.nameKo} 리셉션 — 로고 사인이 새겨진 메인 데스크" loading="lazy" decoding="async"`))}
           <figcaption><span class="cap-no">01</span> 리셉션 · 첫인상을 결정하는 공간</figcaption>
         </figure>
 
         <figure class="mag-cell mag-tall img-reveal" data-reveal data-reveal-delay="1">
-          <img src="/static/img/photos/clinic_22.jpg" alt="${clinic.nameKo} 진료실 — 로고가 새겨진 진료 의자와 밝은 채광" loading="lazy" decoding="async">
+          ${raw(picture(`/static/img/photos/clinic_22.jpg`, `alt="${clinic.nameKo} 진료실 — 로고가 새겨진 진료 의자와 밝은 채광" loading="lazy" decoding="async"`))}
           <figcaption><span class="cap-no">02</span> 진료실 · 채광이 드는 1인 공간</figcaption>
         </figure>
 
         <figure class="mag-cell img-reveal" data-reveal data-reveal-delay="2">
-          <img src="/static/img/photos/clinic_16.jpg" alt="${clinic.nameKo} 대기 라운지 — 소파와 자연광" loading="lazy" decoding="async">
+          ${raw(picture(`/static/img/photos/clinic_16.jpg`, `alt="${clinic.nameKo} 대기 라운지 — 소파와 자연광" loading="lazy" decoding="async"`))}
           <figcaption><span class="cap-no">03</span> 대기 라운지</figcaption>
         </figure>
 
         <figure class="mag-cell img-reveal" data-reveal data-reveal-delay="3">
-          <img src="/static/img/photos/clinic_03.jpg" alt="${clinic.nameKo} 개별 진료실 — 그린톤 인테리어와 디지털 장비" loading="lazy" decoding="async">
+          ${raw(picture(`/static/img/photos/clinic_03.jpg`, `alt="${clinic.nameKo} 개별 진료실 — 그린톤 인테리어와 디지털 장비" loading="lazy" decoding="async"`))}
           <figcaption><span class="cap-no">04</span> 개별 진료실</figcaption>
         </figure>
 
         <figure class="mag-cell mag-wide img-reveal" data-reveal data-reveal-delay="1">
-          <img src="/static/img/photos/clinic_19.jpg" alt="${clinic.nameKo} 브랜드 월 — 치아를 소중히 여기는 마음, 언제나 켜져 있습니다" loading="lazy" decoding="async">
+          ${raw(picture(`/static/img/photos/clinic_19.jpg`, `alt="${clinic.nameKo} 브랜드 월 — 치아를 소중히 여기는 마음, 언제나 켜져 있습니다" loading="lazy" decoding="async"`))}
           <figcaption><span class="cap-no">05</span> “치아를 소중히 여기는 마음, 언제나 켜져 있습니다”</figcaption>
         </figure>
 
         <figure class="mag-cell img-reveal" data-reveal data-reveal-delay="2">
-          <img src="/static/img/photos/clinic_21.jpg" alt="${clinic.nameKo} 오픈 진료 공간 — 다수의 진료 유닛" loading="lazy" decoding="async">
+          ${raw(picture(`/static/img/photos/clinic_21.jpg`, `alt="${clinic.nameKo} 오픈 진료 공간 — 다수의 진료 유닛" loading="lazy" decoding="async"`))}
           <figcaption><span class="cap-no">06</span> 오픈 진료 공간</figcaption>
         </figure>
 
         <figure class="mag-cell img-reveal" data-reveal data-reveal-delay="3">
-          <img src="/static/img/photos/clinic_27.jpg" alt="${clinic.nameKo} 디지털 영상 진단실 — 3D CT 장비" loading="lazy" decoding="async">
+          ${raw(picture(`/static/img/photos/clinic_27.jpg`, `alt="${clinic.nameKo} 디지털 영상 진단실 — 3D CT 장비" loading="lazy" decoding="async"`))}
           <figcaption><span class="cap-no">07</span> 디지털 영상 진단실 (3D CT)</figcaption>
         </figure>
       </div>
@@ -349,7 +349,7 @@ export function HomePage() {
       <div class="split">
         <figure class="figure img-reveal tooth-photo" data-reveal>
           <span class="figure-float">Biomimetic Approach</span>
-          <img src="/static/img/biomimetic-tooth-v2.jpg" alt="연세온치과 실제 진료 케이스 — 자연 색조와 절단연 투명감을 살린 앞니 심미 보철 결과" loading="lazy" decoding="async">
+          ${raw(picture(`/static/img/biomimetic-tooth-v2.jpg`, `alt="연세온치과 실제 진료 케이스 — 자연 색조와 절단연 투명감을 살린 앞니 심미 보철 결과" loading="lazy" decoding="async"`))}
           <figcaption>실제 진료 케이스 — 옆 치아와 자연스럽게 어우러지는 색조·형태 재현</figcaption>
         </figure>
         <div class="split-text" data-reveal data-reveal-delay="2">

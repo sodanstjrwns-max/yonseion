@@ -1,5 +1,5 @@
 import { html, raw } from 'hono/html'
-import { Layout, Breadcrumb } from '../components/layout'
+import { Layout, Breadcrumb, picture } from '../components/layout'
 import { clinic } from '../data/clinic'
 import { breadcrumbSchema, faqSchema, speakableSchema } from '../lib/schema'
 
@@ -29,7 +29,7 @@ export function BiomimeticPage() {
       <p class="reveal">치아는 한 번 깎으면 다시 자라지 않습니다. 그래서 연세온치과는 "어떻게 하면 최소한으로 삭제하고, 최대한 보존하며, 가장 오래 유지되는 결과를 만들 수 있을까"를 진료의 중심에 둡니다. 주변 치과에서 잘 시행하지 않는 러버댐 방습 하의 레진 빌드업, 온레이·오버레이를 원칙대로 시행하는 이유입니다.</p>
 
       <figure class="img-reveal reveal" style="margin:2.4rem 0 0;border-radius:16px;overflow:hidden;background:#0d0d0d;box-shadow:0 16px 44px rgba(0,0,0,.22)">
-        <img src="/static/img/biomimetic-restoration.jpg" alt="자연치아의 형태·색조·투명도를 모방해 제작한 생체모방 보철 — 연세온치과" loading="lazy" decoding="async" style="display:block;width:100%;height:auto">
+        ${raw(picture(`/static/img/biomimetic-restoration.jpg`, `alt="자연치아의 형태·색조·투명도를 모방해 제작한 생체모방 보철 — 연세온치과" loading="lazy" decoding="async" style="display:block;width:100%;height:auto"`))}
         <figcaption style="padding:.95rem 1.3rem;font-size:.86rem;color:rgba(255,255,255,.78);background:#141414;line-height:1.6;word-break:keep-all">자연치아의 형태·색조·투명도까지 닮은 생체모방 보철. 단순히 '하얗게'가 아니라, 빛이 통과하는 결까지 자연치를 모방하는 것이 핵심입니다.</figcaption>
       </figure>
     </div>
@@ -38,7 +38,7 @@ export function BiomimeticPage() {
   <!-- 풀블리드 진료 사진 -->
   <section class="section--tight">
     <figure class="full-bleed img-reveal reveal" style="margin:0;position:relative;aspect-ratio:21/9;overflow:hidden">
-      <img src="/static/img/treatment-digital.jpg" alt="구강스캐너와 3D 디지털 인상으로 진행하는 ${clinic.nameShort}의 정밀 접착 진료" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:center 40%">
+      ${raw(picture(`/static/img/treatment-digital.jpg`, `alt="구강스캐너와 3D 디지털 인상으로 진행하는 ${clinic.nameShort}의 정밀 접착 진료" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:center 40%"`))}
       <span class="figure-float">원칙을 지키는 디지털 정밀 진료</span>
     </figure>
   </section>
@@ -77,7 +77,7 @@ export function BiomimeticPage() {
           { src: 'case-biomimetic-03', alt: '연세온치과 실제 진료 케이스 — 잇몸과 조화롭게 어우러지는 상악 앞니 심미 보철 결과', cap: '앞니 심미 보철 — 잇몸과 조화로운 형태·색조' },
         ].map((c, i) => `
           <figure class="case-card img-reveal reveal reveal-d${i}">
-            <img src="/static/img/${c.src}.jpg" alt="${c.alt}" loading="lazy" decoding="async">
+            ${picture('/static/img/' + c.src + '.jpg', 'alt="' + c.alt + '" loading="lazy" decoding="async"')}
             <figcaption>${c.cap}</figcaption>
           </figure>`).join(''))}
       </div>

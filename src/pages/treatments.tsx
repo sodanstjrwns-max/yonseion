@@ -1,5 +1,5 @@
 import { html, raw } from 'hono/html'
-import { Layout, Breadcrumb } from '../components/layout'
+import { Layout, Breadcrumb, picture } from '../components/layout'
 import { FaqAccordion } from '../components/faq'
 import { clinic } from '../data/clinic'
 import { treatments, getTreatment, coreTreatments, treatmentGroups, treatmentsByGroup, type Treatment } from '../data/treatments'
@@ -28,7 +28,7 @@ export function TreatmentsIndex() {
       <div class="grid grid-3">
         ${raw(coreTreatments.map((t, i) => `
           <a href="/treatments/${t.slug}" class="core-card reveal reveal-d${i + 1}">
-            <img src="/static/img/tx-${t.slug}.jpg?v=20260621b" alt="${t.name}" loading="lazy" onerror="this.style.display='none'">
+            ${picture('/static/img/tx-' + t.slug + '.jpg?v=20260621b', 'alt="' + t.name + '" loading="lazy" onerror="this.style.display=&#39;none&#39;"')}
             <span class="tag">0${i + 1} · ${t.group}</span>
             <h3>${t.name}</h3><p>${t.short}</p>
             <span class="arrow">자세히 보기 <i class="fas fa-arrow-right"></i></span>
@@ -155,7 +155,7 @@ export function TreatmentDetail(slug: string) {
             <div class="tx-case-grid">
               ${t.caseImages.map((c) => `
                 <figure class="tx-case-card">
-                  <img src="${c.src}" alt="${c.alt}" loading="lazy">
+                  ${picture(c.src, 'alt="' + c.alt + '" loading="lazy"')}
                   <figcaption>${c.caption}</figcaption>
                 </figure>`).join('')}
             </div>
