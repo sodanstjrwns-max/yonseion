@@ -244,6 +244,7 @@ app.get('/naver3bc6810af11b42a00b0184d0bfc74731.html', (c) =>
 )
 
 // --- robots.txt (검색봇 + AI 크롤러 정책) ---
+app.get('/9ace7ad105e2443faa6cb4487c8ab0c0.txt', (c) => c.text('9ace7ad105e2443faa6cb4487c8ab0c0'))
 app.get('/robots.txt', (c) => {
   const base = clinic.domain
   return c.text(`# ${clinic.nameKo} (${clinic.nameEn})
