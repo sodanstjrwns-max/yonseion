@@ -271,6 +271,8 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
   <meta name="apple-mobile-web-app-title" content="${clinic.nameKo}">
 
   ${raw(jsonLdArr.map((j) => `<script type="application/ld+json">${JSON.stringify(j)}</script>`).join('\n'))}
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0RW6336MTG"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-0RW6336MTG',{anonymize_ip:true});</script>
 </head>
 <body>
   <div class="scroll-progress" aria-hidden="true"><i></i></div>
