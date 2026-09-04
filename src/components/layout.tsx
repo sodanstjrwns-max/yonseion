@@ -218,6 +218,7 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
   <meta name="description" content="${meta.description}">
   <meta name="keywords" content="${meta.keywords || DEFAULT_KEYWORDS}">
   <link rel="canonical" href="${canonical}">
+  <link rel="alternate" type="application/rss+xml" title="${clinic.nameKo} 칼럼·공지 RSS" href="${clinic.domain}/rss.xml">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <meta name="theme-color" content="${clinic.brand.paper}">
 

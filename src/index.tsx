@@ -245,6 +245,67 @@ app.get('/naver3bc6810af11b42a00b0184d0bfc74731.html', (c) =>
 
 // --- robots.txt (검색봇 + AI 크롤러 정책) ---
 app.get('/9ace7ad105e2443faa6cb4487c8ab0c0.txt', (c) => c.text('9ace7ad105e2443faa6cb4487c8ab0c0'))
+// ============================================================================
+// RSS 2.0 피드 — 칼럼·공지 최신순 (검색엔진·RSS 리더·AEO 봇 구독용)
+// ============================================================================
+app.on('GET', ['/rss.xml', '/feed.xml'], async (c) => {
+  const base = clinic.domain
+  const esc = (v: string) => (v || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;')
+  const strip = (v: string) => (v || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200)
+  const toUTC = (d: string) => { const t = new Date(d); return isNaN(t.getTime()) ? new Date().toUTCString() : t.toUTCString() }
+
+  type FeedItem = { title: string; link: string; date: string; desc: string }
+  const items: FeedItem[] = []
+  try {
+    const store = new Store(c.env.R2)
+    const colIdx = await store.index<{ id: string }>('columns')
+    for (const it of colIdx.slice(0, 30)) {
+      const col = await store.getJSON<Column>(`columns/${it.id}.json`)
+      if (col && col.published) items.push({
+        title: col.title,
+        link: `${base}/column/${col.slug || col.id}`,
+        date: col.createdAt,
+        desc: col.excerpt || strip(col.contentHtml),
+      })
+    }
+    const ntIdx = await store.index<{ id: string }>('notices')
+    for (const it of ntIdx.slice(0, 10)) {
+      const n = await store.getJSON<Notice>(`notices/${it.id}.json`)
+      if (n && n.published) items.push({
+        title: `[공지] ${n.title}`,
+        link: `${base}/notice/${n.id}`,
+        date: n.createdAt,
+        desc: strip(n.contentHtml),
+      })
+    }
+  } catch { /* R2 조회 실패 시에도 채널 메타는 정상 응답 */ }
+  items.sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>${esc(clinic.nameKo + ' — 칼럼·공지')}</title>
+  <link>${base}</link>
+  <description>${esc('부산 동래구 온천동 ' + clinic.nameKo + ' 공식 피드. 원장 칼럼과 병원 공지, 생체모방치의학·심미보철·임플란트 진료 정보.')}</description>
+  <language>ko-KR</language>
+  <copyright>© ${esc(clinic.nameKo)}</copyright>
+  <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
+  <atom:link href="${base}/rss.xml" rel="self" type="application/rss+xml" />
+  <image><url>${base}/static/img/og-default.jpg</url><title>${esc(clinic.nameKo)}</title><link>${base}</link></image>
+${items.map((it) => `  <item>
+    <title>${esc(it.title)}</title>
+    <link>${it.link}</link>
+    <guid isPermaLink="true">${it.link}</guid>
+    <pubDate>${toUTC(it.date)}</pubDate>
+    <description>${esc(it.desc)}</description>
+  </item>`).join('\n')}
+</channel>
+</rss>`
+  c.header('Content-Type', 'application/rss+xml; charset=utf-8')
+  c.header('Cache-Control', 'public, max-age=1800')
+  return c.body(xml)
+})
+
 app.get('/robots.txt', (c) => {
   const base = clinic.domain
   return c.text(`# ${clinic.nameKo} (${clinic.nameEn})

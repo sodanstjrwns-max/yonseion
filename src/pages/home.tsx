@@ -1,7 +1,10 @@
 import { html, raw } from 'hono/html'
 import { Layout, kinetic, picture } from '../components/layout'
 import { clinic } from '../data/clinic'
-import { coreTreatments } from '../data/treatments'
+import { coreTreatments, treatments } from '../data/treatments'
+import { faqGroups } from '../data/faqs'
+import { seoRegions, seoTreatments } from '../data/facilities'
+import { encyclopedia } from '../data/encyclopedia'
 import { doctors } from '../data/doctors'
 import { organizationSchema, websiteSchema, faqSchema, breadcrumbSchema, personSchema, reserveActionSchema } from '../lib/schema'
 
@@ -14,6 +17,16 @@ function phBlock(label: string, ratio = '4/5'): string {
 function splitChars(text: string): string {
   return Array.from(text).map((ch) => `<span class="kc">${ch}</span>`).join('')
 }
+// FAQ 아코디언 아이템 (홈 FAQ + 진료별 FAQ 발췌 공용)
+function faqItemHtml(f: { q: string; a: string }): string {
+  return '<div class="faq-item"><button class="faq-q" type="button"><span>' + f.q + '</span><i class="fas fa-plus"></i></button><div class="faq-a"><div class="faq-a-inner"><p>' + f.a + '</p></div></div></div>'
+}
+// 콘텐츠 허브에서 노출할 백과사전 대표 용어 (실존 슬러그만)
+const encHubSlugs = [
+  'biomimetic-dentistry', 'laminate', 'zirconia-crown', 'veneer', 'dental-implant', 'all-on-x',
+  'navigation-implant', 'composite-resin', 'root-canal', 'scaling', 'periodontitis', 'wisdom-tooth',
+  'tmj-disorder', 'bruxism', 'teeth-whitening', 'tooth-sensitivity', 'halitosis', 'dental-checkup',
+]
 
 export function HomePage() {
   const homeFaqs = [
@@ -25,6 +38,12 @@ export function HomePage() {
     { q: '예약은 어떻게 하나요?', a: `홈페이지의 예약 신청 또는 전화(${clinic.phone})로 상담 예약이 가능합니다.` },
   ]
 
+  // 진료별 FAQ 발췌 — 기존 faqGroups 데이터를 홈에 노출 (FAQPage 스키마와 일치)
+  const homeFaqPicks = Object.entries(faqGroups).map(([key, g]) => ({
+    key, label: g.label, faqs: g.faqs.slice(0, 3),
+  }))
+  const allHomeFaqs = [...homeFaqs, ...homeFaqPicks.flatMap((g) => g.faqs)]
+
   const meta = {
     title: `${clinic.nameKo} | 부산 동래구 온천동 치과 (온천장역)`,
     description: `부산 동래구 온천동 ${clinic.nameKo}(온천장역 도보 3분). 자연치아를 닮은 생체모방치의학으로 중장년 심미보철·전체임플란트·접착수복을 정직하게 진료합니다.`,
@@ -32,7 +51,7 @@ export function HomePage() {
     jsonLd: [
       organizationSchema(),
       websiteSchema(),
-      faqSchema(homeFaqs),
+      faqSchema(allHomeFaqs),
       // B1 리치 스키마 확장: 원장(Person) + 예약 액션(ReserveAction) + 홈 브레드크럼
       personSchema(doctors[0]),
       reserveActionSchema(),
@@ -228,6 +247,64 @@ export function HomePage() {
       </div>
     </div>
   </section>
+
+  <!-- ===== 진료과목별 안내 : 전 진료 상세 (기존 진료 데이터 재활용) ===== -->
+  <section class="section txall-section bg-paper-2" aria-label="진료과목별 안내">
+    <div class="container">
+      <div class="sec-head" data-reveal>
+        <div class="sec-index-row">
+          <span class="sec-index">·</span>
+          <span class="eyebrow">All Treatments</span>
+        </div>
+        <h2 class="sec-title">진료과목별 안내</h2>
+        <p class="sec-lead">연세온치과가 진료하는 과목을 한눈에 정리했습니다.<br>각 진료의 접근 방식과 과정, 자주 묻는 질문은 상세 페이지에서 확인하실 수 있습니다.</p>
+      </div>
+      <div class="txall-grid">
+        ${raw(treatments.map((t, i) => {
+          const encTags = (t.encyclopediaRefs || []).slice(0, 3).map((slug) => {
+            const e = encyclopedia.find((x) => x.slug === slug)
+            return e ? '<a href="/encyclopedia/' + e.slug + '">' + e.term + '</a>' : ''
+          }).join('')
+          const symptoms = (t.symptoms || []).slice(0, 3).map((sym) => '<li>' + sym + '</li>').join('')
+          return '<article class="txall-card reveal reveal-d' + ((i % 2) + 1) + '">' +
+            '<div class="txall-top"><span class="txall-group">' + t.group + '</span>' +
+            (t.category === 'core' ? '<span class="txall-badge">중점 진료</span>' : '') + '</div>' +
+            '<h3 class="txall-title"><a href="/treatments/' + t.slug + '">' + t.name + '</a></h3>' +
+            '<p class="txall-short">' + t.short + '</p>' +
+            '<p class="txall-desc">' + t.hero + '</p>' +
+            (symptoms ? '<ul class="txall-symptoms">' + symptoms + '</ul>' : '') +
+            (encTags ? '<div class="txall-tags"><span class="txall-tags-label">관련 용어</span>' + encTags + '</div>' : '') +
+            '<div class="txall-links">' +
+              '<a class="link-arrow" href="/treatments/' + t.slug + '">자세히 보기 <i class="fas fa-arrow-right"></i></a>' +
+              '<a class="txall-faq" href="/faq#faq-' + t.faqRef + '">' + t.name + ' FAQ</a>' +
+            '</div>' +
+          '</article>'
+        }).join(''))}
+      </div>
+    </div>
+  </section>
+  <style>
+    .txall-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(1rem,2vw,1.6rem)}
+    .txall-card{border:1px solid var(--line);border-radius:8px;padding:clamp(1.4rem,2.4vw,2rem);background:var(--paper);display:flex;flex-direction:column;gap:.7rem}
+    .txall-top{display:flex;align-items:center;gap:.6rem}
+    .txall-group{font-size:.74rem;letter-spacing:.1em;color:var(--mist);text-transform:uppercase}
+    .txall-badge{font-size:.7rem;letter-spacing:.06em;color:var(--gold-2);border:1px solid var(--gold);border-radius:99px;padding:.12rem .55rem}
+    .txall-title{font-size:clamp(1.15rem,1.6vw,1.35rem);letter-spacing:-.01em}
+    .txall-title a{color:var(--ink);text-decoration:none}
+    .txall-title a:hover{color:var(--gold-2)}
+    .txall-short{font-size:.92rem;color:var(--gold-2);font-weight:600}
+    .txall-desc{font-size:.92rem;line-height:1.8;color:var(--ink-2)}
+    .txall-symptoms{margin:.2rem 0 0;padding-left:1.1rem;display:flex;flex-direction:column;gap:.25rem}
+    .txall-symptoms li{font-size:.86rem;line-height:1.6;color:var(--mist)}
+    .txall-tags{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;margin-top:.2rem}
+    .txall-tags-label{font-size:.74rem;color:var(--mist-2);margin-right:.2rem}
+    .txall-tags a{font-size:.78rem;color:var(--mist);border:1px solid var(--line);border-radius:99px;padding:.18rem .6rem;text-decoration:none}
+    .txall-tags a:hover{color:var(--gold-2);border-color:var(--gold)}
+    .txall-links{display:flex;align-items:center;gap:1.2rem;margin-top:auto;padding-top:.6rem}
+    .txall-faq{font-size:.84rem;color:var(--mist);text-decoration:underline;text-underline-offset:3px}
+    .txall-faq:hover{color:var(--gold-2)}
+    @media (max-width:760px){.txall-grid{grid-template-columns:1fr}}
+  </style>
 
   <!-- ===== 진료 공간 : 매거진 화보 그리드 ===== -->
   <section class="section space-section" id="space-gallery">
@@ -425,6 +502,41 @@ export function HomePage() {
     </div>
   </section>
 
+  <!-- ===== 지역 안내 : 부산 전역·인근 도시 내원 안내 (로컬 SEO) ===== -->
+  <section class="section region-section bg-paper-2" aria-label="지역별 내원 안내">
+    <div class="container">
+      <div class="sec-head" data-reveal>
+        <div class="sec-index-row">
+          <span class="sec-index">·</span>
+          <span class="eyebrow">Local Guide</span>
+        </div>
+        <h2 class="sec-title">동래 온천장에서,<br>부산 전역과 인근 도시까지.</h2>
+      </div>
+      <div class="region-text" data-reveal>
+        <p>${clinic.nameKo}은 ${clinic.address}에 있습니다. ${clinic.directions}이며, 도시철도 1호선 노선 위에 있어 부산 도심 어디서든 환승 부담이 적은 위치입니다. 건물 주차가 가능해 차량 내원도 편리합니다.</p>
+        <p>병원이 자리한 동래구 온천동을 비롯해 명륜동·사직동·복산동·안락동·명장동 등 동래구 전역, 부산대학교가 있는 금정구(장전동·구서동), 연제구 연산동, 서면이 있는 부산진구에서는 지하철이나 버스로 대략 5~15분 안팎이면 도착합니다. 해운대구·수영구·남구·북구·동구 등에서도 1호선 환승 또는 차량으로 내원하고 계십니다.</p>
+        <p>온천장은 경남·울산 방면 접근성도 좋은 편입니다. 양산(차량 약 25~30분), 김해(약 30~40분), 울산(약 40~50분)에서도 상담과 정기 진료를 위해 방문하십니다. 지역별 교통편과 진료 안내는 아래에서 자세히 확인하실 수 있습니다.</p>
+      </div>
+      <div class="region-chips" data-reveal>
+        ${raw(seoRegions.map((r, i) => {
+          const t = seoTreatments[i % seoTreatments.length]
+          return '<a class="region-chip" href="/area/' + r.slug + '-' + t.slug + '">' + r.name + ' ' + t.name + '</a>'
+        }).join(''))}
+      </div>
+      <div class="mt-3" data-reveal>
+        <a href="/area" class="link-arrow">지역별 안내 전체 보기 <i class="fas fa-arrow-right"></i></a>
+        <a href="/directions" class="link-arrow" style="margin-left:1.4rem">오시는 길 <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </div>
+  </section>
+  <style>
+    .region-text{max-width:52rem}
+    .region-text p{font-size:.95rem;line-height:1.9;color:var(--ink-2);margin-bottom:1rem}
+    .region-chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.4rem}
+    .region-chip{font-size:.82rem;color:var(--mist);border:1px solid var(--line);border-radius:99px;padding:.32rem .85rem;text-decoration:none;background:var(--paper)}
+    .region-chip:hover{color:var(--gold-2);border-color:var(--gold)}
+  </style>
+
   <!-- ===== 자주 묻는 질문 (AEO — FAQPage 스키마와 일치) ===== -->
   <section class="section" id="home-faq" aria-label="자주 묻는 질문">
     <div class="container">
@@ -433,13 +545,90 @@ export function HomePage() {
         <h2 class="sec-title">자주 묻는 질문</h2>
       </div>
       <div class="faq-list" style="max-width:780px;margin:2rem auto 0">
-        ${raw(homeFaqs.map((f) => '<div class="faq-item"><button class="faq-q" type="button"><span>' + f.q + '</span><i class="fas fa-plus"></i></button><div class="faq-a"><div class="faq-a-inner"><p>' + f.a + '</p></div></div></div>').join(''))}
+        ${raw(homeFaqs.map(faqItemHtml).join(''))}
       </div>
-      <p style="text-align:center;margin-top:1.6rem" data-reveal>
+      <div class="hfg-wrap" style="max-width:780px;margin:2.4rem auto 0">
+        ${raw(homeFaqPicks.map((g) =>
+          '<div class="hfg" data-reveal>' +
+            '<p class="hfg-label"><span class="eyebrow">' + g.label + '</span></p>' +
+            '<div class="faq-list">' + g.faqs.map(faqItemHtml).join('') + '</div>' +
+            '<p class="hfg-more"><a class="link-arrow" href="/faq#faq-' + g.key + '">' + g.label + ' FAQ 전체 보기 <i class="fas fa-arrow-right"></i></a></p>' +
+          '</div>'
+        ).join(''))}
+      </div>
+      <style>
+        .hfg{margin-top:2.4rem}
+        .hfg-label{margin-bottom:.3rem}
+        .hfg-more{margin-top:.9rem;font-size:.9rem}
+      </style>
+      <p style="text-align:center;margin-top:2.2rem" data-reveal>
         <a href="/faq" class="link-arrow">진료별 전체 FAQ 보기 <i class="fas fa-arrow-right"></i></a>
       </p>
     </div>
   </section>
+
+  <!-- ===== 콘텐츠 허브 : 사이트 콘텐츠 링크 그리드 ===== -->
+  <section class="section hub-section" aria-label="콘텐츠 둘러보기">
+    <div class="container">
+      <div class="sec-head" data-reveal>
+        <div class="sec-index-row">
+          <span class="sec-index">·</span>
+          <span class="eyebrow">Explore</span>
+        </div>
+        <h2 class="sec-title">더 깊이 알아보기</h2>
+        <p class="sec-lead">진료 정보부터 치과 상식까지 — 연세온치과가 직접 정리한 콘텐츠입니다.</p>
+      </div>
+      <div class="hub-grid">
+        ${raw([
+          { href: '/encyclopedia', ic: 'fa-book-open', t: '치과 백과사전', d: '생체모방치의학부터 임플란트·심미보철·잇몸 질환까지, 치과 용어와 치료 개념을 질문-답변형으로 정리한 ' + encyclopedia.length + '개 항목의 일반 치의학 정보입니다.' },
+          { href: '/column', ic: 'fa-pen-nib', t: '원장 칼럼', d: '대표원장이 직접 쓰는 진료 이야기와 구강 건강 정보를 연재합니다.' },
+          { href: '/cases/gallery', ic: 'fa-images', t: '치료 사례', d: '진료과목·지역별로 정리한 치료 사례 기록입니다.' },
+          { href: '/video', ic: 'fa-video', t: '진료 영상', d: '병원과 진료를 소개하는 공식 유튜브 영상 모음입니다.' },
+          { href: '/faq', ic: 'fa-circle-question', t: '자주 묻는 질문', d: '심미보철·임플란트·접착수복·턱관절 등 진료별 질문 ' + Object.values(faqGroups).reduce((n, g) => n + g.faqs.length, 0) + '개를 모았습니다.' },
+          { href: '/pricing', ic: 'fa-won-sign', t: '비급여 진료비 안내', d: '의료법에 따라 고지하는 비급여 항목별 진료 비용 안내입니다.' },
+          { href: '/doctors', ic: 'fa-user-doctor', t: '의료진 소개', d: '치과보철과·통합치의학과 전문의 대표원장의 진료 철학을 소개합니다.' },
+          { href: '/mission', ic: 'fa-heart', t: '병원 이야기', d: '연세온이라는 이름에 담긴 세 가지 "온"의 의미를 전합니다.' },
+          { href: '/biomimetic', ic: 'fa-tooth', t: '생체모방치의학', d: '자연치아를 닮게, 최대한 보존하며 치료하는 접근을 설명합니다.' },
+          { href: '/notice', ic: 'fa-bullhorn', t: '공지사항', d: '진료 일정과 병원 소식을 안내합니다.' },
+          { href: '/directions', ic: 'fa-map-location-dot', t: '오시는 길', d: '온천장역 도보 3분 — 주차·교통편 상세 안내입니다.' },
+          { href: '/reservation', ic: 'fa-calendar-check', t: '예약 상담', d: '온라인으로 편하게 상담을 신청하실 수 있습니다.' },
+        ].map((h, i) =>
+          '<a class="hub-card reveal reveal-d' + ((i % 3) + 1) + '" href="' + h.href + '">' +
+            '<span class="hub-ic"><i class="fas ' + h.ic + '"></i></span>' +
+            '<span class="hub-t">' + h.t + '</span>' +
+            '<span class="hub-d">' + h.d + '</span>' +
+          '</a>'
+        ).join(''))}
+      </div>
+      <div class="hub-terms" data-reveal>
+        <p class="hub-terms-label">자주 찾는 백과사전 용어</p>
+        <div class="hub-terms-chips">
+          ${raw(encHubSlugs.map((slug) => {
+            const e = encyclopedia.find((x) => x.slug === slug)
+            return e ? '<a href="/encyclopedia/' + e.slug + '">' + e.term + '</a>' : ''
+          }).join(''))}
+        </div>
+      </div>
+    </div>
+  </section>
+  <style>
+    .hub-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(.8rem,1.6vw,1.2rem)}
+    .hub-card{display:flex;flex-direction:column;gap:.45rem;border:1px solid var(--line);border-radius:8px;
+      padding:clamp(1.2rem,2vw,1.6rem);background:var(--paper);text-decoration:none;
+      transition:border-color .25s ease,transform .25s ease}
+    .hub-card:hover{border-color:var(--gold);transform:translateY(-2px)}
+    .hub-ic{color:var(--gold-2);font-size:1.05rem}
+    .hub-t{font-weight:700;color:var(--ink);letter-spacing:-.01em}
+    .hub-d{font-size:.85rem;line-height:1.65;color:var(--mist)}
+    .hub-terms{margin-top:clamp(2rem,3vw,2.8rem)}
+    .hub-terms-label{font-size:.78rem;letter-spacing:.1em;color:var(--mist-2);text-transform:uppercase;margin-bottom:.7rem}
+    .hub-terms-chips{display:flex;flex-wrap:wrap;gap:.45rem}
+    .hub-terms-chips a{font-size:.82rem;color:var(--mist);border:1px solid var(--line);border-radius:99px;
+      padding:.3rem .8rem;text-decoration:none;background:var(--paper)}
+    .hub-terms-chips a:hover{color:var(--gold-2);border-color:var(--gold)}
+    @media (max-width:860px){.hub-grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:520px){.hub-grid{grid-template-columns:1fr}}
+  </style>
 
   <!-- ===== CTA 밴드 ===== -->
   <section class="section cta-band">
