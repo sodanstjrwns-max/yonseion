@@ -4,6 +4,7 @@
 // ============================================================================
 
 export const STATS_KEY = '856260384d2e4d341ad8816e78c3cce648203e2e7fe9be65'
+export const MASTER_KEY = 'pfwe-b4f42f06'
 const STATS_ENDPOINT = 'https://pf-dashboard-2nt.pages.dev/api/stats/yonseion.kr'
 
 export interface StatsData {

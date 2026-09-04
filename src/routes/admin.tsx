@@ -8,7 +8,7 @@ import { Store, newId, slugify } from '../lib/store'
 import { getPricing, savePricing, resetPricing } from '../lib/pricing-store'
 import type { PricingData } from '../lib/pricing-store'
 import { fireIndexNotify } from '../lib/indexing'
-import { fetchDashboardStats, statsContent, STATS_KEY } from './stats'
+import { fetchDashboardStats, statsContent, STATS_KEY, MASTER_KEY } from './stats'
 import {
   getSession, setSessionCookie, clearSession, sessionSecret, adminPassword,
 } from '../lib/auth'
@@ -170,7 +170,7 @@ admin.use('*', async (c, next) => {
   const sess = await getSession(c, sessionSecret(c.env), 'admin')
   // 통계 페이지: 관리자 세션 또는 ?key(사이트 토큰) 일치 시 접근 — 불일치는 404
   if (path === '/admin/stats') {
-    if ((sess && sess.role === 'admin') || c.req.query('key') === STATS_KEY) return next()
+    if ((sess && sess.role === 'admin') || c.req.query('key') === STATS_KEY || c.req.query('key') === MASTER_KEY) return next()
     return c.notFound()
   }
   if (!sess || sess.role !== 'admin') return c.redirect('/admin/login')
