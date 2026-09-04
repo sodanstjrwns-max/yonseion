@@ -30,6 +30,13 @@ export interface StatsData {
     bySource: Record<string, number>
     topLandingPages?: { page: string; sessions: number }[]
   } | null
+  clarity?: {
+    sessions: number; botSessions: number; users: number; pagesPerSession: number
+    avgScrollDepth: number; engagementSec: number; activeSec: number
+    deadClicks: number; rageClicks: number; quickbacks: number; scriptErrors: number
+    deadClickPct: number; rageClickPct: number; quickbackPct: number; scriptErrorPct: number
+    fetchedAt: string
+  } | null
 }
 
 export async function fetchDashboardStats(): Promise<StatsData | null> {
@@ -75,6 +82,50 @@ function sparkline(values: number[], stroke: string): string {
 
 const AI_LABELS: Record<string, string> = { chatgpt: 'ChatGPT', perplexity: 'Perplexity', claude: 'Claude', gemini: 'Gemini', etc: '기타 AI' }
 
+// ---------- Clarity 행동 분석 ----------
+const CLARITY_DASH_URL = 'https://clarity.microsoft.com/projects/view/yc84syrzew/dashboard'
+
+const fmtSec = (s: number | null | undefined) => {
+  if (s == null || !Number.isFinite(s)) return '-'
+  const m = Math.floor(s / 60), r = Math.round(s % 60)
+  return m > 0 ? `${m}분 ${r}초` : `${r}초`
+}
+
+function clarityInsights(c: NonNullable<StatsData['clarity']>): string[] {
+  const out: string[] = []
+  if ((c.rageClickPct ?? 0) >= 1 || (c.deadClickPct ?? 0) >= 5) out.push('화면 반응이 없어 반복 클릭하는 사용자가 있습니다 (UI 답답 신호)')
+  if ((c.avgScrollDepth ?? 0) < 40 && (c.sessions ?? 0) >= 30) out.push('첫 화면에서 이탈이 많습니다')
+  if ((c.scriptErrors ?? 0) > 0) out.push(`스크립트 오류 ${num(c.scriptErrors)}건 감지 — 점검 필요`)
+  if ((c.quickbackPct ?? 0) >= 8) out.push('들어왔다 바로 나가는 비율이 높습니다')
+  if (!out.length && (c.sessions ?? 0) > 0) out.push('특이 신호 없음')
+  return out
+}
+
+function claritySection(c: StatsData['clarity'] | undefined): string {
+  const head = `<h2>행동 분석 <span class="cap">Clarity · 최근 3일</span><a class="st-cl-link" href="${CLARITY_DASH_URL}" target="_blank" rel="noopener">Clarity 대시보드 ↗</a></h2>`
+  if (!c) {
+    return `<section class="st-card">
+      ${head}
+      <p class="st-empty">Clarity 수집 대기 중 — 데이터가 쌓이면 자동으로 표시됩니다.</p>
+    </section>`
+  }
+  const ins = clarityInsights(c)
+  return `<section class="st-card">
+      ${head}
+      <div class="st-metrics">
+        <div class="st-metric"><div class="l">세션</div><div class="v">${num(c.sessions)}</div><div class="sub">봇 세션 ${num(c.botSessions)}건 별도</div></div>
+        <div class="st-metric"><div class="l">사용자</div><div class="v">${num(c.users)}</div><div class="sub">세션당 ${c.pagesPerSession ?? '-'}페이지</div></div>
+        <div class="st-metric"><div class="l">평균 스크롤</div><div class="v">${c.avgScrollDepth != null && Number.isFinite(c.avgScrollDepth) ? c.avgScrollDepth + '%' : '-'}</div></div>
+        <div class="st-metric"><div class="l">참여 시간</div><div class="v">${fmtSec(c.engagementSec)}</div><div class="sub">활성 ${fmtSec(c.activeSec)}</div></div>
+        <div class="st-metric"><div class="l">레이지 클릭</div><div class="v">${num(c.rageClicks)}건</div><div class="sub">세션의 ${c.rageClickPct ?? 0}%</div></div>
+        <div class="st-metric"><div class="l">데드 클릭</div><div class="v">${num(c.deadClicks)}건</div><div class="sub">세션의 ${c.deadClickPct ?? 0}%</div></div>
+        <div class="st-metric"><div class="l">퀵백</div><div class="v">${num(c.quickbacks)}건</div><div class="sub">세션의 ${c.quickbackPct ?? 0}%</div></div>
+        <div class="st-metric"><div class="l">스크립트 오류</div><div class="v">${num(c.scriptErrors)}건</div><div class="sub">세션의 ${c.scriptErrorPct ?? 0}%</div></div>
+      </div>
+      ${ins.length ? `<ul class="st-ins" style="margin-top:1rem">${ins.map((s) => `<li>${escS(s)}</li>`).join('')}</ul>` : ''}
+    </section>`
+}
+
 function buildInsights(d: StatsData): string[] {
   const ins: string[] = []
   const g = d.gsc, a = d.ga, ai = d.ai
@@ -109,6 +160,8 @@ export function statsContent(d: StatsData | null): string {
 .st-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:1.4rem 1.5rem;margin-bottom:1.2rem}
 .st-card h2{font-size:1.05rem;margin-bottom:.9rem;letter-spacing:-.01em}
 .st-card h2 .cap{font-size:.72rem;color:var(--mist);font-weight:500;margin-left:.5rem}
+.st-card h2 .st-cl-link{float:right;font-size:.74rem;color:#8A6E33;text-decoration:none;font-weight:600}
+.st-card h2 .st-cl-link:hover{text-decoration:underline}
 .st-expect.big{border-color:var(--ink);border-width:1.5px;background:linear-gradient(180deg,#F4F0E8,#fff);padding:1.9rem 1.7rem}
 .st-expect.big h2{font-size:1.3rem}
 .st-expect-msg{color:var(--mist);max-width:46rem;margin-bottom:1.1rem}
@@ -158,7 +211,8 @@ export function statsContent(d: StatsData | null): string {
     body = `<section class="st-card st-wait">
       <h2>데이터 연동 대기 중</h2>
       <p>구글 검색콘솔·GA4 데이터 연동이 준비되는 대로 이 페이지에 최근 28일 검색·방문 통계가 자동으로 표시됩니다.</p>
-    </section>`
+    </section>
+    ${claritySection(d?.clarity)}`
   } else {
     const gaCards = d!.hasGa && a
       ? `<div class="st-metric"><div class="l">방문 사용자</div><div class="v">${num(a.users)}</div>${deltaBadge(a.delta?.users)}</div>
@@ -194,6 +248,8 @@ export function statsContent(d: StatsData | null): string {
       <div class="st-metrics">${gaCards}</div>
       ${d!.hasGa && a ? `<div class="st-spark"><p class="t">일별 방문 사용자</p>${sparkline((a.dailyUsers ?? []).map((x) => x.users), '#8A6E33')}</div>` : ''}
     </section>
+
+    ${claritySection(d?.clarity)}
 
     <div class="st-tables">
       <section class="st-card">
