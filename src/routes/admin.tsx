@@ -8,6 +8,7 @@ import { Store, newId, slugify } from '../lib/store'
 import { getPricing, savePricing, resetPricing } from '../lib/pricing-store'
 import type { PricingData } from '../lib/pricing-store'
 import { fireIndexNotify } from '../lib/indexing'
+import { fetchDashboardStats, statsContent, STATS_KEY } from './stats'
 import {
   getSession, setSessionCookie, clearSession, sessionSecret, adminPassword,
 } from '../lib/auth'
@@ -36,6 +37,7 @@ function shell(title: string, body: string, active = '') {
     ['/admin/columns', '칼럼', 'pen-nib'],
     ['/admin/notices', '공지', 'bullhorn'],
     ['/admin/pricing', '진료비용(수가)', 'won-sign'],
+    ['/admin/stats', '검색·방문 통계', 'chart-line'],
   ]
   return html`<!DOCTYPE html>
 <html lang="ko">
@@ -166,6 +168,11 @@ admin.use('*', async (c, next) => {
   const path = new URL(c.req.url).pathname
   if (path === '/admin/login' || path === '/admin/logout') return next()
   const sess = await getSession(c, sessionSecret(c.env), 'admin')
+  // 통계 페이지: 관리자 세션 또는 ?key(사이트 토큰) 일치 시 접근 — 불일치는 404
+  if (path === '/admin/stats') {
+    if ((sess && sess.role === 'admin') || c.req.query('key') === STATS_KEY) return next()
+    return c.notFound()
+  }
   if (!sess || sess.role !== 'admin') return c.redirect('/admin/login')
   return next()
 })
@@ -203,6 +210,12 @@ admin.post('/login', async (c) => {
 admin.get('/logout', (c) => {
   clearSession(c, 'admin')
   return c.redirect('/admin/login')
+})
+
+// ---------- 검색·방문 통계 (중앙 대시보드 API — 서버사이드 호출) ----------
+admin.get('/stats', async (c) => {
+  const data = await fetchDashboardStats()
+  return c.html(shell('검색·방문 통계', statsContent(data), '/admin/stats'))
 })
 
 // ---------- 대시보드 ----------
