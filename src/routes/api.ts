@@ -6,8 +6,49 @@ import type { Bindings } from '../lib/bindings'
 import { Store, newId } from '../lib/store'
 import { isBot } from '../lib/auth'
 import type { Reservation, Notice } from '../data/types'
+import { STATS_KEY, MASTER_KEY } from './stats'
 
 export const api = new Hono<{ Bindings: Bindings }>()
+
+// --- 실예약 로컬 통계 (PF 중앙 대시보드 수집용) — 개인정보 없이 건수만 반환 ---
+api.get('/local-stats', async (c) => {
+  const key = c.req.query('key')
+  if (key !== STATS_KEY && key !== MASTER_KEY) return c.notFound()
+  if (!c.env.R2) return c.json({ supported: false })
+  try {
+    const now = Date.now()
+    const d28 = 28 * 24 * 60 * 60 * 1000
+    let cur = 0
+    let prev = 0
+    const store = new Store(c.env.R2)
+    const idx = await store.index<{ createdAt?: string }>('reservations')
+    if (idx.length > 0) {
+      for (const it of idx) {
+        const ts = it.createdAt ? Date.parse(it.createdAt) : NaN
+        if (!Number.isFinite(ts)) continue
+        if (ts >= now - d28) cur++
+        else if (ts >= now - 2 * d28) prev++
+      }
+    } else {
+      // 인덱스가 없으면 R2 객체 업로드 시각으로 집계
+      let cursor: string | undefined
+      do {
+        const res = await c.env.R2.list({ prefix: 'reservations/', cursor })
+        for (const obj of res.objects) {
+          if (obj.key.endsWith('_index.json')) continue
+          const ts = obj.uploaded ? obj.uploaded.getTime() : NaN
+          if (!Number.isFinite(ts)) continue
+          if (ts >= now - d28) cur++
+          else if (ts >= now - 2 * d28) prev++
+        }
+        cursor = res.truncated ? res.cursor : undefined
+      } while (cursor)
+    }
+    return c.json({ supported: true, tables: [{ name: 'reservations', cur, prev }], total: { cur, prev } })
+  } catch {
+    return c.json({ supported: false })
+  }
+})
 
 // --- 활성 팝업 공지 조회 (메인 히어로 팝업용) ---
 api.get('/popups', async (c) => {
