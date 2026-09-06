@@ -62,7 +62,11 @@ export function FaqPage() {
 // ---------- 비용 안내 ----------
 export async function PricingPage(r2: R2Bucket) {
   const crumb = [{ name: '홈', url: '/' }, { name: '비용 안내', url: '/pricing' }]
-  const { groups: priceGroups, notes: pricingNotes } = await getPricing(r2)
+  const { groups: priceGroupsRaw, notes: pricingNotes } = await getPricing(r2)
+  // 공개(published !== false) 항목만 노출하고, 남은 항목이 없는 분류는 숨김
+  const priceGroups = priceGroupsRaw
+    .map((g) => ({ ...g, items: g.items.filter((it) => it.published !== false) }))
+    .filter((g) => g.items.length)
   const body = html`
   <section class="page-hero">
     <div class="container">

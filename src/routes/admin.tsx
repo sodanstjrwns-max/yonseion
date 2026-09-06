@@ -1116,6 +1116,7 @@ admin.get('/pricing', async (c) => {
   </div>
   <p class="muted" style="margin:-.6rem 0 1.2rem">
     항목명·비용·비고를 직접 수정하고 <b>[전체 저장]</b>을 누르면 홈페이지 비용 안내 페이지에 즉시 반영됩니다.
+    각 항목의 <b>[공개]</b> 체크를 해제하면 해당 항목은 저장돼 있지만 홈페이지에는 노출되지 않습니다(비공개).
     ${isCustom ? `수가는 <b>관리자에서 수정된 값</b>으로 표시 중입니다.` : `현재는 <b>기본 수가표</b>를 표시 중입니다.`}
   </p>
 
@@ -1143,13 +1144,18 @@ admin.get('/pricing', async (c) => {
     .px-group-head .gh-fields{flex:1;display:grid;gap:.5rem}
     .px-group-head input{margin:0}
     .px-group-head .g-label{font-weight:600}
-    .px-item-row{display:grid;grid-template-columns:1fr 150px 1fr 34px;gap:.5rem;align-items:center;margin-bottom:.4rem}
+    .px-item-row{display:grid;grid-template-columns:1fr 140px 1fr 78px 34px;gap:.5rem;align-items:center;margin-bottom:.4rem}
     .px-item-row input{margin:0;padding:.45rem .6rem;font-size:.88rem}
     .px-item-head{font-size:.72rem;letter-spacing:.05em;color:var(--mist);text-transform:uppercase;margin-bottom:.3rem}
     .px-x{width:32px;height:32px;border:1px solid var(--line);background:#FBF6F4;color:#9C2B2B;border-radius:7px;cursor:pointer;font-size:.8rem}
     .px-x:hover{background:#F3DEDE}
     .px-group-actions{display:flex;gap:.5rem;margin-top:.6rem;flex-wrap:wrap}
-    @media(max-width:680px){.px-item-row{grid-template-columns:1fr 1fr 34px}.px-item-row .it-note{grid-column:1/3}}
+    /* 항목별 공개/비공개 토글 */
+    .px-pub{display:flex;align-items:center;justify-content:center;gap:.35rem;font-size:.78rem;color:#2E7D52;cursor:pointer;user-select:none;white-space:nowrap}
+    .px-pub input{width:auto;margin:0;cursor:pointer}
+    .px-pub.off{color:var(--mist)}
+    .px-item-row.is-hidden input:not([type=checkbox]){background:#F6F4EE;color:#9aa1ad}
+    @media(max-width:680px){.px-item-row{grid-template-columns:1fr 1fr 78px 34px}.px-item-row .it-note{grid-column:1/4}}
   </style>
   <script>
   var PX = ${dataJson};
@@ -1159,10 +1165,15 @@ admin.get('/pricing', async (c) => {
     (PX.groups||[]).forEach(function(g,gi){
       var div=document.createElement('div'); div.className='px-group'; div.dataset.gi=gi;
       var itemsHtml=(g.items||[]).map(function(it,ii){
-        return '<div class="px-item-row" data-ii="'+ii+'">'+
+        var pub=(it.published!==false);
+        return '<div class="px-item-row'+(pub?'':' is-hidden')+'" data-ii="'+ii+'">'+
           '<input placeholder="항목명" value="'+pxEsc(it.name)+'" oninput="PX.groups['+gi+'].items['+ii+'].name=this.value">'+
           '<input placeholder="비용 (예: 600,000원)" value="'+pxEsc(it.price)+'" oninput="PX.groups['+gi+'].items['+ii+'].price=this.value">'+
           '<input class="it-note" placeholder="비고 (선택)" value="'+pxEsc(it.note||'')+'" oninput="PX.groups['+gi+'].items['+ii+'].note=this.value">'+
+          '<label class="px-pub'+(pub?'':' off')+'" title="체크 해제 시 홈페이지 비용 안내에서 숨겨집니다">'+
+            '<input type="checkbox" '+(pub?'checked':'')+' onchange="pxTogglePub('+gi+','+ii+',this)">'+
+            '<span>'+(pub?'공개':'비공개')+'</span>'+
+          '</label>'+
           '<button type="button" class="px-x" title="이 항목 삭제" onclick="pxDelItem('+gi+','+ii+')"><i class="fas fa-trash"></i></button>'+
         '</div>';
       }).join('');
@@ -1174,7 +1185,7 @@ admin.get('/pricing', async (c) => {
           '</div>'+
           '<button type="button" class="px-x" title="분류 전체 삭제" onclick="pxDelGroup('+gi+')"><i class="fas fa-trash"></i></button>'+
         '</div>'+
-        '<div class="px-item-head px-item-row" style="margin-bottom:.4rem"><span>항목</span><span>비용</span><span>비고</span><span></span></div>'+
+        '<div class="px-item-head px-item-row" style="margin-bottom:.4rem"><span>항목</span><span>비용</span><span>비고</span><span style="text-align:center">공개</span><span></span></div>'+
         '<div class="px-items">'+itemsHtml+'</div>'+
         '<div class="px-group-actions"><button type="button" class="btn sm ghost" onclick="pxAddItem('+gi+')"><i class="fas fa-plus"></i> 항목 추가</button>'+
           (gi>0?'<button type="button" class="btn sm ghost" onclick="pxMoveGroup('+gi+',-1)"><i class="fas fa-arrow-up"></i> 위로</button>':'')+
@@ -1185,8 +1196,13 @@ admin.get('/pricing', async (c) => {
   }
   function pxAddGroup(){ PX.groups.push({label:'새 분류',desc:'',items:[{name:'',price:'',note:''}]}); pxRender(); window.scrollTo(0,document.body.scrollHeight); }
   function pxDelGroup(gi){ if(confirm('"'+(PX.groups[gi].label||'이 분류')+'" 분류와 하위 항목을 모두 삭제할까요?')){ PX.groups.splice(gi,1); pxRender(); } }
-  function pxAddItem(gi){ PX.groups[gi].items.push({name:'',price:'',note:''}); pxRender(); }
+  function pxAddItem(gi){ PX.groups[gi].items.push({name:'',price:'',note:'',published:true}); pxRender(); }
   function pxDelItem(gi,ii){ PX.groups[gi].items.splice(ii,1); pxRender(); }
+  function pxTogglePub(gi,ii,el){
+    var on=!!el.checked; PX.groups[gi].items[ii].published=on;
+    var lbl=el.closest('.px-pub'); if(lbl){ lbl.classList.toggle('off',!on); var sp=lbl.querySelector('span'); if(sp) sp.textContent=on?'공개':'비공개'; }
+    var row=el.closest('.px-item-row'); if(row) row.classList.toggle('is-hidden',!on);
+  }
   function pxMoveGroup(gi,dir){ var t=gi+dir; if(t<0||t>=PX.groups.length)return; var tmp=PX.groups[gi]; PX.groups[gi]=PX.groups[t]; PX.groups[t]=tmp; pxRender(); }
   function pxSave(){
     // 빈 항목(항목명·비용 모두 공백) 자동 제거
@@ -1215,6 +1231,7 @@ admin.post('/pricing', async (c) => {
           name: String(it.name || '').trim(),
           price: String(it.price || '').trim(),
           note: String(it.note || '').trim() || undefined,
+          published: it.published !== false,   // 항목별 공개/비공개 (기본 공개)
         })).filter((it) => it.name || it.price),
       })).filter((g) => g.label || g.items.length),
       notes: (Array.isArray(parsed.notes) ? parsed.notes : []).map((n) => String(n).trim()).filter(Boolean),

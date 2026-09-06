@@ -7,6 +7,7 @@ export interface PriceItem {
   name: string
   price: string   // '보험 적용' 또는 '000,000원'
   note?: string
+  published?: boolean   // 홈페이지 비용 안내 노출 여부(생략·true=공개, false=비공개). 기존 항목은 모두 공개.
 }
 
 export const priceGroups: { label: string; desc?: string; items: PriceItem[] }[] = [
