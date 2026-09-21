@@ -5,7 +5,7 @@ import { clinic } from './data/clinic'
 import { treatments } from './data/treatments'
 import { doctors } from './data/doctors'
 import { encyclopedia } from './data/encyclopedia'
-import { glossary } from './data/glossary'
+import { glossary, resolveGlossaryAlias } from './data/glossary'
 import { areaCombos } from './data/facilities'
 import type { CaseItem, Column, Notice } from './data/types'
 
@@ -79,6 +79,9 @@ app.get('/video', async (c) => c.html(await VideoPage()))
 // --- 백과사전 (정적) ---
 app.get('/encyclopedia', (c) => c.html(EncyclopediaIndex()))
 app.get('/encyclopedia/:slug', (c) => {
+  // 중복 slug(alias) → 대표 slug 301
+  const aliasTarget = resolveGlossaryAlias(c.req.param('slug'))
+  if (aliasTarget) return c.redirect(`/encyclopedia/${aliasTarget}`, 301)
   const page = EncyclopediaDetail(c.req.param('slug'))
   return page ? c.html(page) : c.notFound()
 })
@@ -205,10 +208,11 @@ app.get('/sitemap-treatments.xml', (c) => {
 app.get('/sitemap-encyclopedia.xml', (c) => {
   const base = clinic.domain
   const today = new Date().toISOString().slice(0, 10)
+  const seen = new Set<string>()
   const urls: SmUrl[] = [
     ...encyclopedia.map((e) => ({ loc: `${base}/encyclopedia/${e.slug}`, priority: '0.6', changefreq: 'monthly', lastmod: today })),
     ...glossary.map((e) => ({ loc: `${base}/encyclopedia/${e.slug}`, priority: '0.5', changefreq: 'yearly', lastmod: today })),
-  ]
+  ].filter((u) => !seen.has(u.loc) && seen.add(u.loc)) // 리치/경량 레이어에 같은 slug 가 있으면 한 번만 등록
   return c.text(smXml(urls), 200, { 'Content-Type': 'application/xml; charset=utf-8' })
 })
 

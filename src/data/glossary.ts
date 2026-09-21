@@ -14,6 +14,20 @@ export interface GlossaryEntry {
 const g = (slug: string, term: string, termEn: string, category: string, def: string, related?: string[]): GlossaryEntry =>
   ({ slug, term, termEn, category, def, related })
 
+// ============================================================================
+// 중복 slug alias — 제목(term+termEn)이 완전히 같은 용어가 두 URL로 존재해
+// GSC 에서 중복/미색인 처리되던 항목. 대표 slug 로 301 리다이렉트하며
+// 용어 목록·사이트맵에서는 제외한다. (2026-09-21)
+// ============================================================================
+export const GLOSSARY_ALIASES: Record<string, string> = {
+  'mock-up': 'mockup',                       // 목업
+  'mobility': 'tooth-mobility',              // 치아 동요도
+  'inlay-term': 'inlay',                     // 인레이
+  'abrasion': 'cervical-abrasion',           // 치경부 마모증
+  'gutta-percha-material': 'gutta-percha',   // 거타퍼차
+}
+export const resolveGlossaryAlias = (slug: string): string | undefined => GLOSSARY_ALIASES[slug]
+
 export const glossary: GlossaryEntry[] = [
   // ===================== 진단·검사 =====================
   g('panorama-xray', '파노라마 방사선사진', 'Panoramic Radiograph', '진단·검사', '위아래 턱 전체와 모든 치아를 한 장에 담는 방사선 사진으로, 치과 진단의 기본 검사입니다.'),
@@ -175,7 +189,6 @@ export const glossary: GlossaryEntry[] = [
   g('full-zirconia', '풀지르코니아', 'Full Zirconia', '보철·크라운', '전체를 지르코니아로 제작한 크라운으로, 높은 강도가 특징이라 구치부에 적합합니다.'),
   g('layered-zirconia', '레이어드 지르코니아', 'Layered Zirconia', '보철·크라운', '지르코니아 코어 위에 도자기를 쌓아 자연치아의 투명도를 재현한 심미 크라운입니다.'),
   g('veneer-term', '베니어', 'Veneer', '보철·크라운', '치아 앞면에 얇은 세라믹을 붙여 색·형태를 개선하는 심미 보철로, 라미네이트와 같은 개념입니다.'),
-  g('inlay-term', '인레이', 'Inlay', '보철·크라운', '충치 제거 후 치아 내부에 맞춤 제작물을 접착하는 수복 방식으로, 레진·세라믹·금이 사용됩니다.', ['adhesive-restoration']),
   g('table-top', '테이블탑', 'Table Top', '보철·크라운', '교합면만 얇게 덮는 최소삭제 오버레이의 한 형태로, 치질 보존에 유리합니다.', ['conservative']),
   g('post-and-core', '포스트 앤 코어', 'Post and Core', '보철·크라운', '신경치료 후 남은 치질이 부족할 때 기둥(포스트)과 코어를 세워 크라운 지지력을 확보하는 술식입니다.'),
   g('denture', '틀니(의치)', 'Denture', '보철·크라운', '여러 개 또는 전체 치아 상실 시 사용하는 탈착식 보철물입니다.'),
@@ -190,7 +203,6 @@ export const glossary: GlossaryEntry[] = [
   g('vertical-dimension', '수직고경', 'Vertical Dimension', '보철·크라운', '위아래 턱 사이의 높이로, 전악 보철·교합 재구성에서 핵심적으로 평가하는 기준입니다.', ['tmj-occlusion']),
   g('full-mouth-rehab', '전악 수복(풀마우스)', 'Full Mouth Rehabilitation', '보철·크라운', '마모·붕괴된 전체 치열의 교합과 기능, 심미를 종합적으로 재건하는 치료입니다.', ['tmj-occlusion', 'esthetic-prosthetics']),
   g('wax-up', '왁스업', 'Diagnostic Wax-up', '보철·크라운', '치료 전 모형 위에 최종 결과를 왁스로 미리 만들어 보는 진단·설계 과정입니다.'),
-  g('mock-up', '목업', 'Mock-up', '보철·크라운', '왁스업 형태를 환자 입안에 임시로 옮겨 치료 후 모습을 미리 보여주는 과정입니다.'),
   g('digital-smile-design', '디지털 스마일 디자인', 'Digital Smile Design (DSD)', '보철·크라운', '사진·스캔 데이터를 활용해 웃을 때의 심미를 디지털로 설계하는 기법입니다.', ['esthetic-prosthetics']),
   g('retraction-cord', '치은압배사', 'Gingival Retraction Cord', '보철·크라운', '정밀한 본뜨기를 위해 잇몸을 살짝 벌려주는 가는 실입니다.'),
   g('provisional-restoration', '프로비저널', 'Provisional Restoration', '보철·크라운', '장기간 사용하며 교합·심미를 검증하는 정밀 임시 보철물로, 전악 치료에서 중요합니다.'),
@@ -256,7 +268,6 @@ export const glossary: GlossaryEntry[] = [
   g('bone-loss', '치조골 소실', 'Alveolar Bone Loss', '치주', '잇몸병으로 치아를 지지하는 뼈가 녹아내리는 현상으로, 방치 시 치아가 흔들리게 됩니다.'),
   g('gum-recession', '잇몸 퇴축', 'Gingival Recession', '치주', '잇몸이 내려가 치아 뿌리가 드러나는 상태로, 시린 증상과 심미 문제를 일으킵니다.'),
   g('gum-graft', '잇몸 이식술', 'Gum Graft', '치주', '퇴축된 잇몸 부위에 연조직을 이식해 뿌리를 덮고 잇몸 두께를 보강하는 수술입니다.'),
-  g('mobility', '치아 동요도', 'Tooth Mobility', '치주', '치아가 흔들리는 정도로, 치주 상태 평가의 중요한 지표입니다.'),
   g('bleeding-on-probing', '탐침 시 출혈', 'Bleeding on Probing (BOP)', '치주', '잇몸 검사 시 피가 나는 징후로, 활동성 염증이 있다는 신호입니다.'),
   g('periodontal-maintenance', '치주 유지관리', 'Periodontal Maintenance', '치주', '잇몸 치료 후 3~6개월 간격으로 재발을 막는 정기 관리 프로그램입니다.'),
   g('gum-bleeding', '잇몸 출혈', 'Gum Bleeding', '치주', '칫솔질 시 잇몸에서 피가 나는 증상으로, 잇몸 염증의 가장 흔한 초기 신호입니다.'),
@@ -336,7 +347,6 @@ export const glossary: GlossaryEntry[] = [
   g('dry-mouth', '구강건조증', 'Xerostomia / Dry Mouth', '예방·위생', '침 분비가 줄어 입이 마르는 상태로, 충치·구취 위험을 높이며 약물 부작용이 흔한 원인입니다.'),
   g('diet-counseling', '식이 조절 상담', 'Diet Counseling', '예방·위생', '당 섭취 빈도와 산성 음료 습관을 조절해 충치·산부식을 예방하는 상담입니다.'),
   g('acid-erosion', '치아 산부식(침식)', 'Dental Erosion', '예방·위생', '탄산음료·과일산·위산 등으로 법랑질이 녹는 현상으로, 충치와 다른 기전의 치아 손상입니다.'),
-  g('abrasion', '치경부 마모증', 'Cervical Abrasion', '예방·위생', '잘못된 칫솔질 등으로 치아 목 부위가 패이는 현상으로, 시린 증상의 흔한 원인입니다.'),
   g('desensitizer', '지각과민 처치제', 'Desensitizing Agent', '예방·위생', '노출된 상아세관을 막아 시린 증상을 완화하는 도포 약제입니다.'),
   g('electric-toothbrush', '전동칫솔', 'Electric Toothbrush', '예방·위생', '음파·회전 방식으로 플라크 제거를 돕는 칫솔로, 올바른 사용법이 더 중요합니다.'),
   g('oral-hygiene-instruction', '구강위생교육(TBI)', 'Oral Hygiene Instruction', '예방·위생', '개인별 구강 상태에 맞춘 칫솔질·치실 사용법 교육입니다.'),
@@ -431,7 +441,6 @@ export const glossary: GlossaryEntry[] = [
   g('titanium-material', '티타늄 합금', 'Titanium Alloy', '재료·장비', '가볍고 생체친화적인 금속으로, 임플란트와 틀니 프레임에 사용됩니다.'),
   g('gold-alloy', '금 합금', 'Gold Alloy', '재료·장비', '적합성과 마모 특성이 우수한 전통적 보철 재료입니다.'),
   g('calcium-hydroxide', '수산화칼슘', 'Calcium Hydroxide', '재료·장비', '신경 보호와 근관 소독에 쓰이는 전통적 약재입니다.'),
-  g('gutta-percha-material', '거타퍼차', 'Gutta-percha', '재료·장비', '신경치료 후 빈 신경관을 채우는 고무 성질의 충전 재료입니다.'),
   g('handpiece', '핸드피스', 'Dental Handpiece', '재료·장비', '치아를 삭제하는 회전 절삭 기구로, 환자마다 멸균된 것을 사용해야 합니다.'),
   g('ultrasonic-scaler', '초음파 스케일러', 'Ultrasonic Scaler', '재료·장비', '초음파 진동과 물로 치석을 제거하는 장비입니다.'),
   g('rubber-dam-material', '러버댐 장비', 'Rubber Dam Kit', '재료·장비', '치료 치아만 격리하는 고무막과 클램프 세트로, 정밀 접착·신경치료의 필수 장비입니다.', ['adhesive-restoration']),
