@@ -647,75 +647,165 @@ export function HomePage() {
   </section>
 
   <!-- ===== 공지 팝업 (관리자에서 ON 한 공지를 동적으로 표시) ===== -->
-  <div id="noticePopupRoot" aria-live="polite"></div>
+  <div id="noticePopupRoot"></div>
   <style>
-    #noticePopupRoot .np-overlay{position:fixed;inset:0;z-index:9999;background:rgba(14,22,38,.55);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:1.2rem;opacity:0;transition:opacity .3s ease}
-    #noticePopupRoot .np-overlay.show{opacity:1}
-    #noticePopupRoot .np-card{background:#fff;border-radius:18px;max-width:420px;width:100%;overflow:hidden;box-shadow:0 30px 80px rgba(10,18,34,.45);transform:translateY(18px) scale(.98);transition:transform .35s cubic-bezier(.16,1,.3,1);max-height:88vh;display:flex;flex-direction:column}
+    /* 공지 팝업 — 활성 최대 5개. PC(≥768)는 한 장의 딤 위에 나란히, 모바일(≤767)은 "병원 소식 N" 칩 → 한 장씩 넘겨보기 */
+    #noticePopupRoot .np-overlay{position:fixed;inset:0;z-index:9999;background:rgba(14,22,38,.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);display:flex;padding:1.2rem;overflow-y:auto;overscroll-behavior:contain;opacity:0;transition:opacity .3s ease}
+    #noticePopupRoot .np-overlay[hidden]{display:none!important}
+    #noticePopupRoot .np-overlay:not(.show){pointer-events:none}
+    #noticePopupRoot .np-overlay.show{opacity:1;pointer-events:auto}
+    #noticePopupRoot .np-stack{margin:auto;display:flex;flex-wrap:wrap;gap:16px;justify-content:center;align-items:flex-start;max-width:100%}
+    #noticePopupRoot .np-card{position:relative;background:#fff;border-radius:18px;width:380px;max-width:100%;overflow:hidden;box-shadow:0 30px 80px rgba(10,18,34,.45);transform:translateY(18px) scale(.98);transition:transform .35s cubic-bezier(.16,1,.3,1),opacity .25s ease;max-height:88vh;display:flex;flex-direction:column}
     #noticePopupRoot .np-overlay.show .np-card{transform:none}
+    #noticePopupRoot .np-overlay.show .np-card.np-out{opacity:0;transform:translateY(12px) scale(.94)}
+    #noticePopupRoot .np-x{position:absolute;top:10px;right:10px;z-index:3;width:44px;height:44px;border:0;border-radius:50%;background:rgba(255,255,255,.92);color:var(--ink,#14243E);font-size:1.5rem;line-height:1;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);transition:transform .2s}
+    #noticePopupRoot .np-x:hover{transform:rotate(90deg)}
+    #noticePopupRoot .np-scroll{overflow-y:auto;flex:1 1 auto;min-height:0}
     #noticePopupRoot .np-img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#f1ece0;display:block}
-    #noticePopupRoot .np-body{padding:1.6rem 1.7rem;overflow-y:auto}
-    #noticePopupRoot .np-eyebrow{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold,#C59F66);font-weight:600;margin-bottom:.5rem}
-    #noticePopupRoot .np-title{font-size:1.25rem;font-weight:700;line-height:1.35;color:var(--ink,#14243E);margin-bottom:.8rem;letter-spacing:-.02em}
-    #noticePopupRoot .np-content{font-size:.93rem;line-height:1.7;color:#4a5364}
+    #noticePopupRoot .np-body{padding:1.6rem 1.7rem}
+    #noticePopupRoot .np-eyebrow{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold,#C59F66);font-weight:600;margin-bottom:.5rem;padding-right:2.6rem}
+    #noticePopupRoot .np-title{font-size:1.25rem;font-weight:700;line-height:1.35;color:var(--ink,#14243E);margin:0 0 .8rem;letter-spacing:-.02em;word-break:keep-all}
+    #noticePopupRoot .np-content{font-size:.93rem;line-height:1.7;color:#4a5364;word-break:keep-all}
     #noticePopupRoot .np-content p{margin:0 0 .6rem}
     #noticePopupRoot .np-content img{max-width:100%;border-radius:8px;margin:.5rem 0}
     #noticePopupRoot .np-cta{display:inline-flex;align-items:center;gap:.4rem;margin-top:1.1rem;background:var(--ink,#14243E);color:#fff;padding:.7rem 1.3rem;border-radius:9px;font-size:.9rem;font-weight:600;text-decoration:none}
-    #noticePopupRoot .np-foot{display:flex;justify-content:space-between;align-items:center;padding:.8rem 1.5rem;border-top:1px solid #eee5d4;background:#faf8f2}
-    #noticePopupRoot .np-foot button{background:none;border:0;font:inherit;color:#8A93A6;font-size:.85rem;cursor:pointer;padding:.3rem .2rem}
+    #noticePopupRoot .np-foot{flex-shrink:0;display:flex;justify-content:space-between;align-items:center;padding:.4rem 1.2rem;border-top:1px solid #eee5d4;background:#faf8f2}
+    #noticePopupRoot .np-foot button{background:none;border:0;font:inherit;color:#8A93A6;font-size:.85rem;cursor:pointer;padding:.3rem .3rem;min-height:44px}
     #noticePopupRoot .np-foot button:hover{color:#14243E}
-    #noticePopupRoot .np-dots{display:flex;gap:.4rem;justify-content:center;padding:.6rem 0 0}
-    #noticePopupRoot .np-dots span{width:7px;height:7px;border-radius:50%;background:#d8cfba;cursor:pointer;transition:background .2s}
-    #noticePopupRoot .np-dots span.on{background:var(--gold,#C59F66)}
+    #noticePopupRoot .np-expand,#noticePopupRoot .np-nav{display:none}
+    #noticePopupRoot .np-overlay.np-compact{inset:88px 16px auto auto;padding:0;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;overflow:visible}
+    #noticePopupRoot .np-compact .np-stack,#noticePopupRoot .np-compact .np-nav{display:none!important}
+    #noticePopupRoot .np-compact .np-expand{display:block;min-height:44px;padding:10px 18px;background:#faf8f2;border:1px solid var(--gold,#C59F66);border-radius:99px;color:var(--ink,#14243E);font-size:14px;font-weight:600;box-shadow:0 4px 18px #14243e22;cursor:pointer}
+    #noticePopupRoot .np-count{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;margin-left:6px;padding:0 6px;border-radius:99px;background:var(--gold,#C59F66);color:#fff;font-size:12px;font-weight:800;vertical-align:1px}
+    #noticePopupRoot .np-single{flex-direction:column;align-items:center}
+    #noticePopupRoot .np-single .np-stack{margin:auto auto 0;width:100%;max-width:420px;flex-wrap:nowrap}
+    #noticePopupRoot .np-single .np-card{display:none;width:100%}
+    #noticePopupRoot .np-single .np-card.np-active{display:flex;animation:npIn .25s ease}
+    #noticePopupRoot .np-single .np-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin:12px auto auto}
+    #noticePopupRoot .np-single .np-nav[hidden]{display:none}
+    #noticePopupRoot .np-nav button{width:44px;height:44px;border-radius:50%;border:1px solid var(--gold,#C59F66);background:#faf8f2;color:var(--ink,#14243E);font-size:1.4rem;line-height:1;cursor:pointer;box-shadow:0 4px 14px #14243e33}
+    #noticePopupRoot .np-ind{min-width:64px;text-align:center;font-size:14px;font-weight:700;color:#fff;letter-spacing:.04em;text-shadow:0 1px 4px #0006}
+    @keyframes npIn{from{opacity:0;transform:translateX(var(--np-dx,0))}to{opacity:1;transform:none}}
+    @media(max-width:767px){#noticePopupRoot .np-card{max-height:78svh}#noticePopupRoot .np-img{max-height:34svh;object-fit:contain}#noticePopupRoot .np-single .np-card{max-height:calc(100svh - 110px)}#noticePopupRoot .np-body{padding:1.3rem 1.3rem}}
+    @media(prefers-reduced-motion:reduce){#noticePopupRoot .np-overlay,#noticePopupRoot .np-card{transition:none}#noticePopupRoot .np-single .np-card.np-active{animation:none}}
   </style>
   ${raw(`<script>
   (function(){
-    function dismissedToday(id){
-      try{ return localStorage.getItem('np_hide_'+id) === new Date().toISOString().slice(0,10); }catch(e){ return false; }
-    }
-    function hideToday(id){
-      try{ localStorage.setItem('np_hide_'+id, new Date().toISOString().slice(0,10)); }catch(e){}
-    }
+    var MAX=5;
+    var today=new Date(Date.now()+9*3600000).toISOString().slice(0,10); // KST
+    function key(id){ return 'np_hide_'+id; }
+    function dismissedToday(id){ try{ return localStorage.getItem(key(id))===today; }catch(e){ return false; } }
+    function hideToday(id){ try{ localStorage.setItem(key(id), today); }catch(e){} }
+    function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+    function safeHref(u, id){ u=String(u||'').trim(); if(!u || /^(javascript|data|vbscript):/i.test(u)) return '/notice/'+encodeURIComponent(id); return u; }
     fetch('/api/popups').then(function(r){ return r.json(); }).then(function(d){
       if(!d || !d.ok || !d.popups || !d.popups.length) return;
-      var items = d.popups.filter(function(p){ return !dismissedToday(p.id); });
+      var items = d.popups.filter(function(p){ return p && p.id && !dismissedToday(p.id); }).slice(0, MAX);
       if(!items.length) return;
       var root = document.getElementById('noticePopupRoot');
-      var i = 0;
       var ov = document.createElement('div');
       ov.className = 'np-overlay';
-      root.appendChild(ov);
-      function render(){
-        var p = items[i];
-        var cta = '<a class="np-cta" href="'+ (p.link || ('/notice/'+p.id)) +'">자세히 보기 <i class="fas fa-arrow-right"></i></a>';
-        var img = p.image ? '<img class="np-img" src="'+p.image+'" alt="'+ (p.title ? p.title.replace(/"/g,'&quot;') : '연세온치과의원 공지') +'">' : '';
-        var dots = items.length>1 ? '<div class="np-dots">'+items.map(function(_,k){return '<span class="'+(k===i?'on':'')+'" data-k="'+k+'"></span>';}).join('')+'</div>' : '';
-        ov.innerHTML = '<div class="np-card" role="dialog" aria-modal="true" aria-label="공지 팝업">'+
-          img +
-          '<div class="np-body"><div class="np-eyebrow">연세온치과 공지</div>'+
-          '<div class="np-title">'+p.title+'</div>'+
-          '<div class="np-content">'+p.contentHtml+'</div>'+ cta +'</div>'+
-          dots +
-          '<div class="np-foot"><button data-act="today">오늘 하루 보지 않기</button><button data-act="close">닫기 ✕</button></div>'+
+      ov.hidden = true;
+      ov.setAttribute('aria-label', '연세온치과 공지');
+      var html = items.map(function(p, k){
+        var uid = 'np-card-' + k + '-' + String(p.id).replace(/[^A-Za-z0-9_-]/g, '');
+        var href = safeHref(p.link, p.id);
+        var ext = /^https?:[/][/]/i.test(href) ? ' target="_blank" rel="noopener"' : '';
+        var img = p.image ? '<img class="np-img" src="'+esc(p.image)+'" alt="'+esc(p.title || '연세온치과의원 공지')+'">' : '';
+        return '<div class="np-card" id="'+uid+'" data-id="'+esc(p.id)+'" role="group" aria-labelledby="'+uid+'-t">'+
+          '<button type="button" class="np-x" data-act="close" aria-label="'+esc(p.title)+' 팝업 닫기">&times;</button>'+
+          '<div class="np-scroll">'+ img +
+            '<div class="np-body"><div class="np-eyebrow">연세온치과 공지</div>'+
+            '<h2 class="np-title" id="'+uid+'-t">'+esc(p.title)+'</h2>'+
+            '<div class="np-content">'+(p.contentHtml || '')+'</div>'+
+            '<a class="np-cta" href="'+esc(href)+'"'+ext+'>자세히 보기 <i class="fas fa-arrow-right" aria-hidden="true"></i></a></div>'+
+          '</div>'+
+          '<div class="np-foot"><button type="button" data-act="today">오늘 하루 보지 않기</button><button type="button" data-act="close">닫기 ✕</button></div>'+
         '</div>';
-        ov.querySelectorAll('.np-dots span').forEach(function(s){
-          s.addEventListener('click', function(){ i = +this.getAttribute('data-k'); render(); });
-        });
-        ov.querySelector('[data-act="today"]').addEventListener('click', function(){ hideToday(p.id); next(); });
-        ov.querySelector('[data-act="close"]').addEventListener('click', next);
+      }).join('');
+      ov.innerHTML = '<button type="button" class="np-expand" aria-expanded="false" aria-controls="np-stack">병원 소식</button>'+
+        '<div class="np-stack" id="np-stack">'+html+'</div>'+
+        '<div class="np-nav" hidden><button type="button" class="np-prev" aria-label="이전 소식">&lsaquo;</button><span class="np-ind" aria-live="polite">1 / '+items.length+'</span><button type="button" class="np-next" aria-label="다음 소식">&rsaquo;</button></div>';
+      root.appendChild(ov);
+      var stack = ov.querySelector('.np-stack'), nav = ov.querySelector('.np-nav'), ind = ov.querySelector('.np-ind'), chip = ov.querySelector('.np-expand');
+      var mq = matchMedia('(max-width:767px)');
+      var compact = mq.matches, idx = 0, prevOverflow = '', locked = false;
+      function cards(){ return Array.prototype.slice.call(stack.querySelectorAll('.np-card:not(.np-out)')); }
+      function lock(){ if(!locked){ prevOverflow = document.body.style.overflow; document.body.style.overflow = 'hidden'; locked = true; } }
+      function unlock(){ if(locked){ document.body.style.overflow = prevOverflow; locked = false; } }
+      function setDialog(on){
+        if(on){ ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); }
+        else { ov.setAttribute('role','region'); ov.removeAttribute('aria-modal'); }
       }
-      function next(){
-        if(i < items.length-1){ i++; render(); }
-        else { close(); }
+      function updateChip(){
+        var n = cards().length;
+        chip.innerHTML = '병원 소식<span class="np-count">'+n+'</span>';
+        chip.setAttribute('aria-label', '병원 소식 '+n+'건 보기');
       }
-      function close(){
-        ov.classList.remove('show');
-        setTimeout(function(){ ov.remove(); }, 320);
+      function show(i, dir){
+        var cs = cards(); if(!cs.length) return;
+        idx = (i + cs.length) % cs.length;
+        cs.forEach(function(c, k){ c.classList.toggle('np-active', k===idx); c.style.setProperty('--np-dx', dir ? (dir*40)+'px' : '0'); });
+        ind.textContent = (idx+1)+' / '+cs.length;
+        nav.hidden = cs.length < 2;
       }
-      ov.addEventListener('click', function(e){ if(e.target===ov) close(); });
-      document.addEventListener('keydown', function onEsc(e){ if(e.key==='Escape'){ close(); document.removeEventListener('keydown', onEsc); } });
-      render();
+      function focusFirst(){
+        var c = ov.classList.contains('np-single') ? stack.querySelector('.np-card.np-active') : cards()[0];
+        var b = c && c.querySelector('.np-x'); if(b){ try{ b.focus({preventScroll:true}); }catch(e){ b.focus(); } }
+      }
+      function applyMode(){
+        if(compact){ ov.classList.add('np-compact'); ov.classList.remove('np-single'); setDialog(false); updateChip(); return; }
+        ov.classList.remove('np-compact'); setDialog(true);
+        ov.classList.toggle('np-single', mq.matches);
+        if(mq.matches) show(idx, 0);
+      }
+      function closeAll(){
+        ov.classList.remove('show'); unlock();
+        setTimeout(function(){ ov.hidden = true; }, 320);
+      }
+      function removeCard(c){
+        c.classList.add('np-out');
+        var single = ov.classList.contains('np-single');
+        var left = cards().length;
+        if(!left){ closeAll(); return; }
+        if(single){ c.parentNode.removeChild(c); show(Math.min(idx, left-1), 0); }
+        else setTimeout(function(){ if(c.parentNode) c.parentNode.removeChild(c); }, 260);
+        updateChip();
+        setTimeout(focusFirst, single ? 0 : 270);
+      }
+      stack.addEventListener('click', function(e){
+        var b = e.target.closest && e.target.closest('[data-act]');
+        if(!b){ if(e.target===stack && !ov.classList.contains('np-single')) closeAll(); return; }
+        e.preventDefault();
+        var c = b.closest('.np-card');
+        if(b.getAttribute('data-act')==='today') hideToday(c.getAttribute('data-id'));
+        removeCard(c);
+      });
+      chip.addEventListener('click', function(){
+        compact = false; chip.setAttribute('aria-expanded','true');
+        applyMode(); lock(); focusFirst();
+      });
+      ov.querySelector('.np-prev').addEventListener('click', function(){ show(idx-1, -1); focusFirst(); });
+      ov.querySelector('.np-next').addEventListener('click', function(){ show(idx+1, 1); focusFirst(); });
+      var sx = 0, sy = 0, tracking = false;
+      stack.addEventListener('touchstart', function(e){ if(!ov.classList.contains('np-single') || e.touches.length!==1) return; tracking = true; sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, {passive:true});
+      stack.addEventListener('touchend', function(e){
+        if(!tracking) return; tracking = false;
+        var t = e.changedTouches[0], dx = t.clientX-sx, dy = t.clientY-sy;
+        if(Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)*1.3){ if(dx<0) show(idx+1, 1); else show(idx-1, -1); }
+      }, {passive:true});
+      ov.addEventListener('click', function(e){ if(e.target===ov && !compact) closeAll(); });
+      document.addEventListener('keydown', function(e){
+        if(ov.hidden || compact) return;
+        if(e.key==='Escape') closeAll();
+        else if(ov.classList.contains('np-single')){ if(e.key==='ArrowRight') show(idx+1, 1); else if(e.key==='ArrowLeft') show(idx-1, -1); }
+      });
+      var onMq = function(){ if(!compact && !ov.hidden) applyMode(); };
+      if(mq.addEventListener) mq.addEventListener('change', onMq); else if(mq.addListener) mq.addListener(onMq);
+      applyMode();
+      ov.hidden = false;
       requestAnimationFrame(function(){ requestAnimationFrame(function(){ ov.classList.add('show'); }); });
+      if(!compact){ lock(); setTimeout(focusFirst, 60); }
     }).catch(function(){});
   })();
   </script>`)}

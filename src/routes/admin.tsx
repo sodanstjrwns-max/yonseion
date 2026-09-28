@@ -8,6 +8,7 @@ import { Store, newId, slugify } from '../lib/store'
 import { getPricing, savePricing, resetPricing } from '../lib/pricing-store'
 import type { PricingData } from '../lib/pricing-store'
 import { fireIndexNotify } from '../lib/indexing'
+import { POPUP_MAX, isPopupActive, sortedActivePopups } from '../lib/popups'
 import { fetchDashboardStats, statsContent, STATS_KEY, MASTER_KEY } from './stats'
 import {
   getSession, setSessionCookie, clearSession, sessionSecret, adminPassword,
@@ -235,8 +236,7 @@ admin.get('/', async (c) => {
   } catch { /* noop */ }
 
   // 활성 팝업 공지 현황
-  const today = new Date().toISOString().slice(0, 10)
-  const activePopups = (ntcIdx as any[]).filter((x) => x.popup && x.published !== false && (!x.popupUntil || x.popupUntil >= today))
+  const activePopups = sortedActivePopups(ntcIdx as any[])
 
   // 최근 예약 5건
   const recentRsv: Reservation[] = []
@@ -254,7 +254,7 @@ admin.get('/', async (c) => {
     <a class="btn" style="background:#E0C99B;color:#14243E" href="/admin/reservations">예약 확인하기 <i class="fas fa-arrow-right"></i></a>
   </div>` : ''}
   ${activePopups.length ? `<div class="panel" style="background:#FCF7EA;border-color:#E4D9BC;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.8rem;padding:.9rem 1.2rem">
-    <span><i class="fas fa-bullhorn" style="color:#AE8A4C;margin-right:.4rem"></i> 메인 화면에 공지 <b>${activePopups.length}건</b>이 팝업으로 노출 중입니다.</span>
+    <span><i class="fas fa-bullhorn" style="color:#AE8A4C;margin-right:.4rem"></i> 메인 화면에 공지 <b>${Math.min(activePopups.length, POPUP_MAX)}건</b>이 팝업으로 노출 중입니다.${activePopups.length > POPUP_MAX ? ` <span class="badge off" style="background:#F6E3C8;color:#8A5A12">표시 중 ${POPUP_MAX}/${activePopups.length} — 오래된 것은 숨겨짐</span>` : ''}</span>
     <a class="btn sm ghost" href="/admin/notices">공지 관리</a>
   </div>` : ''}
   <div class="cards">
@@ -992,16 +992,18 @@ admin.get('/notices', async (c) => {
   const store = new Store(c.env.R2)
   const idx = await store.index<{ id: string; title: string; createdAt: string; published: boolean; pinned?: boolean; popup?: boolean; popupUntil?: string }>('notices')
   const views = await viewCounts(c, 'notice', idx.map((x) => x.id))
-  const today = new Date().toISOString().slice(0, 10)
-  const popupActive = (x: any) => x.popup && x.published && (!x.popupUntil || x.popupUntil >= today)
-  const activeCount = idx.filter(popupActive).length
+  const popupActive = (x: any) => isPopupActive(x)
+  const activeSorted = sortedActivePopups(idx)
+  const activeCount = activeSorted.length
+  const shownIds = new Set(activeSorted.slice(0, POPUP_MAX).map((x) => x.id))
   const body = `
   <div class="toolbar"><h1 style="margin:0">공지 관리</h1><a class="btn" href="/admin/notices/new"><i class="fas fa-plus"></i> 새 공지</a></div>
-  ${activeCount ? `<div class="panel" style="background:#FCF7EA;border-color:#E4D9BC;display:flex;align-items:center;gap:.6rem;padding:.9rem 1.2rem"><i class="fas fa-bullhorn" style="color:#AE8A4C"></i> 현재 메인 화면에 <b>${activeCount}건</b>의 공지가 팝업으로 노출 중입니다.</div>` : ''}
+  <div class="panel" style="background:#FCF7EA;border-color:#E4D9BC;display:flex;align-items:center;flex-wrap:wrap;gap:.6rem;padding:.9rem 1.2rem"><i class="fas fa-bullhorn" style="color:#AE8A4C"></i> ${activeCount ? `현재 메인 화면에 <b>${Math.min(activeCount, POPUP_MAX)}건</b>의 공지가 팝업으로 노출 중입니다.` : '현재 메인 화면에 노출 중인 팝업이 없습니다.'}${activeCount > POPUP_MAX ? ` <span class="badge off" style="background:#F6E3C8;color:#8A5A12">표시 중 ${POPUP_MAX}/${activeCount} — 오래된 것은 숨겨짐</span>` : ''}
+    <small class="muted" style="flex-basis:100%">팝업은 최대 ${POPUP_MAX}개까지 동시에 표시됩니다 (PC는 나란히, 모바일은 넘겨보기). 상단 고정 공지가 먼저, 그다음 최신 공지 순입니다.</small></div>
   ${idx.length ? `<table><thead><tr><th>제목</th><th>작성일</th><th>조회수</th><th>상태</th><th></th></tr></thead><tbody>
     ${idx.map((x) => `<tr><td>${esc(x.title)}</td><td class="muted">${(x.createdAt || '').slice(0, 10)}</td>
       <td class="muted"><i class="far fa-eye" style="font-size:.75rem"></i> ${views[x.id] || 0}</td>
-      <td style="white-space:nowrap">${x.published ? '<span class="badge confirmed">게시</span>' : '<span class="badge off">비공개</span>'}${x.pinned ? ' <span class="badge pin">고정</span>' : ''}${popupActive(x) ? ' <span class="badge popup"><i class="fas fa-bullhorn" style="font-size:.65rem"></i> 팝업</span>' : (x.popup ? ' <span class="badge off">팝업 대기</span>' : '')}</td>
+      <td style="white-space:nowrap">${x.published ? '<span class="badge confirmed">게시</span>' : '<span class="badge off">비공개</span>'}${x.pinned ? ' <span class="badge pin">고정</span>' : ''}${popupActive(x) ? (shownIds.has(x.id) ? ' <span class="badge popup"><i class="fas fa-bullhorn" style="font-size:.65rem"></i> 팝업</span>' : ` <span class="badge off" title="활성 팝업이 ${POPUP_MAX}개를 넘어 표시되지 않습니다">팝업 숨겨짐</span>`) : (x.popup ? ' <span class="badge off">팝업 대기</span>' : '')}</td>
       <td><a class="btn sm ghost" href="/admin/notices/${x.id}">수정</a>
       <form method="POST" action="/admin/notices/${x.id}/delete" style="display:inline" onsubmit="return confirm('삭제할까요?')"><button class="btn sm danger">삭제</button></form></td></tr>`).join('')}
   </tbody></table>` : '<div class="panel">작성된 공지가 없습니다.</div>'}`
@@ -1028,7 +1030,7 @@ function noticeForm(n?: Notice) {
         <span class="sw-text"><b>상단 고정</b><small>공지 목록 맨 위에 대표 공지로 고정합니다</small></span></label>
 
       <label class="switch accent"><input type="checkbox" name="popup" id="popupToggle" ${n?.popup ? 'checked' : ''} onchange="document.getElementById('popupFields').style.display=this.checked?'block':'none'"><span class="track"></span>
-        <span class="sw-text"><b><i class="fas fa-bullhorn" style="color:#AE8A4C;margin-right:.3rem"></i>메인 페이지 팝업으로 띄우기</b><small>홈 화면 접속 시 팝업 창으로 이 공지를 노출합니다</small></span></label>
+        <span class="sw-text"><b><i class="fas fa-bullhorn" style="color:#AE8A4C;margin-right:.3rem"></i>메인 페이지 팝업으로 띄우기</b><small>홈 화면 접속 시 팝업 창으로 이 공지를 노출합니다 · 팝업은 최대 ${POPUP_MAX}개까지 동시에 표시됩니다 (PC는 나란히, 모바일은 넘겨보기)</small></span></label>
 
       <div class="sub-fields" id="popupFields" style="display:${n?.popup ? 'block' : 'none'}">
         <div class="row2">
