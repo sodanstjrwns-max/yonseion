@@ -42,6 +42,17 @@ function isThinEncycloSlug(slug: string): boolean {
   return light ? isThinGlossary(light) : false
 }
 
+// 동적 HTML 응답에도 기본 헤더 적용 (_headers는 정적 자산에만 적용됨).
+app.use('*', async (c, next) => {
+  await next()
+  c.header('X-Content-Type-Options', 'nosniff')
+  c.header('X-Frame-Options', 'SAMEORIGIN')
+  c.header('Referrer-Policy', 'strict-origin-when-cross-origin')
+  if (new URL(c.req.url).protocol === 'https:') {
+    c.header('Strict-Transport-Security', 'max-age=31536000')
+  }
+})
+
 // --- A4 canonical 통일: www → 비(非)www 301 리다이렉트 ---
 // 같은 페이지가 www / 비www 두 주소로 존재하면 SEO 점수가 분산됩니다.
 // 대표 주소(yonseion.kr)로 영구 이동(301) 처리해 색인을 하나로 모읍니다.
