@@ -287,11 +287,18 @@ export function ColumnsPage(items: Column[]) {
   }, body)
 }
 
+// 스킴 없이 저장된 외부 링크(href="blog.naver.com/…")는 브라우저·크롤러가 현재 경로 기준 상대주소로 해석해
+// /column/blog.naver.com/… 404 가 된다 → 도메인 형태의 href 에 https:// 를 붙여 렌더 (저장된 원문은 그대로)
+const BARE_HREF_RE = /(<a\b[^>]*?\bhref=)(["'])(?![a-z][a-z0-9+.-]*:|\/|#|\?|\.)((?:[a-z0-9-]+\.)+(?:com|net|org|kr|co|me|io|tv|ly|gl|app|link|page|site|info|biz)(?:[/?#][^"']*)?)\2/gi
+export function fixBareHrefs(h: string): string {
+  return (h || '').replace(BARE_HREF_RE, '$1$2https://$3$2')
+}
+
 export function ColumnDetailPage(col: Column) {
   const crumb = [{ name: '홈', url: '/' }, { name: '원장 칼럼', url: '/column' }, { name: col.title, url: `/column/${col.slug}` }]
   const doc = getDoctor(col.authorSlug)
   const related = (col.relatedTreatments || []).map((s) => getTreatment(s)).filter(Boolean)
-  const { html: anchoredHtml, toc } = buildToc(col.contentHtml)
+  const { html: anchoredHtml, toc } = buildToc(fixBareHrefs(col.contentHtml))
   const mins = readingMin(col.contentHtml)
   const updated = col.updatedAt && col.updatedAt.slice(0, 10) !== col.createdAt.slice(0, 10)
   const body = html`
@@ -412,7 +419,7 @@ export function NoticeDetailPage(n: Notice) {
     <div class="container">
       <article class="prose" data-reveal>
         ${raw(n.image ? `<img src="${n.image}" alt="${n.title}" style="width:100%;border-radius:4px;margin-bottom:2rem">` : '')}
-        ${raw(n.contentHtml)}
+        ${raw(fixBareHrefs(n.contentHtml))}
       </article>
       <a href="/notice" class="link-arrow" style="margin-top:3rem;display:inline-block">목록으로 <i class="fas fa-arrow-left"></i></a>
     </div>

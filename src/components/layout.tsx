@@ -13,6 +13,7 @@ export interface SeoMeta {
   ogImage?: string
   jsonLd?: object | object[]
   breadcrumb?: { name: string; url: string }[]
+  robots?: string         // 기본 'index, follow, max-image-preview:large'. 얇은 용어·로그인 등은 'noindex, follow'
 }
 
 // 기본 키워드(주로 네이버 대응) — 페이지에서 meta.keywords로 덮어쓸 수 있음
@@ -219,7 +220,7 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
   <meta name="keywords" content="${meta.keywords || DEFAULT_KEYWORDS}">
   <link rel="canonical" href="${canonical}">
   <link rel="alternate" type="application/rss+xml" title="${clinic.nameKo} 칼럼·공지 RSS" href="${clinic.domain}/rss.xml">
-  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="robots" content="${meta.robots || 'index, follow, max-image-preview:large'}">
   <meta name="theme-color" content="${clinic.brand.paper}">
 
   <!-- 검색엔진 소유권 인증 (Search Engine Verification) -->

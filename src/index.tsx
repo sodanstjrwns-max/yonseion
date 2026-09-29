@@ -6,6 +6,8 @@ import { treatments } from './data/treatments'
 import { doctors } from './data/doctors'
 import { encyclopedia } from './data/encyclopedia'
 import { glossary, resolveGlossaryAlias } from './data/glossary'
+import { isThinEncyclo, isThinGlossary, NOINDEX_FOLLOW } from './lib/thin-content'
+
 import { areaCombos } from './data/facilities'
 import type { CaseItem, Column, Notice } from './data/types'
 
@@ -31,6 +33,14 @@ import { member } from './routes/member'
 import { getSession, sessionSecret } from './lib/auth'
 
 const app = new Hono<{ Bindings: Bindings }>()
+
+// 얇은 백과사전 slug 판정 (리치 레이어 우선 — EncyclopediaDetail 과 같은 순서)
+function isThinEncycloSlug(slug: string): boolean {
+  const rich = encyclopedia.find((e) => e.slug === slug)
+  if (rich) return isThinEncyclo(rich)
+  const light = glossary.find((e) => e.slug === slug)
+  return light ? isThinGlossary(light) : false
+}
 
 // --- A4 canonical 통일: www → 비(非)www 301 리다이렉트 ---
 // 같은 페이지가 www / 비www 두 주소로 존재하면 SEO 점수가 분산됩니다.
@@ -82,8 +92,11 @@ app.get('/encyclopedia/:slug', (c) => {
   // 중복 slug(alias) → 대표 slug 301
   const aliasTarget = resolveGlossaryAlias(c.req.param('slug'))
   if (aliasTarget) return c.redirect(`/encyclopedia/${aliasTarget}`, 301)
-  const page = EncyclopediaDetail(c.req.param('slug'))
-  return page ? c.html(page) : c.notFound()
+  const slug = c.req.param('slug')
+  const page = EncyclopediaDetail(slug)
+  if (!page) return c.notFound()
+  if (isThinEncycloSlug(slug)) c.header('X-Robots-Tag', NOINDEX_FOLLOW) // 얇은 용어: meta 와 동일하게 헤더로도
+  return c.html(page)
 })
 
 // --- 지역 SEO ---
@@ -204,14 +217,15 @@ app.get('/sitemap-treatments.xml', (c) => {
   return c.text(smXml(urls), 200, { 'Content-Type': 'application/xml; charset=utf-8' })
 })
 
-// --- sitemap-encyclopedia.xml (200 용어 + glossary) ---
+// --- sitemap-encyclopedia.xml (리치 해설 + 기준 이상 경량 용어) ---
+// 얇은 용어(lib/thin-content.ts, noindex, follow)는 제외 — 본문 보강 시 자동 복귀
 app.get('/sitemap-encyclopedia.xml', (c) => {
   const base = clinic.domain
   const today = new Date().toISOString().slice(0, 10)
   const seen = new Set<string>()
   const urls: SmUrl[] = [
-    ...encyclopedia.map((e) => ({ loc: `${base}/encyclopedia/${e.slug}`, priority: '0.6', changefreq: 'monthly', lastmod: today })),
-    ...glossary.map((e) => ({ loc: `${base}/encyclopedia/${e.slug}`, priority: '0.5', changefreq: 'yearly', lastmod: today })),
+    ...encyclopedia.filter((e) => !isThinEncyclo(e)).map((e) => ({ loc: `${base}/encyclopedia/${e.slug}`, priority: '0.6', changefreq: 'monthly', lastmod: today })),
+    ...glossary.filter((e) => !isThinGlossary(e)).map((e) => ({ loc: `${base}/encyclopedia/${e.slug}`, priority: '0.5', changefreq: 'yearly', lastmod: today })),
   ].filter((u) => !seen.has(u.loc) && seen.add(u.loc)) // 리치/경량 레이어에 같은 slug 가 있으면 한 번만 등록
   return c.text(smXml(urls), 200, { 'Content-Type': 'application/xml; charset=utf-8' })
 })

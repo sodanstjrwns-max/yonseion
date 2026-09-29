@@ -5,6 +5,7 @@ import { encyclopedia, getEntry, encycloCategories } from '../data/encyclopedia'
 import { glossary, GlossaryEntry } from '../data/glossary'
 import { getTreatment } from '../data/treatments'
 import { breadcrumbSchema, speakableSchema, faqSchema, definedTermSchema, medicalWebPageSchema } from '../lib/schema'
+import { isThinEncyclo, isThinGlossary, NOINDEX_FOLLOW } from '../lib/thin-content'
 
 // ============================================================================
 // 치과 백과사전 — AEO 직답형 정적 콘텐츠 허브
@@ -197,6 +198,7 @@ export function EncyclopediaDetail(slug: string) {
     title: `${entry.term}이란? | 치과 백과사전 | ${clinic.nameKo}`,
     description: entry.oneLiner,
     path: `/encyclopedia/${entry.slug}`,
+    robots: isThinEncyclo(entry) ? NOINDEX_FOLLOW : undefined,
     jsonLd: [
       breadcrumbSchema(crumb),
       definedTermSchema({ term: entry.term, termEn: entry.termEn, description: entry.oneLiner, slug: entry.slug }),
@@ -281,6 +283,7 @@ export function GlossaryDetail(slug: string) {
     title: `${entry.term}(${entry.termEn})이란? | 치과 백과사전 | ${clinic.nameKo}`,
     description: entry.def,
     path: `/encyclopedia/${entry.slug}`,
+    robots: isThinGlossary(entry) ? NOINDEX_FOLLOW : undefined, // 한 문장 정의만 있는 경량 용어 → noindex, follow
     jsonLd: [
       breadcrumbSchema(crumb),
       termSchema,

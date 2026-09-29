@@ -16,6 +16,14 @@ import { clinic } from '../data/clinic'
 
 export const member = new Hono<{ Bindings: Bindings }>()
 
+// 로그인·회원가입 화면: X-Robots-Tag 로도 noindex (케이스 페이지가 ?back= 변형 30여 개를 링크함)
+for (const p of ['/login', '/signup']) {
+  member.use(p, async (c, next) => {
+    await next()
+    c.header('X-Robots-Tag', 'noindex, follow')
+  })
+}
+
 // ---------- 공통 폼 셸 ----------
 function authShell(opts: { title: string; eyebrow: string; lead: string; formHtml: string; path: string; error?: string; notice?: string }) {
   const body = html`
@@ -37,6 +45,7 @@ function authShell(opts: { title: string; eyebrow: string; lead: string; formHtm
     title: `${opts.title} | ${clinic.nameKo}`,
     description: `${clinic.nameKo} ${opts.title} — 치료 전후 사진 열람 등 회원 전용 콘텐츠를 이용하실 수 있습니다.`,
     path: opts.path,
+    robots: 'noindex, follow', // 로그인·회원가입(?back= 변형 포함)은 색인 대상 아님
   }, body)
 }
 

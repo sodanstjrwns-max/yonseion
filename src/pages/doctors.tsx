@@ -22,7 +22,8 @@ export function DoctorsIndex() {
         ${raw(doctors.map((d) => `
           <a href="/doctors/${d.slug}" class="card reveal" style="text-align:center;padding:0;overflow:hidden">
             <div style="aspect-ratio:3/4;background:linear-gradient(135deg,var(--paper-2),var(--line));display:grid;place-items:center;overflow:hidden">
-              ${raw(picture(d.photo, `alt="${d.name} ${d.role}" loading="lazy" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<i class=&quot;fas fa-user-md&quot; style=&quot;font-size:4rem;color:var(--gold)&quot;></i>'"`))}
+              <i class="fas fa-user-md" aria-hidden="true" style="grid-area:1/1;font-size:4rem;color:var(--gold)"></i>
+              <span style="grid-area:1/1;width:100%;height:100%;display:block">${raw(picture(d.photo, `alt="${d.name} ${d.role}" loading="lazy" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'"`))}</span>
             </div>
             <div style="padding:1.8rem">
               <h2 style="margin-top:0;font-size:1.25rem">${d.name} <span style="font-size:1rem;color:var(--muted);font-weight:500">${d.role}</span></h2>
@@ -55,7 +56,8 @@ export function DoctorDetail(slug: string) {
     <div class="container doc-grid" style="display:grid;grid-template-columns:380px 1fr;gap:3.5rem;align-items:start">
       <div class="reveal">
         <div style="aspect-ratio:3/4;border-radius:18px;overflow:hidden;background:linear-gradient(135deg,var(--paper-2),var(--line));display:grid;place-items:center">
-          ${raw(picture(d.photo, `alt="${d.name} ${d.role} ${d.title}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<i class=&quot;fas fa-user-md&quot; style=&quot;font-size:5rem;color:var(--gold)&quot;></i>'"`))}
+          <i class="fas fa-user-md" aria-hidden="true" style="grid-area:1/1;font-size:5rem;color:var(--gold)"></i>
+          <span style="grid-area:1/1;width:100%;height:100%;display:block">${raw(picture(d.photo, `alt="${d.name} ${d.role} ${d.title}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'"`))}</span>
         </div>
         <a href="/reservation" class="btn btn-navy" style="width:100%;justify-content:center;margin-top:1rem">예약 상담 <i class="fas fa-arrow-right"></i></a>
       </div>

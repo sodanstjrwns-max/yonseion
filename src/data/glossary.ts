@@ -25,6 +25,15 @@ export const GLOSSARY_ALIASES: Record<string, string> = {
   'inlay-term': 'inlay',                     // 인레이
   'abrasion': 'cervical-abrasion',           // 치경부 마모증
   'gutta-percha-material': 'gutta-percha',   // 거타퍼차
+  // 2026-09-29: 같은 개념이 다른 slug·표기로 두 번 등록된 경량 용어 8쌍 — 내부 링크가 더 많은 쪽을 대표로 301
+  'wax-up': 'diagnostic-waxup',              // 진단 왁스업 (Diagnostic Wax-up)
+  'tooth-anatomy-crown': 'crown-anatomy',    // 치관 (Anatomical Crown)
+  'tooth-root': 'root',                      // 치근 (Tooth Root)
+  'articular-disc': 'tmj-disc',              // 관절원판 (Articular Disc)
+  'permanent-tooth': 'permanent-teeth',      // 영구치
+  'curing-light': 'light-curing-unit',       // 광중합기
+  'internal-bleaching': 'internal-whitening', // 실활치 미백
+  'immediate-dentin-sealing-term': 'ids',    // 즉시상아질봉쇄(IDS) → 리치 레이어 심층 해설
 }
 export const resolveGlossaryAlias = (slug: string): string | undefined => GLOSSARY_ALIASES[slug]
 
@@ -86,7 +95,6 @@ export const glossary: GlossaryEntry[] = [
   g('inferior-alveolar-nerve', '하치조신경', 'Inferior Alveolar Nerve', '해부·구조', '아래턱 속을 지나가는 감각신경으로, 아래 어금니 임플란트·사랑니 발치 시 위치 확인이 중요합니다.'),
   g('mental-foramen', '이공', 'Mental Foramen', '해부·구조', '아래턱 작은어금니 부근에서 신경이 빠져나오는 구멍으로, 임플란트 식립 시 피해야 하는 구조물입니다.'),
   g('tmj', '턱관절', 'Temporomandibular Joint', '해부·구조', '아래턱뼈와 머리뼈를 연결해 입을 벌리고 다물게 하는 관절입니다.', ['tmj-occlusion']),
-  g('articular-disc', '관절원판 (디스크)', 'Articular Disc', '해부·구조', '턱관절 뼈 사이에서 쿠션 역할을 하는 연골판으로, 위치가 어긋나면 소리·통증이 생길 수 있습니다.', ['tmj-occlusion']),
   g('masseter', '교근', 'Masseter Muscle', '해부·구조', '음식을 씹을 때 쓰는 볼 옆 큰 근육으로, 이갈이로 비대해지면 사각턱처럼 보일 수 있습니다.', ['tmj-occlusion']),
   g('temporalis', '측두근', 'Temporalis Muscle', '해부·구조', '관자놀이 부위의 저작근으로, 과긴장 시 두통과 비슷한 통증을 일으킬 수 있습니다.', ['tmj-occlusion']),
   g('tongue', '혀', 'Tongue', '해부·구조', '맛을 느끼고 발음·삼킴을 돕는 근육 기관으로, 구강 건강 상태를 반영하는 부위이기도 합니다.'),
@@ -99,7 +107,6 @@ export const glossary: GlossaryEntry[] = [
   g('molar', '대구치 (큰어금니)', 'Molar', '해부·구조', '치열 가장 안쪽의 큰 치아로, 음식을 갈아 으깨는 주된 역할을 합니다.'),
   g('wisdom-tooth', '사랑니 (제3대구치)', 'Wisdom Tooth', '해부·구조', '가장 늦게 나는 제일 안쪽 어금니로, 비스듬히 나거나 매복된 경우 발치를 고려합니다.'),
   g('deciduous-tooth', '유치 (젖니)', 'Deciduous Tooth', '해부·구조', '생후 6개월경부터 나는 어린이 치아 20개로, 영구치 자리를 유지하는 중요한 역할을 합니다.'),
-  g('permanent-tooth', '영구치', 'Permanent Tooth', '해부·구조', '유치가 빠진 뒤 평생 사용하는 치아로, 사랑니 포함 최대 32개입니다.'),
   g('dental-arch', '치열궁', 'Dental Arch', '해부·구조', '치아가 활 모양으로 배열된 전체 형태를 가리키는 용어입니다.'),
   g('midline', '정중선', 'Dental Midline', '해부·구조', '위아래 앞니 중앙을 지나는 가상의 선으로, 심미 치료에서 좌우 대칭의 기준이 됩니다.', ['esthetic-prosthetics']),
   g('gummy-smile', '거미스마일', 'Gummy Smile', '해부·구조', '웃을 때 잇몸이 과도하게 드러나는 상태로, 원인에 따라 다양한 개선 방법을 고려할 수 있습니다.', ['esthetic-prosthetics']),
@@ -129,7 +136,6 @@ export const glossary: GlossaryEntry[] = [
   g('cavity-prep', '와동 형성', 'Cavity Preparation', '충치·보존', '충치를 제거하고 충전물이 들어갈 공간을 다듬는 과정입니다.'),
   g('etching', '산부식 (에칭)', 'Acid Etching', '충치·보존', '접착 전 치아 표면을 산으로 처리해 미세한 요철을 만들어 접착력을 높이는 단계입니다.', ['adhesive-restoration']),
   g('bonding-agent', '접착제 (본딩제)', 'Bonding Agent', '충치·보존', '레진과 치아를 화학적·기계적으로 결합시키는 접착 재료입니다.', ['adhesive-restoration']),
-  g('curing-light', '광중합기', 'Curing Light', '충치·보존', '빛으로 레진을 굳히는 장비로, 레진 치료의 필수 기구입니다.'),
   g('polymerization-shrinkage', '중합수축', 'Polymerization Shrinkage', '충치·보존', '레진이 굳으며 부피가 줄어드는 현상으로, 이를 줄이는 적층 충전 기법이 중요합니다.', ['adhesive-restoration']),
   g('matrix-band', '매트릭스 밴드', 'Matrix Band', '충치·보존', '인접면 충전 시 치아 옆면 형태를 만들어주는 얇은 금속·플라스틱 띠입니다.'),
   g('cervical-abrasion', '치경부 마모증', 'Cervical Abrasion', '충치·보존', '잘못된 칫솔질 등으로 치아 목 부위가 패이는 비우식성 손상으로, 시린 증상의 흔한 원인입니다.', ['adhesive-restoration']),
@@ -166,7 +172,6 @@ export const glossary: GlossaryEntry[] = [
   g('working-length', '작업장 (근관장)', 'Working Length', '신경치료', '신경치료에서 기구가 들어가야 하는 신경관의 정확한 길이입니다.'),
   g('canal-sealer', '근관 실러', 'Root Canal Sealer', '신경치료', '거타퍼차와 신경관 벽 사이 미세한 틈을 메우는 충전 보조 재료입니다.'),
   g('cracked-tooth-syndrome', '균열치아증후군', 'Cracked Tooth Syndrome', '신경치료', '눈에 잘 보이지 않는 치아 균열로 씹을 때 통증이 생기는 상태로, 진단이 까다로운 질환입니다.'),
-  g('internal-bleaching', '실활치 미백', 'Internal Bleaching', '신경치료', '신경치료 후 변색된 치아 내부에 미백제를 넣어 색을 개선하는 술식입니다.'),
   g('endodontic-microscope', '치과 현미경', 'Dental Operating Microscope', '신경치료', '신경관 입구와 내부를 확대해 보며 정밀 치료를 가능하게 하는 장비입니다.'),
   g('calcified-canal', '석회화 근관', 'Calcified Canal', '신경치료', '신경관이 좁아지거나 막힌 상태로, 신경치료의 난이도를 높이는 요인입니다.'),
   g('perforation', '천공', 'Perforation', '신경치료', '치아 벽이나 뿌리에 비정상적인 구멍이 생긴 상태로, MTA 등으로 수리를 시도합니다.'),
@@ -202,7 +207,6 @@ export const glossary: GlossaryEntry[] = [
   g('occlusal-adjustment', '교합조정', 'Occlusal Adjustment', '보철·크라운', '보철물이나 치아의 맞물림을 미세하게 다듬어 편안한 교합을 만드는 처치입니다.', ['tmj-occlusion']),
   g('vertical-dimension', '수직고경', 'Vertical Dimension', '보철·크라운', '위아래 턱 사이의 높이로, 전악 보철·교합 재구성에서 핵심적으로 평가하는 기준입니다.', ['tmj-occlusion']),
   g('full-mouth-rehab', '전악 수복(풀마우스)', 'Full Mouth Rehabilitation', '보철·크라운', '마모·붕괴된 전체 치열의 교합과 기능, 심미를 종합적으로 재건하는 치료입니다.', ['tmj-occlusion', 'esthetic-prosthetics']),
-  g('wax-up', '왁스업', 'Diagnostic Wax-up', '보철·크라운', '치료 전 모형 위에 최종 결과를 왁스로 미리 만들어 보는 진단·설계 과정입니다.'),
   g('digital-smile-design', '디지털 스마일 디자인', 'Digital Smile Design (DSD)', '보철·크라운', '사진·스캔 데이터를 활용해 웃을 때의 심미를 디지털로 설계하는 기법입니다.', ['esthetic-prosthetics']),
   g('retraction-cord', '치은압배사', 'Gingival Retraction Cord', '보철·크라운', '정밀한 본뜨기를 위해 잇몸을 살짝 벌려주는 가는 실입니다.'),
   g('provisional-restoration', '프로비저널', 'Provisional Restoration', '보철·크라운', '장기간 사용하며 교합·심미를 검증하는 정밀 임시 보철물로, 전악 치료에서 중요합니다.'),
@@ -525,8 +529,6 @@ export const glossary: GlossaryEntry[] = [
 
   // ===== 치아 상식 =====
   g('tooth-numbering', '치식(치아 번호)', 'Tooth Numbering System', '치아 상식', '치아를 부위별 번호로 표기하는 체계로, 국내는 FDI 방식(11~48번)을 주로 사용합니다.'),
-  g('tooth-anatomy-crown', '치관(치아 머리)', 'Anatomical Crown', '치아 상식', '잇몸 위로 드러난 치아 부분으로, 법랑질로 덮여 있습니다.'),
-  g('tooth-root', '치근(치아 뿌리)', 'Tooth Root', '치아 상식', '뼈 속에 박혀 치아를 지지하는 부분으로, 백악질로 덮여 치주인대와 연결됩니다.'),
   g('tooth-lifespan', '치아의 수명', 'Tooth Longevity', '치아 상식', '관리에 따라 평생 사용할 수 있으며, 정기검진과 조기 치료가 수명을 결정합니다.'),
   g('chewing-force', '저작력(씹는 힘)', 'Chewing Force', '치아 상식', '어금니 기준 평균 50~70kg에 달하는 힘으로, 보철물 설계 시 중요한 고려 요소입니다.'),
   g('tooth-count', '치아 개수', 'Number of Teeth', '치아 상식', '유치 20개, 영구치는 사랑니 포함 32개(사랑니 제외 28개)입니다.'),
@@ -552,7 +554,6 @@ export const glossary: GlossaryEntry[] = [
   g('co-diagnosis', '코다이아그노시스(공동 진단)', 'Co-diagnosis', '진료 철학', '구강 카메라·영상을 함께 보며 환자가 자신의 상태를 직접 이해하고 치료를 결정하도록 돕는 방식입니다.'),
   g('biomimetic-protocol', '바이오미메틱 프로토콜', 'Biomimetic Protocol', '진료 철학', '자연치아의 구조·역학을 모방해 접착 수복하는 치료 절차로, 신경 보호와 파절 예방을 목표로 합니다.', ['biomimetic-dentistry', 'adhesive-restoration']),
   g('deep-margin-elevation', '심부 변연 거상술(DME)', 'Deep Margin Elevation', '진료 철학', '잇몸 깊이 진행된 충치의 경계를 레진으로 끌어올려 수술 없이 정밀 접착 수복을 가능하게 하는 술식입니다.', ['adhesive-restoration', 'conservative']),
-  g('immediate-dentin-sealing-term', '즉시상아질봉쇄(IDS) 개념', 'Immediate Dentin Sealing Concept', '진료 철학', '치아 삭제 직후 신선한 상아질을 곧바로 접착 봉쇄해 시림과 세균 침투를 막는 접착치의학의 핵심 술식입니다.', ['ids', 'adhesive-restoration']),
   g('bioceramic-sealer', '바이오세라믹 실러', 'Bioceramic Sealer', '재료·장비', '생체친화성이 우수한 신경관 충전용 실러로, 현대 신경치료에서 사용이 늘고 있습니다.'),
   g('pfm-vs-zirconia', '금속도재관과 지르코니아 비교', 'PFM vs Zirconia', '보철·크라운', '지르코니아는 금속 노출·도재 파절 문제가 적어 PFM을 대체하는 추세입니다.'),
   g('implant-brand', '임플란트 브랜드(국산·수입)', 'Implant Brands', '임플란트', '오스템·덴티움 등 국산과 스트라우만 등 수입 브랜드가 있으며, 식립 실력과 관리가 더 중요합니다.'),
