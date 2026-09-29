@@ -4,7 +4,8 @@
 import { Hono } from 'hono'
 import { html, raw } from 'hono/html'
 import type { Bindings } from '../lib/bindings'
-import { Store, newId, slugify } from '../lib/store'
+import { Store, newId } from '../lib/store'
+import { generateSeoSlug, isValidSlug, uniqueSlug } from '../lib/seo-slug'
 import { getPricing, savePricing, resetPricing } from '../lib/pricing-store'
 import type { PricingData } from '../lib/pricing-store'
 import { fireIndexNotify } from '../lib/indexing'
@@ -396,6 +397,97 @@ async function viewCounts(c: any, type: string, ids: string[]): Promise<Record<s
   return out
 }
 
+// ---------- 영문 주소(슬러그) — 칼럼·케이스 공용 ----------
+type SlugKind = 'column' | 'case'
+const SLUG_PREFIX: Record<SlugKind, 'columns' | 'cases'> = { column: 'columns', case: 'cases' }
+const SLUG_FALLBACK: Record<SlugKind, string> = { column: 'dental-column', case: 'dental-case' }
+const SLUG_PATH: Record<SlugKind, string> = { column: '/column/', case: '/cases/' }
+
+async function takenSlugs(store: Store, kind: SlugKind, exceptId?: string): Promise<Set<string>> {
+  const idx = await store.index<{ id: string; slug: string }>(SLUG_PREFIX[kind])
+  return new Set(idx.filter((x) => x.id !== exceptId).map((x) => x.slug))
+}
+
+// 저장 시 슬러그 결정: 기존 글은 칸을 바꾸지 않으면 그대로 유지, 새 글은 제목→영문 자동(겹치면 -2, -3)
+async function resolveSlug(store: Store, kind: SlugKind, rawIn: unknown, title: string, existing?: { id: string; slug: string }):
+  Promise<{ slug: string; error?: undefined } | { error: string; slug?: undefined }> {
+  const raw = String(rawIn ?? '').trim()
+  if (existing && (raw === '' || raw === existing.slug)) return { slug: existing.slug }
+  const taken = await takenSlugs(store, kind, existing?.id)
+  if (!raw) return { slug: uniqueSlug(generateSeoSlug(title, SLUG_FALLBACK[kind]), taken) }
+  const s = raw.toLowerCase()
+  if (!isValidSlug(s)) return { error: `영문 주소 "${raw}" 를 쓸 수 없습니다 — 영문 소문자·숫자·하이픈(-)만, 3~80자로 입력해 주세요.` }
+  if (taken.has(s)) return { error: `영문 주소 "${s}" 는 이미 다른 글이 쓰고 있습니다. 예: ${uniqueSlug(s, taken)}` }
+  return { slug: s }
+}
+
+// 에디터 실시간 미리보기 — ?kind=column|case&id=<수정 중인 글 id>&title=… 또는 &slug=…(직접 입력 확인)
+admin.get('/api/slug-preview', async (c) => {
+  const kind: SlugKind = c.req.query('kind') === 'case' ? 'case' : 'column'
+  const store = new Store(c.env.R2)
+  const taken = await takenSlugs(store, kind, c.req.query('id') || undefined)
+  const manual = c.req.query('slug')
+  if (manual !== undefined) {
+    const s = manual.trim().toLowerCase()
+    return c.json({ slug: s, valid: isValidSlug(s), taken: taken.has(s), suggestion: uniqueSlug(s, taken) })
+  }
+  const base = generateSeoSlug(c.req.query('title') || '', SLUG_FALLBACK[kind])
+  const slug = uniqueSlug(base, taken)
+  return c.json({ slug, base, valid: isValidSlug(slug), taken: false })
+})
+
+// 제목 아래 "영문 주소(슬러그)" 칸 + 자동 채움 스크립트 (제목 input 은 id="f-title")
+function slugField(kind: SlugKind, id: string | undefined, value: string, origSlug: string) {
+  const auto = !origSlug && !value
+  const host = String(clinic.domain).replace(/^https?:\/\//, '').replace(/\/$/, '')
+  return `
+      <label>영문 주소(슬러그) <small class="muted">— 제목을 쓰면 자동으로 영어 주소가 만들어집니다. 필요하면 직접 고칠 수 있어요 (영문 소문자·숫자·하이픈)</small></label>
+      <div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap">
+        <span class="muted" style="font-size:.82rem;white-space:nowrap">${esc(host)}${SLUG_PATH[kind]}</span>
+        <input name="slug" id="f-slug" value="${esc(value)}" data-auto="${auto ? '1' : '0'}" data-orig="${esc(origSlug)}" data-kind="${kind}" data-id="${esc(id || '')}"
+          autocomplete="off" spellcheck="false" maxlength="80" placeholder="제목을 입력하면 자동 생성" style="flex:1;min-width:220px;font-family:monospace">
+        <button type="button" class="btn sm ghost" onclick="slugRegen()" title="제목으로 영문 주소를 다시 만듭니다"><i class="fas fa-rotate"></i> 제목에서 다시 만들기</button>
+      </div>
+      <div class="charcount" id="slug-hint"></div>`
+}
+const slugScript = `
+<script>
+(function(){
+  var SI=document.getElementById('f-slug'), TI=document.getElementById('f-title'), H=document.getElementById('slug-hint');
+  if(!SI||!TI) return;
+  var auto=SI.dataset.auto==='1', orig=SI.dataset.orig||'', kind=SI.dataset.kind, id=SI.dataset.id, t1=null, t2=null, seq=0;
+  var base='/admin/api/slug-preview?kind='+encodeURIComponent(kind)+'&id='+encodeURIComponent(id);
+  function hint(msg,cls){ H.textContent=msg; H.className='charcount'+(cls?' '+cls:''); }
+  function fmtOk(v){ return /^[a-z0-9-]{3,80}$/.test(v) && !/^-|-$|--/.test(v); }
+  function refresh(){ if(window.updateSeo){ try{ updateSeo(); }catch(e){} } }
+  function check(){
+    var v=SI.value.trim();
+    if(orig && v===orig){ hint(/[^\\x00-\\x7f]/.test(v)?'기존 주소를 그대로 유지합니다 (예전에 만든 한글 주소 — 바꾸면 이 주소로는 더 이상 열리지 않습니다)':'기존 주소를 그대로 유지합니다'); refresh(); return; }
+    if(!v){ hint(orig?'비워두면 기존 주소를 유지합니다':'제목을 입력하면 자동으로 채워집니다'); refresh(); return; }
+    if(!fmtOk(v)){ hint('영문 소문자·숫자·하이픈(-)만, 3~80자로 입력해 주세요','bad'); refresh(); return; }
+    hint(orig?'저장하면 주소가 바뀝니다 — 예전 주소로는 더 이상 열리지 않으니 이미 알린 글이면 그대로 두세요':(auto?'제목에서 자동 생성됨':'직접 입력한 주소'), orig?'warn':'');
+    clearTimeout(t2); t2=setTimeout(function(){
+      fetch(base+'&slug='+encodeURIComponent(v)).then(function(r){return r.json();}).then(function(d){
+        if(SI.value.trim()!==v) return;
+        if(d.taken) hint('이미 다른 글이 쓰는 주소입니다 — 예: '+d.suggestion,'bad');
+      }).catch(function(){});
+    },350);
+    refresh();
+  }
+  function gen(force){
+    var title=TI.value.trim(); if(!title){ if(auto){ SI.value=''; check(); } return; }
+    var my=++seq;
+    fetch(base+'&title='+encodeURIComponent(title)).then(function(r){return r.json();}).then(function(d){
+      if(my!==seq) return; if(auto||force){ SI.value=d.slug; check(); }
+    }).catch(function(){});
+  }
+  TI.addEventListener('input',function(){ if(!auto) return; clearTimeout(t1); t1=setTimeout(gen,300); });
+  SI.addEventListener('input',function(){ auto=false; check(); });
+  window.slugRegen=function(){ if(orig && !confirm('제목으로 새 영문 주소를 만들까요? 저장하면 예전 주소로는 더 이상 열리지 않습니다.')) return; gen(true); };
+  check(); if(auto && TI.value.trim()) gen();
+})();
+</script>`
+
 // ---------- 이미지 업로드 (공용) ----------
 admin.post('/upload', async (c) => {
   const form = await c.req.parseBody()
@@ -656,7 +748,8 @@ function updateSeo(){
   // 구글 미리보기
   document.getElementById('gp-t').textContent=(mt||title||'제목을 입력하세요');
   document.getElementById('gp-d').textContent=(md||excerpt||'요약/메타 설명을 입력하세요');
-  document.getElementById('gp-u').textContent='${esc(clinic.domain)}'.replace(/^https?:\\/\\//,'')+'/column/' + (slugP(title)||'…');
+  var slugEl=document.getElementById('f-slug');
+  document.getElementById('gp-u').textContent='${esc(clinic.domain)}'.replace(/^https?:\\/\\//,'')+'/column/' + ((slugEl&&slugEl.value.trim())||'…');
 
   var checks=[
     { ok: title.length>=15 && title.length<=40, warn:title.length>0, t:'제목 15~40자 ('+title.length+'자)' },
@@ -681,7 +774,6 @@ function updateSeo(){
     return '<li class="'+cls+'"><i class="fas '+ic+'"></i><span>'+c.t+'</span></li>';
   }).join('');
 }
-function slugP(s){ return (s||'').toLowerCase().trim().replace(/[^\\w가-힣\\s-]/g,'').replace(/\\s+/g,'-').slice(0,40); }
 
 // 저장 직전 — 에디터 HTML을 hidden 필드에 동기화
 function syncEditor(){
@@ -713,16 +805,17 @@ admin.get('/cases', async (c) => {
   return c.html(shell('케이스', body, '/admin/cases'))
 })
 
-function caseForm(cs?: CaseItem) {
+function caseForm(cs?: CaseItem, opts: { error?: string; origSlug?: string } = {}) {
   const txOpts = treatments.map((t) => `<option value="${t.slug}" ${cs?.treatmentSlug === t.slug ? 'selected' : ''}>${t.name}</option>`).join('')
   const docOpts = doctors.map((d) => `<option value="${d.slug}" ${cs?.doctorSlug === d.slug ? 'selected' : ''}>${d.name} ${d.role}</option>`).join('')
   const imgField = (id: string, label: string, val?: string) => `
     <label>${label}</label>
     <input type="text" id="${id}" name="${id}" value="${val || ''}" placeholder="/api/images/... (직접 입력 또는 업로드)">
     <input type="file" accept="image/*" onchange="upload(this,'${id}')" style="margin-top:.3rem"><small class="muted"></small>`
-  return `
+  return `${opts.error ? `<div class="panel" style="border:1px solid #C25B4A;color:#C25B4A;margin-bottom:1rem"><i class="fas fa-circle-exclamation"></i> ${esc(opts.error)}</div>` : ''}
   <form class="panel" method="POST">
-    <label>케이스 제목 *</label><input name="title" required value="${cs?.title || ''}" placeholder="예: 50대 남성 — 상악 전치부 심미보철">
+    <label>케이스 제목 *</label><input name="title" id="f-title" required value="${esc(cs?.title || '')}" placeholder="예: 50대 남성 — 상악 전치부 심미보철">
+    ${slugField('case', opts.origSlug ? cs?.id : undefined, cs?.slug || '', opts.origSlug || '')}
     <div class="row3">
       <div><label>나이대</label><input name="ageGroup" value="${cs?.ageGroup || ''}" placeholder="50대"></div>
       <div><label>성별</label><select name="gender">${['남성', '여성'].map((g) => `<option ${cs?.gender === g ? 'selected' : ''}>${g}</option>`).join('')}</select></div>
@@ -748,7 +841,7 @@ function caseForm(cs?: CaseItem) {
     <label><input type="checkbox" name="published" style="width:auto;margin-right:.5rem" ${cs?.published !== false ? 'checked' : ''}>게시 (체크 해제 시 비공개 저장)</label>
     <label><input type="checkbox" name="consent" style="width:auto;margin-right:.5rem" required ${cs ? 'checked' : ''}>환자 동의를 받았으며, 동일 환자·동일 부위 사진임을 확인합니다 (의료법 §56)</label>
     <button class="btn" style="margin-top:1.2rem"><i class="fas fa-floppy-disk"></i> 저장</button>
-  </form>${uploadScript}`
+  </form>${uploadScript}${slugScript}`
 }
 
 admin.get('/cases/new', (c) => c.html(shell('케이스 등록', `<h1>새 케이스</h1>${caseForm()}`, '/admin/cases')))
@@ -756,16 +849,16 @@ admin.get('/cases/:id', async (c) => {
   const store = new Store(c.env.R2)
   const cs = await store.getJSON<CaseItem>(`cases/${c.req.param('id')}.json`)
   if (!cs) return c.redirect('/admin/cases')
-  return c.html(shell('케이스 수정', `<h1>케이스 수정</h1>${caseForm(cs)}`, '/admin/cases'))
+  return c.html(shell('케이스 수정', `<h1>케이스 수정</h1>${caseForm(cs, { origSlug: cs.slug })}`, '/admin/cases'))
 })
 
-async function saveCase(c: any, existing?: CaseItem) {
+async function saveCase(c: any, existing?: CaseItem): Promise<{ error: string; draft: CaseItem } | undefined> {
   const f = await c.req.parseBody()
   const store = new Store(c.env.R2)
   const title = String(f.title || '').trim()
   const cs: CaseItem = {
     id: existing?.id || newId('cs_'),
-    slug: existing?.slug || slugify(title) || newId('case-'),
+    slug: String(f.slug ?? '').trim(),
     title,
     ageGroup: String(f.ageGroup || ''),
     gender: String(f.gender || ''),
@@ -783,19 +876,28 @@ async function saveCase(c: any, existing?: CaseItem) {
     published: !!f.published,
     createdAt: existing?.createdAt || new Date().toISOString(),
   }
+  const r = await resolveSlug(store, 'case', f.slug, title, existing)
+  if (r.error !== undefined) return { error: r.error, draft: cs }
+  cs.slug = r.slug
   await store.putJSON(`cases/${cs.id}.json`, cs)
   const idx = (await store.index<any>('cases')).filter((x: any) => x.id !== cs.id)
   idx.unshift({ id: cs.id, slug: cs.slug, title: cs.title, createdAt: cs.createdAt, published: cs.published })
   await store.setIndex('cases', idx)
   // 발행된 케이스(비포애프터)는 구글에 자동 색인 요청
+  if (existing?.published && existing.slug !== cs.slug) fireIndexNotify(c, `/cases/${existing.slug}`, 'URL_DELETED')
   if (cs.published) fireIndexNotify(c, `/cases/${cs.slug}`)
 }
 
-admin.post('/cases/new', async (c) => { await saveCase(c); return c.redirect('/admin/cases') })
+admin.post('/cases/new', async (c) => {
+  const r = await saveCase(c)
+  if (r) return c.html(shell('케이스 등록', `<h1>새 케이스</h1>${caseForm(r.draft, { error: r.error })}`, '/admin/cases'))
+  return c.redirect('/admin/cases')
+})
 admin.post('/cases/:id', async (c) => {
   const store = new Store(c.env.R2)
   const existing = await store.getJSON<CaseItem>(`cases/${c.req.param('id')}.json`)
-  await saveCase(c, existing || undefined)
+  const r = await saveCase(c, existing || undefined)
+  if (r) return c.html(shell('케이스 수정', `<h1>케이스 수정</h1>${caseForm(r.draft, { error: r.error, origSlug: existing?.slug })}`, '/admin/cases'))
   return c.redirect('/admin/cases')
 })
 admin.post('/cases/:id/delete', async (c) => {
@@ -827,16 +929,17 @@ admin.get('/columns', async (c) => {
   return c.html(shell('칼럼', body, '/admin/columns'))
 })
 
-function columnForm(col?: Column) {
+function columnForm(col?: Column, opts: { error?: string; origSlug?: string } = {}) {
   const docOpts = doctors.map((d) => `<option value="${d.slug}" ${col?.authorSlug === d.slug ? 'selected' : ''}>${d.name} ${d.role}</option>`).join('')
   const txOpts = treatments.map((t) => `<option value="${t.slug}" ${col?.relatedTreatments?.includes(t.slug) ? 'selected' : ''}>${esc(t.name)}</option>`).join('')
   const initial = col?.contentHtml || '<h2>소제목을 입력하세요</h2><p>본문을 입력하세요. 사진은 본문 안으로 끌어다 놓거나 붙여넣으면 바로 삽입됩니다.</p>'
-  return `
+  return `${opts.error ? `<div class="panel" style="border:1px solid #C25B4A;color:#C25B4A;margin-bottom:1rem"><i class="fas fa-circle-exclamation"></i> ${esc(opts.error)}</div>` : ''}
   <form class="col-layout" method="POST" id="colForm" onsubmit="return syncEditor()">
     <div>
     <div class="panel" style="margin-bottom:1.2rem">
       <label style="margin-top:0">제목 *</label><input name="title" id="f-title" required value="${esc(col?.title || '')}" oninput="updateSeo()">
       <div class="charcount" id="cc-title"></div>
+      ${slugField('column', opts.origSlug ? col?.id : undefined, col?.slug || '', opts.origSlug || '')}
       <label>요약 / 목록 설명 * <small class="muted">(검색결과 본문에 노출 — 1~2문장)</small></label>
       <textarea name="excerpt" id="f-excerpt" required maxlength="200" style="min-height:64px" oninput="updateSeo()">${esc(col?.excerpt || '')}</textarea>
       <div class="charcount" id="cc-excerpt"></div>
@@ -928,7 +1031,7 @@ function columnForm(col?: Column) {
         </div>
       </div>
     </aside>
-  </form>${uploadScript}${rteScript}`
+  </form>${uploadScript}${rteScript}${slugScript}`
 }
 
 admin.get('/columns/new', (c) => c.html(shell('칼럼 작성', `<h1>새 칼럼</h1>${columnForm()}`, '/admin/columns')))
@@ -936,17 +1039,17 @@ admin.get('/columns/:id', async (c) => {
   const store = new Store(c.env.R2)
   const col = await store.getJSON<Column>(`columns/${c.req.param('id')}.json`)
   if (!col) return c.redirect('/admin/columns')
-  return c.html(shell('칼럼 수정', `<h1>칼럼 수정</h1>${columnForm(col)}`, '/admin/columns'))
+  return c.html(shell('칼럼 수정', `<h1>칼럼 수정</h1>${columnForm(col, { origSlug: col.slug })}`, '/admin/columns'))
 })
 
-async function saveColumn(c: any, existing?: Column) {
+async function saveColumn(c: any, existing?: Column): Promise<{ error: string; draft: Column } | undefined> {
   const f = await c.req.parseBody({ all: true })
   const store = new Store(c.env.R2)
   const title = String(f.title || '').trim()
   const rel = Array.isArray(f.relatedTreatments) ? f.relatedTreatments.map(String) : (f.relatedTreatments ? [String(f.relatedTreatments)] : [])
   const col: Column = {
     id: existing?.id || newId('col_'),
-    slug: existing?.slug || slugify(title) || newId('column-'),
+    slug: String(f.slug ?? '').trim(),
     title,
     excerpt: String(f.excerpt || ''),
     contentHtml: String(f.contentHtml || ''),
@@ -960,19 +1063,28 @@ async function saveColumn(c: any, existing?: Column) {
     createdAt: existing?.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }
+  const r = await resolveSlug(store, 'column', f.slug, title, existing)
+  if (r.error !== undefined) return { error: r.error, draft: col }
+  col.slug = r.slug
   await store.putJSON(`columns/${col.id}.json`, col)
   const idx = (await store.index<any>('columns')).filter((x: any) => x.id !== col.id)
   idx.unshift({ id: col.id, slug: col.slug, title: col.title, createdAt: col.createdAt, published: col.published })
   await store.setIndex('columns', idx)
   // 발행된 칼럼은 구글에 자동 색인 요청
+  if (existing?.published && existing.slug !== col.slug) fireIndexNotify(c, `/column/${existing.slug}`, 'URL_DELETED')
   if (col.published) fireIndexNotify(c, `/column/${col.slug}`)
 }
 
-admin.post('/columns/new', async (c) => { await saveColumn(c); return c.redirect('/admin/columns') })
+admin.post('/columns/new', async (c) => {
+  const r = await saveColumn(c)
+  if (r) return c.html(shell('칼럼 작성', `<h1>새 칼럼</h1>${columnForm(r.draft, { error: r.error })}`, '/admin/columns'))
+  return c.redirect('/admin/columns')
+})
 admin.post('/columns/:id', async (c) => {
   const store = new Store(c.env.R2)
   const existing = await store.getJSON<Column>(`columns/${c.req.param('id')}.json`)
-  await saveColumn(c, existing || undefined)
+  const r = await saveColumn(c, existing || undefined)
+  if (r) return c.html(shell('칼럼 수정', `<h1>칼럼 수정</h1>${columnForm(r.draft, { error: r.error, origSlug: existing?.slug })}`, '/admin/columns'))
   return c.redirect('/admin/columns')
 })
 admin.post('/columns/:id/delete', async (c) => {
