@@ -7,6 +7,8 @@ import { doctors } from './data/doctors'
 import { encyclopedia } from './data/encyclopedia'
 import { glossary, resolveGlossaryAlias } from './data/glossary'
 import { isThinEncyclo, isThinGlossary, NOINDEX_FOLLOW } from './lib/thin-content'
+import { CONTENT_DATES, PAGE_DATES, latestDate } from './lib/content-dates'
+import { getPricing } from './lib/pricing-store'
 
 import { areaCombos } from './data/facilities'
 import type { CaseItem, Column, Notice } from './data/types'
@@ -185,87 +187,120 @@ app.get('/notice/:id', async (c) => {
 // Sitemap — index + 콘텐츠별 분할 (대형 사이트 신호 / 크롤 효율↑)
 // ============================================================================
 type SmUrl = { loc: string; priority: string; changefreq: string; lastmod: string }
+// lastmod = 콘텐츠 실제 수정일(lib/content-dates.ts 고정값, R2 콘텐츠는 updatedAt/createdAt). 날짜를 모르면 태그 생략.
+// ※ new Date() 로 오늘 날짜를 찍지 않는다 (2026-09-29 SEO/AEO 감사).
 const smXml = (urls: SmUrl[]) => `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map((u) => `  <url><loc>${u.loc}</loc><lastmod>${u.lastmod}</lastmod><changefreq>${u.changefreq}</changefreq><priority>${u.priority}</priority></url>`).join('\n')}
+${urls.map((u) => `  <url><loc>${u.loc}</loc>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ''}<changefreq>${u.changefreq}</changefreq><priority>${u.priority}</priority></url>`).join('\n')}
 </urlset>`
+const smResponse = (c: any, urls: SmUrl[]) => c.text(smXml(urls), 200, { 'Content-Type': 'application/xml; charset=utf-8' })
 
-// --- sitemap.xml (인덱스) ---
-app.get('/sitemap.xml', (c) => {
+type R2Dated = { slug?: string; published: boolean; createdAt?: string; updatedAt?: string }
+async function loadR2Dated(env: Bindings) {
+  try {
+    const store = new Store(env.R2)
+    const [cases, cols, notices, pricing] = await Promise.all([
+      store.index<R2Dated>('cases'),
+      store.index<R2Dated>('columns'),
+      store.index<R2Dated>('notices'),
+      getPricing(env.R2),
+    ])
+    const pub = (xs: R2Dated[]) => xs.filter((x) => x.published)
+    return { cases: pub(cases), cols: pub(cols), notices: pub(notices), pricingUpdatedAt: pricing.updatedAt }
+  } catch {
+    return { cases: [] as R2Dated[], cols: [] as R2Dated[], notices: [] as R2Dated[], pricingUpdatedAt: undefined as string | undefined }
+  }
+}
+const itemDate = (x: R2Dated) => latestDate(x.updatedAt, x.createdAt)
+
+async function sitemapPagesUrls(env: Bindings): Promise<SmUrl[]> {
   const base = clinic.domain
-  const today = new Date().toISOString().slice(0, 10)
-  const maps = ['sitemap-pages.xml', 'sitemap-treatments.xml', 'sitemap-encyclopedia.xml', 'sitemap-area.xml', 'sitemap-content.xml']
+  const r2 = await loadR2Dated(env)
+  const staticPaths: { p: string; cf: string; lm: string }[] = [
+    { p: '/', cf: 'weekly', lm: PAGE_DATES.home },
+    { p: '/mission', cf: 'monthly', lm: PAGE_DATES.mission },
+    { p: '/biomimetic', cf: 'monthly', lm: PAGE_DATES.biomimetic },
+    { p: '/treatments', cf: 'monthly', lm: CONTENT_DATES.treatments },
+    { p: '/doctors', cf: 'monthly', lm: PAGE_DATES.doctors },
+    { p: '/reservation', cf: 'yearly', lm: PAGE_DATES.reservation },
+    { p: '/faq', cf: 'monthly', lm: PAGE_DATES.faq },
+    { p: '/pricing', cf: 'monthly', lm: latestDate(r2.pricingUpdatedAt) || PAGE_DATES.pricing },
+    { p: '/directions', cf: 'yearly', lm: PAGE_DATES.directions },
+    { p: '/cases/gallery', cf: 'weekly', lm: latestDate(...r2.cases.map(itemDate)) },
+    { p: '/column', cf: 'weekly', lm: latestDate(...r2.cols.map(itemDate)) },
+    { p: '/notice', cf: 'weekly', lm: latestDate(...r2.notices.map(itemDate)) },
+    { p: '/video', cf: 'monthly', lm: '' }, // 유튜브 RSS 자동 반영 — 수정일을 알 수 없어 생략
+    { p: '/encyclopedia', cf: 'monthly', lm: latestDate(CONTENT_DATES.encyclopedia, CONTENT_DATES.glossary) },
+    { p: '/area', cf: 'monthly', lm: PAGE_DATES.area },
+  ]
+  return [
+    ...staticPaths.map((s) => ({ loc: base + s.p, priority: s.p === '/' ? '1.0' : '0.8', changefreq: s.cf, lastmod: s.lm })),
+    ...doctors.map((d) => ({ loc: `${base}/doctors/${d.slug}`, priority: '0.8', changefreq: 'monthly', lastmod: PAGE_DATES.doctors })),
+  ]
+}
+
+function sitemapTreatmentUrls(): SmUrl[] {
+  const base = clinic.domain
+  return treatments.map((t) => ({ loc: `${base}/treatments/${t.slug}`, priority: t.category === 'core' ? '0.9' : '0.7', changefreq: 'monthly', lastmod: CONTENT_DATES.treatments }))
+}
+
+// 얇은 용어(lib/thin-content.ts, noindex, follow)는 제외 — 본문 보강 시 자동 복귀
+function sitemapEncyclopediaUrls(): SmUrl[] {
+  const base = clinic.domain
+  const seen = new Set<string>()
+  return [
+    ...encyclopedia.filter((e) => !isThinEncyclo(e)).map((e) => ({ loc: `${base}/encyclopedia/${e.slug}`, priority: '0.6', changefreq: 'monthly', lastmod: CONTENT_DATES.encyclopedia })),
+    ...glossary.filter((e) => !isThinGlossary(e)).map((e) => ({ loc: `${base}/encyclopedia/${e.slug}`, priority: '0.5', changefreq: 'yearly', lastmod: CONTENT_DATES.glossary })),
+  ].filter((u) => !seen.has(u.loc) && seen.add(u.loc)) // 리치/경량 레이어에 같은 slug 가 있으면 한 번만 등록
+}
+
+// 지역 페이지는 지역 데이터 + 진료·의료진·FAQ 데이터를 함께 렌더 → 그중 최신 수정일
+function sitemapAreaUrls(): SmUrl[] {
+  const base = clinic.domain
+  const lm = latestDate(PAGE_DATES.area, CONTENT_DATES.treatments, PAGE_DATES.doctors, PAGE_DATES.faq)
+  return areaCombos().map((a) => ({ loc: `${base}/area/${a.slug}`, priority: '0.6', changefreq: 'monthly', lastmod: lm }))
+}
+
+async function sitemapContentUrls(env: Bindings): Promise<SmUrl[]> {
+  const base = clinic.domain
+  const r2 = await loadR2Dated(env)
+  return [
+    ...r2.cases.map((x) => ({ loc: `${base}/cases/${x.slug}`, priority: '0.7', changefreq: 'monthly', lastmod: itemDate(x) })),
+    ...r2.cols.map((x) => ({ loc: `${base}/column/${x.slug}`, priority: '0.7', changefreq: 'monthly', lastmod: itemDate(x) })),
+  ]
+}
+
+// --- sitemap.xml (인덱스) — 하위 사이트맵별 lastmod = 그 안 URL 의 최신 lastmod ---
+app.get('/sitemap.xml', async (c) => {
+  const base = clinic.domain
+  const [pages, content] = await Promise.all([sitemapPagesUrls(c.env), sitemapContentUrls(c.env)])
+  const maps: [string, SmUrl[]][] = [
+    ['sitemap-pages.xml', pages],
+    ['sitemap-treatments.xml', sitemapTreatmentUrls()],
+    ['sitemap-encyclopedia.xml', sitemapEncyclopediaUrls()],
+    ['sitemap-area.xml', sitemapAreaUrls()],
+    ['sitemap-content.xml', content],
+  ]
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${maps.map((m) => `  <sitemap><loc>${base}/${m}</loc><lastmod>${today}</lastmod></sitemap>`).join('\n')}
+${maps.map(([m, urls]) => {
+    const lm = latestDate(...urls.map((u) => u.lastmod))
+    return `  <sitemap><loc>${base}/${m}</loc>${lm ? `<lastmod>${lm}</lastmod>` : ''}</sitemap>`
+  }).join('\n')}
 </sitemapindex>`
   return c.text(xml, 200, { 'Content-Type': 'application/xml; charset=utf-8' })
 })
 
 // --- sitemap-pages.xml (정적 페이지) ---
-app.get('/sitemap-pages.xml', (c) => {
-  const base = clinic.domain
-  const today = new Date().toISOString().slice(0, 10)
-  const staticPaths: { p: string; cf: string }[] = [
-    { p: '/', cf: 'weekly' }, { p: '/mission', cf: 'monthly' }, { p: '/biomimetic', cf: 'monthly' },
-    { p: '/treatments', cf: 'monthly' }, { p: '/doctors', cf: 'monthly' },
-    { p: '/reservation', cf: 'yearly' }, { p: '/faq', cf: 'monthly' }, { p: '/pricing', cf: 'monthly' },
-    { p: '/directions', cf: 'yearly' }, { p: '/cases/gallery', cf: 'weekly' }, { p: '/column', cf: 'weekly' },
-    { p: '/notice', cf: 'weekly' }, { p: '/video', cf: 'monthly' }, { p: '/encyclopedia', cf: 'monthly' }, { p: '/area', cf: 'monthly' },
-  ]
-  const urls: SmUrl[] = [
-    ...staticPaths.map((s) => ({ loc: base + s.p, priority: s.p === '/' ? '1.0' : '0.8', changefreq: s.cf, lastmod: today })),
-    ...doctors.map((d) => ({ loc: `${base}/doctors/${d.slug}`, priority: '0.8', changefreq: 'monthly', lastmod: today })),
-  ]
-  return c.text(smXml(urls), 200, { 'Content-Type': 'application/xml; charset=utf-8' })
-})
-
+app.get('/sitemap-pages.xml', async (c) => smResponse(c, await sitemapPagesUrls(c.env)))
 // --- sitemap-treatments.xml ---
-app.get('/sitemap-treatments.xml', (c) => {
-  const base = clinic.domain
-  const today = new Date().toISOString().slice(0, 10)
-  const urls: SmUrl[] = treatments.map((t) => ({ loc: `${base}/treatments/${t.slug}`, priority: t.category === 'core' ? '0.9' : '0.7', changefreq: 'monthly', lastmod: today }))
-  return c.text(smXml(urls), 200, { 'Content-Type': 'application/xml; charset=utf-8' })
-})
-
+app.get('/sitemap-treatments.xml', (c) => smResponse(c, sitemapTreatmentUrls()))
 // --- sitemap-encyclopedia.xml (리치 해설 + 기준 이상 경량 용어) ---
-// 얇은 용어(lib/thin-content.ts, noindex, follow)는 제외 — 본문 보강 시 자동 복귀
-app.get('/sitemap-encyclopedia.xml', (c) => {
-  const base = clinic.domain
-  const today = new Date().toISOString().slice(0, 10)
-  const seen = new Set<string>()
-  const urls: SmUrl[] = [
-    ...encyclopedia.filter((e) => !isThinEncyclo(e)).map((e) => ({ loc: `${base}/encyclopedia/${e.slug}`, priority: '0.6', changefreq: 'monthly', lastmod: today })),
-    ...glossary.filter((e) => !isThinGlossary(e)).map((e) => ({ loc: `${base}/encyclopedia/${e.slug}`, priority: '0.5', changefreq: 'yearly', lastmod: today })),
-  ].filter((u) => !seen.has(u.loc) && seen.add(u.loc)) // 리치/경량 레이어에 같은 slug 가 있으면 한 번만 등록
-  return c.text(smXml(urls), 200, { 'Content-Type': 'application/xml; charset=utf-8' })
-})
-
+app.get('/sitemap-encyclopedia.xml', (c) => smResponse(c, sitemapEncyclopediaUrls()))
 // --- sitemap-area.xml (지역 SEO) ---
-app.get('/sitemap-area.xml', (c) => {
-  const base = clinic.domain
-  const today = new Date().toISOString().slice(0, 10)
-  const urls: SmUrl[] = areaCombos().map((a) => ({ loc: `${base}/area/${a.slug}`, priority: '0.6', changefreq: 'monthly', lastmod: today }))
-  return c.text(smXml(urls), 200, { 'Content-Type': 'application/xml; charset=utf-8' })
-})
-
+app.get('/sitemap-area.xml', (c) => smResponse(c, sitemapAreaUrls()))
 // --- sitemap-content.xml (R2 동적 콘텐츠 — 케이스/칼럼) ---
-app.get('/sitemap-content.xml', async (c) => {
-  const base = clinic.domain
-  const today = new Date().toISOString().slice(0, 10)
-  const urls: SmUrl[] = []
-  try {
-    const store = new Store(c.env.R2)
-    const [cases, cols] = await Promise.all([
-      store.index<{ slug: string; published: boolean; createdAt?: string; updatedAt?: string }>('cases'),
-      store.index<{ slug: string; published: boolean; createdAt?: string; updatedAt?: string }>('columns'),
-    ])
-    const lm = (x: { updatedAt?: string; createdAt?: string }) => (x.updatedAt || x.createdAt || today).slice(0, 10)
-    cases.filter((x) => x.published).forEach((x) => urls.push({ loc: `${base}/cases/${x.slug}`, priority: '0.7', changefreq: 'monthly', lastmod: lm(x) }))
-    cols.filter((x) => x.published).forEach((x) => urls.push({ loc: `${base}/column/${x.slug}`, priority: '0.7', changefreq: 'monthly', lastmod: lm(x) }))
-  } catch { /* noop */ }
-  return c.text(smXml(urls), 200, { 'Content-Type': 'application/xml; charset=utf-8' })
-})
+app.get('/sitemap-content.xml', async (c) => smResponse(c, await sitemapContentUrls(c.env)))
 
 // --- 네이버 서치어드바이저 소유확인 (HTML 파일 방식) ---
 app.get('/naver3bc6810af11b42a00b0184d0bfc74731.html', (c) =>
