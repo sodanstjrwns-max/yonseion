@@ -6,6 +6,7 @@ import { glossary, GlossaryEntry } from '../data/glossary'
 import { getTreatment } from '../data/treatments'
 import { breadcrumbSchema, speakableSchema, faqSchema, definedTermSchema, medicalWebPageSchema } from '../lib/schema'
 import { isThinEncyclo, isThinGlossary, NOINDEX_FOLLOW } from '../lib/thin-content'
+import { CONTENT_DATES } from '../lib/content-dates'
 
 // ============================================================================
 // 치과 백과사전 — AEO 직답형 정적 콘텐츠 허브
@@ -171,7 +172,8 @@ export function EncyclopediaDetail(slug: string) {
       <div class="detail-grid">
         <article class="prose" data-reveal>
           ${raw(entry.body.map((b) => `<h2>${b.h}</h2><p>${b.p}</p>`).join(''))}
-          <p class="muted" style="font-size:.8rem;margin-top:2.5rem">※ 본 내용은 일반적인 의학 정보이며, 개인의 상태에 따라 진단·치료 방법이 다를 수 있습니다. 정확한 내용은 내원하여 전문의와 상담하시기 바랍니다.</p>
+          <p class="muted enc-review" style="font-size:.82rem;margin-top:2.5rem">감수: <a href="/doctors/kim-kyunghee">김경희 대표원장</a> · 최종 검토 <time datetime="${CONTENT_DATES.encyclopedia}">${CONTENT_DATES.encyclopedia}</time></p>
+          <p class="muted" style="font-size:.8rem;margin-top:.6rem">※ 본 내용은 일반적인 의학 정보이며, 개인의 상태에 따라 진단·치료 방법이 다를 수 있습니다. 정확한 내용은 내원하여 전문의와 상담하시기 바랍니다.</p>
         </article>
         <aside class="sidebar">
           ${raw(related.length ? `
@@ -208,6 +210,8 @@ export function EncyclopediaDetail(slug: string) {
         path: `/encyclopedia/${entry.slug}`,
         reviewerName: '김경희',
         reviewerSlug: 'kim-kyunghee',
+        lastReviewed: CONTENT_DATES.encyclopedia,
+        about: { type: 'DefinedTerm', id: `${clinic.domain}/encyclopedia/${entry.slug}#term`, name: entry.term },
       }),
       ...(faqEntries.length ? [faqSchema(faqEntries)] : []),
       speakableSchema(['#encyclo-answer']),
@@ -227,6 +231,7 @@ export function GlossaryDetail(slug: string) {
   const termSchema = {
     '@context': 'https://schema.org',
     '@type': 'DefinedTerm',
+    '@id': `${clinic.domain}/encyclopedia/${entry.slug}#term`,
     name: entry.term,
     alternateName: entry.termEn,
     description: entry.def,
@@ -251,7 +256,8 @@ export function GlossaryDetail(slug: string) {
           <h2>${entry.term}(${entry.termEn})이란?</h2>
           <p>${entry.def}</p>
           ${raw(related.length ? `<h2>관련 진료 안내</h2><p>${entry.term}와(과) 관련된 진료가 궁금하시다면 ${related.map((t) => `<a href="/treatments/${t!.slug}">${t!.name}</a>`).join(', ')} 페이지에서 더 자세한 내용을 확인하실 수 있습니다.</p>` : '')}
-          <p class="muted" style="font-size:.8rem;margin-top:2.5rem">※ 본 내용은 일반적인 의학 정보이며, 개인의 상태에 따라 진단·치료 방법이 다를 수 있습니다. 정확한 내용은 내원하여 전문의와 상담하시기 바랍니다.</p>
+          <p class="muted enc-review" style="font-size:.82rem;margin-top:2.5rem">감수: <a href="/doctors/kim-kyunghee">김경희 대표원장</a> · 최종 검토 <time datetime="${CONTENT_DATES.glossary}">${CONTENT_DATES.glossary}</time></p>
+          <p class="muted" style="font-size:.8rem;margin-top:.6rem">※ 본 내용은 일반적인 의학 정보이며, 개인의 상태에 따라 진단·치료 방법이 다를 수 있습니다. 정확한 내용은 내원하여 전문의와 상담하시기 바랍니다.</p>
         </article>
         <aside class="sidebar">
           ${raw(related.length ? `
@@ -293,6 +299,8 @@ export function GlossaryDetail(slug: string) {
         path: `/encyclopedia/${entry.slug}`,
         reviewerName: '김경희',
         reviewerSlug: 'kim-kyunghee',
+        lastReviewed: CONTENT_DATES.glossary,
+        about: { type: 'DefinedTerm', id: `${clinic.domain}/encyclopedia/${entry.slug}#term`, name: entry.term },
       }),
       speakableSchema(['#encyclo-answer']),
     ],

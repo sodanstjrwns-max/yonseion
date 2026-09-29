@@ -8,6 +8,7 @@ import { faqGroups } from '../data/faqs'
 import { getEntry } from '../data/encyclopedia'
 import { breadcrumbSchema, procedureSchema, speakableSchema, howToSchema, medicalWebPageSchema, itemListSchema, compareQaSchema } from '../lib/schema'
 import { autoLink } from '../lib/inlink'
+import { CONTENT_DATES } from '../lib/content-dates'
 
 // ---------- 진료 전체 목록 ----------
 export function TreatmentsIndex() {
@@ -247,6 +248,7 @@ export function TreatmentDetail(slug: string) {
 
         <p class="reveal" style="margin-top:2rem;font-size:.82rem;color:var(--muted);border-top:1px solid var(--line);padding-top:1rem">
           <i class="fas fa-user-md" style="color:var(--gold);margin-right:.4rem"></i>이 내용은 <a href="/doctors/kim-kyunghee" style="color:var(--navy);font-weight:600">${docs[0]?.name || '대표원장'} ${docs[0]?.role || '원장'}</a>의 감수를 거쳤습니다. 진단·치료 결과는 개인의 구강 상태에 따라 다를 수 있습니다.
+          <span style="display:block;margin-top:.35rem">감수: ${docs[0]?.name || '김경희'} ${docs[0]?.role || '대표원장'} · 최종 검토 <time datetime="${CONTENT_DATES.treatments}">${CONTENT_DATES.treatments}</time></span>
         </p>
       </div>
 
@@ -367,6 +369,8 @@ export function TreatmentDetail(slug: string) {
       path: '/treatments/' + t.slug,
       reviewerName: docs[0]?.name || '김경희',
       reviewerSlug: docs[0]?.slug || 'kim-kyunghee',
+      lastReviewed: CONTENT_DATES.treatments,
+      about: { type: 'MedicalProcedure', id: clinic.domain + '/treatments/' + t.slug + '#procedure', name: t.name },
     }),
     speakableSchema(['#tx-answer', '.answer']),
   ]

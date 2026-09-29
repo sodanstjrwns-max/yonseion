@@ -16,6 +16,16 @@ export function organizationSchema() {
     name: clinic.nameKo,
     alternateName: clinic.nameEn,
     url: BASE,
+    // 로고 — 헤더·푸터에 쓰는 실제 로고 자산(흰 배경 가로형)
+    logo: {
+      '@type': 'ImageObject',
+      '@id': BASE + '/#logo',
+      url: BASE + '/static/img/logo-horizontal-color.png',
+      contentUrl: BASE + '/static/img/logo-horizontal-color.png',
+      width: 1024,
+      height: 352,
+      caption: clinic.nameKo,
+    },
     telephone: clinic.phone,
     email: clinic.email,
     slogan: clinic.tagline,
@@ -71,10 +81,12 @@ export function organizationSchema() {
 export function personSchema(doc: Doctor) {
   return {
     '@context': 'https://schema.org',
-    '@type': 'Person',
+    // 의료진 = Physician (PFWE-SPEC §3.3 — Person 속성(jobTitle·hasCredential 등) 유지 위해 병기)
+    '@type': ['Person', 'Physician'],
     '@id': BASE + '/doctors/' + doc.slug + '#person',
     name: doc.name,
     jobTitle: doc.role + ' · ' + doc.title,
+    medicalSpecialty: 'https://schema.org/Dentistry',
     worksFor: { '@id': BASE + '/#clinic' },
     image: BASE + doc.photo,
     url: BASE + '/doctors/' + doc.slug,
@@ -91,6 +103,7 @@ export function procedureSchema(t: Treatment) {
   const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'MedicalProcedure',
+    '@id': BASE + '/treatments/' + t.slug + '#procedure',
     name: t.name,
     url: BASE + '/treatments/' + t.slug,
     description: t.hero,
@@ -208,7 +221,9 @@ export function articleSchema(opts: {
     datePublished: opts.datePublished,
     dateModified: opts.dateModified || opts.datePublished,
     author: opts.authorName ? { '@type': 'Person', name: opts.authorName, url: opts.authorSlug ? BASE + '/doctors/' + opts.authorSlug : undefined } : { '@id': BASE + '/#clinic' },
-    reviewedBy: opts.authorName ? { '@type': 'Person', name: opts.authorName } : undefined,
+    reviewedBy: opts.authorName
+      ? { '@type': ['Person', 'Physician'], ...(opts.authorSlug ? { '@id': BASE + '/doctors/' + opts.authorSlug + '#person' } : {}), name: opts.authorName }
+      : undefined,
     publisher: { '@id': BASE + '/#clinic' },
   }
 }
@@ -340,9 +355,12 @@ export function definedTermSchema(opts: {
 // --- MedicalWebPage (의료 콘텐츠 페이지 — E-E-A-T: 전문의 감수) ---
 export function medicalWebPageSchema(opts: {
   title: string; description: string; path: string;
-  reviewerName?: string; reviewerSlug?: string; lastReviewed?: string;
+  reviewerName?: string; reviewerSlug?: string;
+  /** 고정 검토일(YYYY-MM-DD) — lib/content-dates.ts. 없으면 lastReviewed 생략(오늘 날짜 자동 생성 금지) */
+  lastReviewed?: string;
+  /** 페이지 주제 엔티티 — 진료 상세는 MedicalProcedure @id, 백과는 DefinedTerm @id */
+  about?: { type: string; id: string; name: string };
 }) {
-  const today = new Date().toISOString().slice(0, 10)
   return {
     '@context': 'https://schema.org',
     '@type': 'MedicalWebPage',
@@ -352,10 +370,16 @@ export function medicalWebPageSchema(opts: {
     url: BASE + opts.path,
     inLanguage: 'ko',
     isPartOf: { '@id': BASE + '/#website' },
-    about: { '@type': 'MedicalEntity' },
-    lastReviewed: opts.lastReviewed || today,
+    ...(opts.about ? { about: { '@type': opts.about.type, '@id': opts.about.id, name: opts.about.name } } : {}),
+    ...(opts.lastReviewed ? { lastReviewed: opts.lastReviewed } : {}),
     reviewedBy: opts.reviewerName
-      ? { '@type': 'Person', name: opts.reviewerName, url: opts.reviewerSlug ? BASE + '/doctors/' + opts.reviewerSlug : undefined, worksFor: { '@id': BASE + '/#clinic' } }
+      ? {
+          '@type': ['Person', 'Physician'],
+          ...(opts.reviewerSlug ? { '@id': BASE + '/doctors/' + opts.reviewerSlug + '#person' } : {}),
+          name: opts.reviewerName,
+          url: opts.reviewerSlug ? BASE + '/doctors/' + opts.reviewerSlug : undefined,
+          worksFor: { '@id': BASE + '/#clinic' },
+        }
       : { '@id': BASE + '/#clinic' },
     publisher: { '@id': BASE + '/#clinic' },
   }

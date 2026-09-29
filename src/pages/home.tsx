@@ -44,8 +44,9 @@ export function HomePage() {
   }))
   const allHomeFaqs = [...homeFaqs, ...homeFaqPicks.flatMap((g) => g.faqs)]
 
+  const meta_title = `${clinic.nameKo} | 부산 동래구 온천동 치과 (온천장역)`
   const meta = {
-    title: `${clinic.nameKo} | 부산 동래구 온천동 치과 (온천장역)`,
+    title: meta_title,
     description: `부산 동래구 온천동 ${clinic.nameKo}(온천장역 도보 3분). 자연치아를 닮은 생체모방치의학으로 중장년 심미보철·전체임플란트·접착수복을 정직하게 진료합니다.`,
     path: '/',
     jsonLd: [
@@ -56,6 +57,18 @@ export function HomePage() {
       personSchema(doctors[0]),
       reserveActionSchema(),
       breadcrumbSchema([{ name: '홈', url: '/' }]),
+      // 홈 WebPage + speakable — 실제 DOM 의 히어로 태그라인·미션 문장만 지정
+      {
+        '@context': 'https://schema.org',
+        '@type': 'WebPage',
+        '@id': clinic.domain + '/#webpage',
+        url: clinic.domain + '/',
+        name: meta_title,
+        inLanguage: 'ko',
+        isPartOf: { '@id': clinic.domain + '/#website' },
+        about: { '@id': clinic.domain + '/#clinic' },
+        speakable: { '@type': 'SpeakableSpecification', cssSelector: ['h1.hw-tagline', '.hw-mission'] },
+      },
     ],
   }
 
