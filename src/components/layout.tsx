@@ -14,6 +14,8 @@ export interface SeoMeta {
   jsonLd?: object | object[]
   breadcrumb?: { name: string; url: string }[]
   robots?: string         // 기본 'index, follow, max-image-preview:large'. 얇은 용어·로그인 등은 'noindex, follow'
+  ogType?: 'website' | 'article'
+  article?: { published?: string; modified?: string; section?: string } // og:type=article 일 때 article:* 메타
 }
 
 // 기본 키워드(주로 네이버 대응) — 페이지에서 meta.keywords로 덮어쓸 수 있음
@@ -229,7 +231,12 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
   <meta name="naver-site-verification" content="5f2e390bb9247da01f5983bfa2664e4003b21289">
 
   <!-- Open Graph -->
-  <meta property="og:type" content="website">
+  <meta property="og:type" content="${meta.ogType || 'website'}">
+  ${raw(meta.ogType === 'article' && meta.article ? [
+    meta.article.published ? `<meta property="article:published_time" content="${meta.article.published}">` : '',
+    meta.article.modified ? `<meta property="article:modified_time" content="${meta.article.modified}">` : '',
+    meta.article.section ? `<meta property="article:section" content="${meta.article.section.replace(/"/g, '&quot;')}">` : '',
+  ].filter(Boolean).join('\n  ') : '')}
   <meta property="og:site_name" content="${clinic.nameKo}">
   <meta property="og:title" content="${meta.title}">
   <meta property="og:description" content="${meta.description}">
@@ -272,7 +279,7 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="${clinic.nameKo}">
 
-  ${raw(jsonLdArr.map((j) => `<script type="application/ld+json">${JSON.stringify(j)}</script>`).join('\n'))}
+  ${raw(jsonLdArr.map((j) => `<script type="application/ld+json">${JSON.stringify(j).replace(/</g, '\\u003c')}</script>`).join('\n'))}
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-0RW6336MTG"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-0RW6336MTG',{anonymize_ip:true});</script>
 <script>(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","yc84syrzew");</script>

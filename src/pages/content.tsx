@@ -1,7 +1,8 @@
 import { html, raw } from 'hono/html'
 import { Layout, Breadcrumb } from '../components/layout'
 import { clinic } from '../data/clinic'
-import { getTreatment } from '../data/treatments'
+import { getTreatment, treatments as ALL_TREATMENTS } from '../data/treatments'
+import { answerSummary, faqsFromArticleHtml, enhanceArticleImages, caseAutoSummary, flatText, clipSentences, kstYmd } from '../lib/column-seo'
 import { getDoctor } from '../data/doctors'
 import { breadcrumbSchema, articleSchema } from '../lib/schema'
 import type { CaseItem, Column, Notice } from '../data/types'
@@ -9,6 +10,44 @@ import { autoLink } from '../lib/inlink'
 import { getMergedVideos } from '../lib/youtube'
 
 const fmt = (iso: string) => (iso || '').slice(0, 10).replace(/-/g, '.')
+const BASE = clinic.domain
+export const LIST_PER = 12
+const escA = (s: any) => String(s ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+
+/** 서버 렌더 페이지네이션 — 1페이지는 쿼리 없는 주소, 나머지 ?page=N (a 링크) */
+function pagerHtml(base: string, page: number, pages: number): string {
+  if (pages <= 1) return ''
+  const href = (n: number) => (n === 1 ? base.replace(/[?&]$/, '') : `${base}page=${n}`)
+  return `<nav class="list-pager" aria-label="페이지">${Array.from({ length: pages }, (_, i) => i + 1).map((n) => `<a href="${href(n)}"${n === page ? ' aria-current="page"' : ''}>${n}</a>`).join('')}</nav>`
+}
+const LIST_CSS = `<style>
+    .list-pager{display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-top:3rem}
+    .list-pager a{min-width:2.6rem;height:2.6rem;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:4px;color:var(--ink);font-family:var(--serif,serif)}
+    .list-pager a:hover{border-color:var(--gold)}
+    .list-pager a[aria-current]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+    .answer-box{border:1px solid var(--line);border-left:3px solid var(--gold);background:var(--paper-2);padding:1.4rem 1.6rem;margin:0 0 2.2rem;border-radius:4px}
+    .answer-box .answer-label{font-size:.78rem;letter-spacing:.14em;color:var(--gold);margin:0 0 .5rem}
+    .answer-box .answer-summary{margin:0;line-height:1.85;color:var(--ink)}
+    .answer-box dl{display:flex;flex-wrap:wrap;gap:.6rem 2rem;margin:1rem 0 0;font-size:.88rem}
+    .answer-box dt{color:var(--mist-2,#8A93A6);font-size:.78rem}
+    .answer-box dd{margin:.15rem 0 0;color:var(--ink);font-weight:600}
+  </style>`
+
+/** 목록 CollectionPage + ItemList + Breadcrumb (@graph) */
+function collectionGraph(opts: { path: string; name: string; total: number; offset: number; items: { name: string; path: string }[]; crumb: { name: string; url: string }[] }) {
+  const url = BASE + opts.path
+  const bc: any = breadcrumbSchema(opts.crumb); delete bc['@context']; bc['@id'] = url + '#breadcrumb'
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      { '@type': 'CollectionPage', '@id': url + '#webpage', url, name: opts.name, inLanguage: 'ko', isPartOf: { '@id': BASE + '/#website' }, mainEntity: { '@id': url + '#itemlist' }, breadcrumb: { '@id': url + '#breadcrumb' } },
+      { '@type': 'ItemList', '@id': url + '#itemlist', name: opts.name, numberOfItems: opts.total, itemListOrder: 'https://schema.org/ItemListOrderDescending',
+        itemListElement: opts.items.map((it, i) => ({ '@type': 'ListItem', position: opts.offset + i + 1, name: it.name, url: BASE + it.path })) },
+      bc,
+    ],
+  }
+}
+const byNewest = <T extends { createdAt?: string }>(a: T, b: T) => String(b.createdAt || '').localeCompare(String(a.createdAt || ''))
 
 // 본문 H2에 anchor id 부여 + 목차(TOC) 추출
 function buildToc(htmlStr: string): { html: string; toc: { id: string; text: string; level: number }[] } {
@@ -45,17 +84,27 @@ function emptyState(label: string, sub: string) {
 // ============================================================================
 // 비포/애프터 케이스 갤러리
 // ============================================================================
-export function CasesGalleryPage(items: CaseItem[], filter?: string) {
-  const crumb = [{ name: '홈', url: '/' }, { name: '비포 / 애프터', url: '/cases/gallery' }]
-  const published = items.filter((x) => x.published)
+export function CasesGalleryPage(items: CaseItem[], filter?: string, pageQ = 1) {
+  const published = items.filter((x) => x.published).sort(byNewest)
   const cats = [...new Set(published.map((x) => x.treatmentSlug))]
-  const list = filter ? published.filter((x) => x.treatmentSlug === filter) : published
+  const cat = filter && cats.includes(filter) ? filter : ''
+  const all = cat ? published.filter((x) => x.treatmentSlug === cat) : published
+  const total = all.length
+  const pages = Math.max(1, Math.ceil(total / LIST_PER))
+  const page = Math.min(Math.max(1, pageQ), pages)
+  const offset = (page - 1) * LIST_PER
+  const list = all.slice(offset, offset + LIST_PER)
+  const catT = cat ? getTreatment(cat) : undefined
+  const crumb = [{ name: '홈', url: '/' }, { name: '비포 / 애프터', url: '/cases/gallery' }, ...(catT ? [{ name: catT.name, url: `/cases/gallery?treatment=${cat}` }] : [])]
+  const qs = [cat ? `treatment=${cat}` : '', page > 1 ? `page=${page}` : ''].filter(Boolean).join('&')
+  const path = `/cases/gallery${qs ? `?${qs}` : ''}`
+  const pageSuffix = page > 1 ? ` (${page}페이지)` : ''
 
   const body = html`
   <section class="page-hero">
     <div class="container">
       <p class="eyebrow">Before &amp; After</p>
-      <h1>치료 전후 케이스</h1>
+      <h1>${catT ? `${catT.name} 치료 전후 케이스` : '치료 전후 케이스'}</h1>
       <p class="lead">연세온치과에서 진행한 치료의 전후 기록입니다.<br>치료 결과는 개인의 구강 상태에 따라 다를 수 있습니다.</p>
     </div>
   </section>
@@ -65,12 +114,13 @@ export function CasesGalleryPage(items: CaseItem[], filter?: string) {
     <div class="container">
       ${raw(cats.length ? `
       <nav class="faq-tabs" data-reveal aria-label="케이스 분류">
-        <a href="/cases/gallery" class="faq-tab${!filter ? ' active' : ''}">전체</a>
+        <a href="/cases/gallery" class="faq-tab${!cat ? ' active' : ''}">전체</a>
         ${cats.map((slug) => {
           const t = getTreatment(slug)
-          return `<a href="/cases/gallery?treatment=${slug}" class="faq-tab${filter === slug ? ' active' : ''}">${t?.name || slug}</a>`
+          return `<a href="/cases/gallery?treatment=${slug}" class="faq-tab${cat === slug ? ' active' : ''}">${t?.name || slug}</a>`
         }).join('')}
       </nav>` : '')}
+      ${raw(catT ? `<p class="muted" style="margin-top:1.2rem;font-size:.9rem">${catT.name} 케이스 ${total}건 · <a href="/treatments/${catT.slug}" class="link-arrow">${catT.name} 진료 안내</a> · <a href="/column?treatment=${catT.slug}" class="link-arrow">관련 원장 칼럼</a></p>` : '')}
 
       ${raw(list.length ? `
       <div class="cards cards--3" style="margin-top:2.5rem">
@@ -81,14 +131,14 @@ export function CasesGalleryPage(items: CaseItem[], filter?: string) {
           return `
           <a href="/cases/${cs.slug}" class="card" data-reveal data-reveal-delay="${(i % 3) + 1}">
             <div class="card-img">${img
-              ? `<img src="${img}" alt="${cs.title}" loading="lazy">`
+              ? `<img src="${img}" alt="${escA(t?.name || '치과')} 치료 전" loading="lazy" decoding="async">`
               : `<div class="ph" style="height:100%"><span class="ph-label">CASE</span></div>`}</div>
             <span class="tag">${t?.name || cs.treatmentSlug} · ${cs.ageGroup} ${cs.gender}</span>
             <h2 style="font-size:1.25rem">${cs.title}</h2>
             <p>${cs.regionLabel} · 치료기간 ${cs.duration}</p>
           </a>`
         }).join('')}
-      </div>` : emptyState('등록된 케이스를 준비하고 있습니다', '실제 치료 케이스가 순차적으로 업데이트될 예정입니다.'))}
+      </div>${pagerHtml(`/cases/gallery?${cat ? `treatment=${cat}&` : ''}`, page, pages)}` : emptyState('등록된 케이스를 준비하고 있습니다', '실제 치료 케이스가 순차적으로 업데이트될 예정입니다.'))}
 
       <p class="muted" style="font-size:.78rem;margin-top:3rem;line-height:1.8" data-reveal>
         ※ 본 게시물은 의료법 제56조를 준수하며, 치료 전후 사진은 동일 환자·동일 부위이며 환자 동의하에 게시되었습니다.
@@ -96,19 +146,24 @@ export function CasesGalleryPage(items: CaseItem[], filter?: string) {
       </p>
     </div>
   </section>
+  ${raw(LIST_CSS)}
   `
   return Layout({
-    title: `비포/애프터 케이스 | ${clinic.nameKo}`,
-    description: `${clinic.nameKo} 치료 전후(비포/애프터) 케이스 — 심미보철, All-on-X 전체임플란트, 접착수복 등 생체모방치의학 기반 실제 치료 기록을 ${clinic.addressLocality}에서 투명하게 공개합니다.`,
-    path: '/cases/gallery',
-    jsonLd: [breadcrumbSchema(crumb)],
+    title: `${catT ? `${catT.name} ` : ''}비포/애프터 케이스${pageSuffix} | ${clinic.nameKo}`,
+    description: (catT
+      ? `${clinic.nameKo} ${catT.name} 치료 전후 케이스 ${total}건 — 진단·치료 과정과 치료 기간을 공개합니다(치료 후 사진은 회원 전용). 결과는 개인에 따라 다를 수 있습니다.`
+      : `${clinic.nameKo} 치료 전후(비포/애프터) 케이스 — 심미보철, All-on-X 전체임플란트, 접착수복 등 생체모방치의학 기반 실제 치료 기록을 ${clinic.addressLocality}에서 투명하게 공개합니다.`) + pageSuffix,
+    path,
+    jsonLd: [collectionGraph({ path, name: `${catT ? `${catT.name} ` : ''}치료 전후 케이스 목록${pageSuffix}`, total, offset, items: list.map((x) => ({ name: x.title, path: `/cases/${x.slug}` })), crumb })],
   }, body)
 }
 
-export function CaseDetailPage(cs: CaseItem, isMember = false) {
-  const crumb = [{ name: '홈', url: '/' }, { name: '비포 / 애프터', url: '/cases/gallery' }, { name: cs.title, url: `/cases/${cs.slug}` }]
+export function CaseDetailPage(cs: CaseItem, isMember = false, siblings: CaseItem[] = [], relCols: Column[] = []) {
   const t = getTreatment(cs.treatmentSlug)
   const doc = getDoctor(cs.doctorSlug)
+  const crumb = [{ name: '홈', url: '/' }, { name: '비포 / 애프터', url: '/cases/gallery' }, ...(t ? [{ name: t.name, url: `/cases/gallery?treatment=${t.slug}` }] : []), { name: cs.title, url: `/cases/${cs.slug}` }]
+  const txName = t?.name || '치과'
+  const summary = caseAutoSummary(cs, txName, doc ? `${doc.name} ${doc.role}` : '', clinic.nameKo)
 
   // 회원 전용 잠금 오버레이 (애프터 사진)
   const lockOverlay = (label: string) => `
@@ -131,7 +186,7 @@ export function CaseDetailPage(cs: CaseItem, isMember = false) {
         <h3 style="font-family:var(--serif-kr);font-size:1.2rem;margin-bottom:1rem">${label}</h3>
         <div style="position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:4px;background:var(--paper-2)">
           ${before
-            ? `<img src="${before}" alt="${label} 치료 전" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+            ? `<img src="${before}" alt="${txName} 치료 전 (${label})" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
                <span style="position:absolute;left:1rem;top:1rem;background:rgba(0,0,0,.55);color:#fff;font-size:.7rem;letter-spacing:.14em;padding:.3rem .7rem;border-radius:2px;z-index:3">BEFORE</span>`
             : ''}
           ${lockOverlay(label)}
@@ -144,9 +199,9 @@ export function CaseDetailPage(cs: CaseItem, isMember = false) {
       <div data-reveal style="margin-bottom:3rem">
         <h3 style="font-family:var(--serif-kr);font-size:1.2rem;margin-bottom:1rem">${label}</h3>
         <div class="compare" data-compare style="position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:4px;background:var(--paper-2);cursor:ew-resize">
-          <img src="${after}" alt="${label} 치료 후" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+          <img src="${after}" alt="${txName} 치료 후 (${label})" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
           <div class="compare-top" style="position:absolute;inset:0;clip-path:inset(0 50% 0 0)">
-            <img src="${before}" alt="${label} 치료 전" style="width:100%;height:100%;object-fit:cover">
+            <img src="${before}" alt="${txName} 치료 전 (${label})" style="width:100%;height:100%;object-fit:cover">
           </div>
           <div class="compare-handle" style="position:absolute;top:0;bottom:0;left:50%;width:2px;background:#fff;box-shadow:0 0 8px rgba(0,0,0,.4)"></div>
           <span style="position:absolute;left:1rem;top:1rem;background:rgba(0,0,0,.55);color:#fff;font-size:.7rem;letter-spacing:.14em;padding:.3rem .7rem;border-radius:2px">BEFORE</span>
@@ -159,7 +214,7 @@ export function CaseDetailPage(cs: CaseItem, isMember = false) {
     return `
     <div data-reveal style="margin-bottom:3rem">
       <h3 style="font-family:var(--serif-kr);font-size:1.2rem;margin-bottom:1rem">${label} (${before ? '치료 전' : '치료 후'})</h3>
-      <img src="${single}" alt="${label}" style="width:100%;border-radius:4px" loading="lazy">
+      <img src="${single}" alt="${txName} ${before ? '치료 전' : '치료 후'} (${label})" style="width:100%;border-radius:4px" loading="lazy">
     </div>`
   }
 
@@ -177,6 +232,15 @@ export function CaseDetailPage(cs: CaseItem, isMember = false) {
     <div class="container">
       <div class="detail-grid">
         <div>
+          <div class="answer-box" data-reveal>
+            <p class="answer-label">CASE SUMMARY · 케이스 요약</p>
+            <p class="answer-summary">${summary}</p>
+            <dl>
+              ${raw(t ? `<div><dt>진료</dt><dd><a href="/treatments/${t.slug}">${t.name}</a></dd></div>` : '')}
+              ${raw(cs.duration ? `<div><dt>치료 기간</dt><dd>${escA(cs.duration)}</dd></div>` : '')}
+              ${raw(doc ? `<div><dt>담당</dt><dd><a href="/doctors/${doc.slug}">${doc.name} ${doc.role}</a></dd></div>` : '')}
+            </dl>
+          </div>
           ${raw(pair('구내 사진', cs.images.intraBefore, cs.images.intraAfter))}
           ${raw(pair('파노라마', cs.images.panoBefore, cs.images.panoAfter))}
           <div class="prose" data-reveal>
@@ -186,6 +250,8 @@ export function CaseDetailPage(cs: CaseItem, isMember = false) {
           <p class="muted" style="font-size:.78rem;margin-top:2.5rem;line-height:1.8">
             ※ 동일 환자·동일 부위의 치료 전후 사진이며, 환자 동의하에 게시되었습니다. 치료 결과는 개인에 따라 다를 수 있으며 부작용이 발생할 수 있습니다.
           </p>
+          ${raw(siblings.length ? `<div data-reveal style="margin-top:2.5rem"><h2 style="font-family:var(--serif-kr);font-size:1.25rem;margin-bottom:.8rem">${txName} 다른 케이스</h2>${siblings.map((x) => `<a href="/cases/${x.slug}" class="link-arrow" style="display:block;padding:.45rem 0">${x.title} <i class="fas fa-arrow-right"></i></a>`).join('')}<a href="/cases/gallery?treatment=${cs.treatmentSlug}" class="muted" style="font-size:.85rem">케이스 전체 보기 →</a></div>` : '')}
+          ${raw(relCols.length ? `<div data-reveal style="margin-top:2rem"><h2 style="font-family:var(--serif-kr);font-size:1.25rem;margin-bottom:.8rem">${txName} 관련 원장 칼럼</h2>${relCols.map((x) => `<a href="/column/${x.slug}" class="link-arrow" style="display:block;padding:.45rem 0">${x.title} <i class="fas fa-arrow-right"></i></a>`).join('')}</div>` : '')}
         </div>
         <aside class="sidebar">
           ${raw(doc ? `
@@ -210,21 +276,60 @@ export function CaseDetailPage(cs: CaseItem, isMember = false) {
     </div>
   </section>
   <script>fetch('/api/views/case/${cs.id}',{method:'POST'}).catch(function(){});</script>
+  ${raw(LIST_CSS)}
   `
+  const path = `/cases/${cs.slug}`
+  const url = BASE + path
+  const pubImg = cs.images.intraBefore || cs.images.panoBefore // 공개 사진 = 치료 전만
+  const bc: any = breadcrumbSchema(crumb); delete bc['@context']; bc['@id'] = url + '#breadcrumb'
+  const desc = clipSentences(`${cs.title}. ${flatText(cs.description) || summary}`, 155, 60)
+  // MedicalWebPage (Review·Rating 없음 — 의료법)
+  const graph = [
+    {
+      '@type': 'MedicalWebPage',
+      '@id': url + '#webpage',
+      url,
+      name: `${t ? `${t.name} 케이스 — ` : ''}${cs.title}`,
+      description: desc,
+      inLanguage: 'ko',
+      isPartOf: { '@id': BASE + '/#website' },
+      breadcrumb: { '@id': url + '#breadcrumb' },
+      about: t ? { '@id': BASE + '/treatments/' + t.slug + '#procedure' } : { '@id': BASE + '/#clinic' },
+      ...(doc ? { reviewedBy: { '@id': BASE + '/doctors/' + doc.slug + '#person' } } : {}),
+      ...(cs.createdAt ? { datePublished: cs.createdAt, dateModified: (cs as any).updatedAt || cs.createdAt, lastReviewed: kstYmd((cs as any).updatedAt || cs.createdAt) } : {}),
+      ...(pubImg ? { primaryImageOfPage: { '@type': 'ImageObject', url: BASE + pubImg, caption: `${txName} 치료 전` } } : {}),
+      medicalAudience: { '@type': 'MedicalAudience', audienceType: 'Patient' },
+      speakable: { '@type': 'SpeakableSpecification', cssSelector: ['h1', '.answer-summary'] },
+    },
+    bc,
+  ]
   return Layout({
-    title: `${cs.title} | 케이스 | ${clinic.nameKo}`,
-    description: `${cs.ageGroup} ${cs.gender} ${t?.name || ''} 치료 케이스 — ${cs.description.slice(0, 110)}`,
-    path: `/cases/${cs.slug}`,
-    jsonLd: [breadcrumbSchema(crumb)],
+    title: `${t ? `${t.name} 케이스 — ` : ''}${cs.title}${cs.duration ? ` (${cs.duration})` : ''} | ${clinic.nameKo}`,
+    description: desc,
+    path,
+    ogType: 'article',
+    article: { published: cs.createdAt, modified: (cs as any).updatedAt || cs.createdAt, section: t?.name },
+    jsonLd: [{ '@context': 'https://schema.org', '@graph': graph }],
   }, body)
 }
 
 // ============================================================================
 // 원장 칼럼
 // ============================================================================
-export function ColumnsPage(items: Column[]) {
-  const crumb = [{ name: '홈', url: '/' }, { name: '원장 칼럼', url: '/column' }]
-  const list = items.filter((x) => x.published)
+export function ColumnsPage(items: Column[], pageQ = 1, treatment?: string) {
+  const pub = items.filter((x) => x.published).sort(byNewest)
+  const usedTx = ALL_TREATMENTS.filter((t) => pub.some((x) => (x.relatedTreatments || []).includes(t.slug)))
+  const tx = treatment && usedTx.some((t) => t.slug === treatment) ? getTreatment(treatment) : undefined
+  const all = tx ? pub.filter((x) => (x.relatedTreatments || []).includes(tx.slug)) : pub
+  const total = all.length
+  const pages = Math.max(1, Math.ceil(total / LIST_PER))
+  const page = Math.min(Math.max(1, pageQ), pages)
+  const offset = (page - 1) * LIST_PER
+  const list = all.slice(offset, offset + LIST_PER)
+  const crumb = [{ name: '홈', url: '/' }, { name: '원장 칼럼', url: '/column' }, ...(tx ? [{ name: tx.name, url: `/column?treatment=${tx.slug}` }] : [])]
+  const qs = [tx ? `treatment=${tx.slug}` : '', page > 1 ? `page=${page}` : ''].filter(Boolean).join('&')
+  const path = `/column${qs ? `?${qs}` : ''}`
+  const pageSuffix = page > 1 ? ` (${page}페이지)` : ''
   const body = html`
   <section class="page-hero">
     <div class="container">
@@ -237,6 +342,12 @@ export function ColumnsPage(items: Column[]) {
 
   <section class="section--tight">
     <div class="container">
+      ${raw(usedTx.length >= 2 ? `
+      <nav class="faq-tabs" data-reveal aria-label="진료별 칼럼" style="margin-bottom:2rem">
+        <a href="/column" class="faq-tab${!tx ? ' active' : ''}">전체</a>
+        ${usedTx.map((t) => `<a href="/column?treatment=${t.slug}" class="faq-tab${tx?.slug === t.slug ? ' active' : ''}">${t.name}</a>`).join('')}
+      </nav>` : '')}
+      ${raw(tx ? `<p class="muted" style="margin:-.8rem 0 2rem;font-size:.9rem">${tx.name} 칼럼 ${total}편 · <a href="/treatments/${tx.slug}" class="link-arrow">${tx.name} 진료 안내</a> · <a href="/cases/gallery?treatment=${tx.slug}" class="link-arrow">${tx.name} 케이스</a></p>` : '')}
       ${raw(list.length ? `
       <div class="col-grid">
         ${list.map((col, i) => {
@@ -244,7 +355,7 @@ export function ColumnsPage(items: Column[]) {
           const thumb = col.thumbnail
           const alt = `${col.title}${doc ? ` — ${doc.name} ${doc.role}` : ''}`
           const media = thumb
-            ? `<span class="col-thumb"><img src="${thumb}" alt="${alt.replace(/"/g, '&quot;')}" loading="lazy"></span>`
+            ? `<span class="col-thumb"><img src="${thumb}" alt="${alt.replace(/"/g, '&quot;')}" loading="lazy" decoding="async"></span>`
             : `<span class="col-thumb col-thumb--ph" aria-hidden="true"><i class="fas fa-pen-nib"></i></span>`
           return `
           <a class="col-card" href="/column/${col.slug}" data-reveal data-reveal-delay="${(i % 3) + 1}">
@@ -257,9 +368,10 @@ export function ColumnsPage(items: Column[]) {
             </span>
           </a>`
         }).join('')}
-      </div>` : emptyState('칼럼을 준비하고 있습니다', '원장이 직접 쓰는 치아 건강 이야기가 곧 게시됩니다.'))}
+      </div>${pagerHtml(`/column?${tx ? `treatment=${tx.slug}&` : ''}`, page, pages)}` : emptyState('칼럼을 준비하고 있습니다', '원장이 직접 쓰는 치아 건강 이야기가 곧 게시됩니다.'))}
     </div>
   </section>
+  ${raw(LIST_CSS)}
 
   <style>
     .col-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:2rem 1.8rem; }
@@ -280,10 +392,12 @@ export function ColumnsPage(items: Column[]) {
   </style>
   `
   return Layout({
-    title: `원장 칼럼 | ${clinic.nameKo}`,
-    description: `${clinic.nameKo} 원장 칼럼 — 생체모방치의학, 심미보철, 임플란트(All-on-X), 충치·턱관절 치료에 대한 전문의의 깊이 있는 이야기를 ${clinic.addressLocality} 온천장역 연세온치과에서 전합니다.`,
-    path: '/column',
-    jsonLd: [breadcrumbSchema(crumb)],
+    title: `${tx ? `${tx.name} ` : ''}원장 칼럼${pageSuffix} | ${clinic.nameKo}`,
+    description: (tx
+      ? `${clinic.nameKo} ${tx.name} 칼럼 ${total}편 — 전문의가 직접 쓰고 감수한 ${tx.name} 진료 정보.`
+      : `${clinic.nameKo} 원장 칼럼 — 생체모방치의학, 심미보철, 임플란트(All-on-X), 충치·턱관절 치료에 대한 전문의의 깊이 있는 이야기를 ${clinic.addressLocality} 온천장역 연세온치과에서 전합니다.`) + pageSuffix,
+    path,
+    jsonLd: [collectionGraph({ path, name: `${tx ? `${tx.name} ` : ''}원장 칼럼 목록${pageSuffix}`, total, offset, items: list.map((x) => ({ name: x.title, path: `/column/${x.slug}` })), crumb })],
   }, body)
 }
 
@@ -294,11 +408,14 @@ export function fixBareHrefs(h: string): string {
   return (h || '').replace(BARE_HREF_RE, '$1$2https://$3$2')
 }
 
-export function ColumnDetailPage(col: Column) {
-  const crumb = [{ name: '홈', url: '/' }, { name: '원장 칼럼', url: '/column' }, { name: col.title, url: `/column/${col.slug}` }]
+export function ColumnDetailPage(col: Column, relCols: Column[] = [], relCases: CaseItem[] = []) {
   const doc = getDoctor(col.authorSlug)
   const related = (col.relatedTreatments || []).map((s) => getTreatment(s)).filter(Boolean)
-  const { html: anchoredHtml, toc } = buildToc(fixBareHrefs(col.contentHtml))
+  const mainTx = related[0]
+  const crumb = [{ name: '홈', url: '/' }, { name: '원장 칼럼', url: '/column' }, ...(mainTx ? [{ name: mainTx.name, url: `/column?treatment=${mainTx.slug}` }] : []), { name: col.title, url: `/column/${col.slug}` }]
+  const summary = answerSummary(col.contentHtml, col.excerpt)
+  const reviewed = kstYmd(col.updatedAt || col.createdAt)
+  const { html: anchoredHtml, toc } = buildToc(enhanceArticleImages(fixBareHrefs(col.contentHtml), col.title).replace(/<(\/?)h1\b/gi, '<$1h2'))
   const mins = readingMin(col.contentHtml)
   const updated = col.updatedAt && col.updatedAt.slice(0, 10) !== col.createdAt.slice(0, 10)
   const body = html`
@@ -315,14 +432,19 @@ export function ColumnDetailPage(col: Column) {
     <div class="container">
       <div class="detail-grid">
         <article class="prose" data-reveal>
-          ${raw(col.thumbnail ? `<img src="${col.thumbnail}" alt="${col.metaTitle || col.title}" style="width:100%;border-radius:4px;margin-bottom:2.5rem">` : '')}
+          ${raw(summary ? `<div class="answer-box"><p class="answer-label">KEY ANSWER · 핵심 답변</p><p class="answer-summary">${escA(summary)}</p></div>` : '')}
+          ${raw(col.thumbnail ? `<img src="${col.thumbnail}" alt="${escA(col.metaTitle || col.title)}" style="width:100%;border-radius:4px;margin-bottom:2.5rem" fetchpriority="high" decoding="async">` : '')}
           ${raw(autoLink(anchoredHtml, 10))}
           ${raw(doc ? `
           <div style="border-top:1px solid var(--line);margin-top:3.5rem;padding-top:2rem">
             <p class="muted" style="font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.6rem">Written &amp; Reviewed by</p>
-            <p style="font-weight:600;color:var(--ink);margin-bottom:.2rem">${doc.name} ${doc.role}</p>
+            <p style="font-weight:600;color:var(--ink);margin-bottom:.2rem"><a href="/doctors/${doc.slug}">${doc.name} ${doc.role}</a></p>
             <p class="muted" style="font-size:.88rem">${doc.licenses.join(' · ')}</p>
+            <p class="muted" style="font-size:.82rem;margin-top:.4rem">게시 ${fmt(col.createdAt)}${reviewed ? ` · 최종 검토 ${reviewed.replace(/-/g, '.')}` : ''}</p>
           </div>` : '')}
+          <p class="muted" style="font-size:.78rem;margin-top:1.4rem;line-height:1.8">※ 이 글은 일반적인 치과 건강 정보이며 진단을 대신하지 않습니다. 치료 방법과 결과는 개인의 구강 상태에 따라 다를 수 있으니 정확한 내용은 내원하여 전문의와 상담하시기 바랍니다.</p>
+          ${raw(relCases.length ? `<div style="margin-top:2.5rem"><h2 style="font-size:1.25rem">${mainTx ? mainTx.name + ' ' : ''}치료 케이스</h2>${relCases.map((x) => `<a href="/cases/${x.slug}" class="link-arrow" style="display:block;padding:.4rem 0">${x.title} <i class="fas fa-arrow-right"></i></a>`).join('')}</div>` : '')}
+          ${raw(relCols.length ? `<div style="margin-top:2rem"><h2 style="font-size:1.25rem">함께 읽으면 좋은 칼럼</h2>${relCols.map((x) => `<a href="/column/${x.slug}" class="link-arrow" style="display:block;padding:.4rem 0">${x.title} <i class="fas fa-arrow-right"></i></a>`).join('')}</div>` : '')}
         </article>
         <aside class="sidebar">
           ${raw(toc.length >= 2 ? `
@@ -354,20 +476,62 @@ export function ColumnDetailPage(col: Column) {
     .prose h2,.prose h3{scroll-margin-top:90px}
   </style>
   <script>fetch('/api/views/column/${col.id}',{method:'POST'}).catch(function(){});</script>
+  ${raw(LIST_CSS)}
   `
+  const path = `/column/${col.slug}`
+  const url = BASE + path
+  const desc = col.metaDescription || clipSentences(flatText(col.excerpt) || summary, 160, 60)
+  const authorId = doc ? BASE + '/doctors/' + doc.slug + '#person' : undefined
+  const faqs = faqsFromArticleHtml(col.contentHtml)
+  const bc: any = breadcrumbSchema(crumb); delete bc['@context']; bc['@id'] = url + '#breadcrumb'
+  const image = col.thumbnail ? BASE + col.thumbnail : BASE + '/static/img/og-default.jpg'
+  const graph: any[] = [
+    {
+      '@type': 'BlogPosting',
+      '@id': url + '#article',
+      headline: (col.metaTitle || col.title).slice(0, 110),
+      name: col.title,
+      description: desc,
+      image: { '@type': 'ImageObject', url: image },
+      datePublished: col.createdAt,
+      dateModified: col.updatedAt || col.createdAt,
+      inLanguage: 'ko',
+      ...(authorId ? { author: { '@id': authorId }, reviewedBy: { '@id': authorId } } : { author: { '@id': BASE + '/#clinic' } }),
+      publisher: { '@id': BASE + '/#clinic' },
+      mainEntityOfPage: { '@id': url + '#webpage' },
+      isPartOf: { '@id': BASE + '/#website' },
+      ...(mainTx ? { about: related.map((t) => ({ '@id': BASE + '/treatments/' + t!.slug + '#procedure' })), articleSection: mainTx.name } : {}),
+      speakable: { '@type': 'SpeakableSpecification', cssSelector: ['h1', '.answer-summary'] },
+    },
+    {
+      '@type': 'MedicalWebPage',
+      '@id': url + '#webpage',
+      url,
+      name: col.metaTitle || col.title,
+      description: desc,
+      inLanguage: 'ko',
+      isPartOf: { '@id': BASE + '/#website' },
+      mainEntity: { '@id': url + '#article' },
+      breadcrumb: { '@id': url + '#breadcrumb' },
+      ...(mainTx ? { about: { '@id': BASE + '/treatments/' + mainTx.slug + '#procedure' } } : {}),
+      ...(authorId ? { reviewedBy: { '@id': authorId } } : {}),
+      ...(reviewed ? { lastReviewed: reviewed } : {}),
+      datePublished: col.createdAt,
+      dateModified: col.updatedAt || col.createdAt,
+      medicalAudience: { '@type': 'MedicalAudience', audienceType: 'Patient' },
+      speakable: { '@type': 'SpeakableSpecification', cssSelector: ['h1', '.answer-summary'] },
+    },
+    bc,
+    ...(faqs.length ? [{ '@type': 'FAQPage', '@id': url + '#faq', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }] : []),
+  ]
   return Layout({
     title: col.metaTitle || `${col.title} | ${clinic.nameKo}`,
-    description: col.metaDescription || col.excerpt,
-    path: `/column/${col.slug}`,
+    description: desc,
+    path,
     ogImage: col.thumbnail ? clinic.domain + col.thumbnail : undefined,
-    jsonLd: [
-      breadcrumbSchema(crumb),
-      articleSchema({
-        title: col.metaTitle || col.title, description: col.metaDescription || col.excerpt, path: `/column/${col.slug}`,
-        image: col.thumbnail, datePublished: col.createdAt, dateModified: col.updatedAt,
-        authorSlug: col.authorSlug, authorName: doc?.name,
-      }),
-    ],
+    ogType: 'article',
+    article: { published: col.createdAt, modified: col.updatedAt || col.createdAt, section: mainTx?.name },
+    jsonLd: [{ '@context': 'https://schema.org', '@graph': graph }],
   }, body)
 }
 

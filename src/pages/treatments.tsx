@@ -72,7 +72,7 @@ export function TreatmentsIndex() {
 }
 
 // ---------- 진료 상세 ----------
-export function TreatmentDetail(slug: string) {
+export function TreatmentDetail(slug: string, relCols: { slug: string; title: string; excerpt?: string; createdAt?: string }[] = [], relCases: { slug: string; title: string; duration?: string }[] = []) {
   const t = getTreatment(slug)
   if (!t) return null
   const crumb = [{ name: '홈', url: '/' }, { name: '진료안내', url: '/treatments' }, { name: t.name, url: '/treatments/' + t.slug }]
@@ -269,6 +269,22 @@ export function TreatmentDetail(slug: string) {
       </aside>
     </div>
   </section>
+
+  ${relCols.length || relCases.length ? html`
+  <section class="section--tight" id="tx-related-content">
+    <div class="container" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2.5rem">
+      ${raw(relCols.length ? `<div class="reveal">
+        <h2 style="font-size:1.35rem;margin-bottom:1rem">${t.name}, 원장이 직접 쓴 칼럼</h2>
+        ${relCols.map((x) => `<a href="/column/${x.slug}" class="link-arrow" style="display:block;padding:.55rem 0;border-bottom:1px solid var(--line)">${x.title} <i class="fas fa-arrow-right"></i></a>`).join('')}
+        <a href="/column?treatment=${t.slug}" class="muted" style="display:inline-block;margin-top:.8rem;font-size:.88rem">${t.name} 칼럼 전체 보기 →</a>
+      </div>` : '')}
+      ${raw(relCases.length ? `<div class="reveal">
+        <h2 style="font-size:1.35rem;margin-bottom:1rem">${t.name} 치료 케이스</h2>
+        ${relCases.map((x) => `<a href="/cases/${x.slug}" class="link-arrow" style="display:block;padding:.55rem 0;border-bottom:1px solid var(--line)">${x.title}${x.duration ? ` <span class="muted" style="font-size:.82rem">· ${x.duration}</span>` : ''} <i class="fas fa-arrow-right"></i></a>`).join('')}
+        <a href="/cases/gallery?treatment=${t.slug}" class="muted" style="display:inline-block;margin-top:.8rem;font-size:.88rem">${t.name} 케이스 전체 보기 →</a>
+      </div>` : '')}
+    </div>
+  </section>` : ''}
 
   ${mergedFaqs.length ? html`
   <section class="section bg-paper2" id="tx-faq">
