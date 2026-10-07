@@ -133,9 +133,9 @@ export function CasesGalleryPage(items: CaseItem[], filter?: string, pageQ = 1) 
             <div class="card-img">${img
               ? `<img src="${img}" alt="${escA(t?.name || '치과')} 치료 전" loading="lazy" decoding="async">`
               : `<div class="ph" style="height:100%"><span class="ph-label">CASE</span></div>`}</div>
-            <span class="tag">${t?.name || cs.treatmentSlug} · ${cs.ageGroup} ${cs.gender}</span>
+            <span class="tag">${[t?.name || cs.treatmentSlug, [cs.ageGroup, cs.gender].filter(Boolean).join(' ')].filter(Boolean).join(' · ')}</span>
             <h2 style="font-size:1.25rem">${cs.title}</h2>
-            <p>${cs.regionLabel} · 치료기간 ${cs.duration}</p>
+            ${caseMetaLine(cs) ? `<p>${caseMetaLine(cs)}</p>` : ''}
           </a>`
         }).join('')}
       </div>${pagerHtml(`/cases/gallery?${cat ? `treatment=${cat}&` : ''}`, page, pages)}` : emptyState('등록된 케이스를 준비하고 있습니다', '실제 치료 케이스가 순차적으로 업데이트될 예정입니다.'))}
@@ -158,6 +158,12 @@ export function CasesGalleryPage(items: CaseItem[], filter?: string, pageQ = 1) 
   }, body)
 }
 
+/** 목록·상세 보조 줄 — 비어 있는 항목은 건너뜀 (지역·기간이 없는 케이스) */
+function caseMetaLine(cs: CaseItem, withPatient = false): string {
+  return [withPatient ? [cs.ageGroup, cs.gender].filter(Boolean).join(' ') : '', cs.regionLabel, cs.duration ? `치료기간 ${cs.duration}` : '']
+    .filter(Boolean).map(escA).join(' · ')
+}
+
 export function CaseDetailPage(cs: CaseItem, isMember = false, siblings: CaseItem[] = [], relCols: Column[] = []) {
   const t = getTreatment(cs.treatmentSlug)
   const doc = getDoctor(cs.doctorSlug)
@@ -177,16 +183,19 @@ export function CaseDetailPage(cs: CaseItem, isMember = false, siblings: CaseIte
       </div>
     </div>`
 
-  const pair = (label: string, before?: string, after?: string) => {
+  // face: 안모(얼굴) — 세로 사진(2:3) 비율, alt "{진료명} 치료 전 안모" 형식, 게이트 정책은 구내·파노라마와 동일
+  const pair = (label: string, before?: string, after?: string, face = false) => {
     if (!before && !after) return ''
+    const box = face ? 'aspect-ratio:2/3;max-width:440px;margin:0 auto' : 'aspect-ratio:16/9'
+    const altOf = (when: '치료 전' | '치료 후') => face ? `${txName} ${when} 안모` : `${txName} ${when} (${label})`
     // 비회원: 애프터 사진 잠금 — 비포만 표시 + 잠금 안내
     if (after && !isMember) {
       return `
       <div data-reveal style="margin-bottom:3rem">
         <h3 style="font-family:var(--serif-kr);font-size:1.2rem;margin-bottom:1rem">${label}</h3>
-        <div style="position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:4px;background:var(--paper-2)">
+        <div style="position:relative;${box};overflow:hidden;border-radius:4px;background:var(--paper-2)">
           ${before
-            ? `<img src="${before}" alt="${txName} 치료 전 (${label})" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+            ? `<img src="${before}" alt="${altOf('치료 전')}" loading="lazy" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
                <span style="position:absolute;left:1rem;top:1rem;background:rgba(0,0,0,.55);color:#fff;font-size:.7rem;letter-spacing:.14em;padding:.3rem .7rem;border-radius:2px;z-index:3">BEFORE</span>`
             : ''}
           ${lockOverlay(label)}
@@ -198,10 +207,10 @@ export function CaseDetailPage(cs: CaseItem, isMember = false, siblings: CaseIte
       return `
       <div data-reveal style="margin-bottom:3rem">
         <h3 style="font-family:var(--serif-kr);font-size:1.2rem;margin-bottom:1rem">${label}</h3>
-        <div class="compare" data-compare style="position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:4px;background:var(--paper-2);cursor:ew-resize">
-          <img src="${after}" alt="${txName} 치료 후 (${label})" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+        <div class="compare" data-compare style="position:relative;${box};overflow:hidden;border-radius:4px;background:var(--paper-2);cursor:ew-resize">
+          <img src="${after}" alt="${altOf('치료 후')}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
           <div class="compare-top" style="position:absolute;inset:0;clip-path:inset(0 50% 0 0)">
-            <img src="${before}" alt="${txName} 치료 전 (${label})" style="width:100%;height:100%;object-fit:cover">
+            <img src="${before}" alt="${altOf('치료 전')}" style="width:100%;height:100%;object-fit:cover">
           </div>
           <div class="compare-handle" style="position:absolute;top:0;bottom:0;left:50%;width:2px;background:#fff;box-shadow:0 0 8px rgba(0,0,0,.4)"></div>
           <span style="position:absolute;left:1rem;top:1rem;background:rgba(0,0,0,.55);color:#fff;font-size:.7rem;letter-spacing:.14em;padding:.3rem .7rem;border-radius:2px">BEFORE</span>
@@ -214,7 +223,7 @@ export function CaseDetailPage(cs: CaseItem, isMember = false, siblings: CaseIte
     return `
     <div data-reveal style="margin-bottom:3rem">
       <h3 style="font-family:var(--serif-kr);font-size:1.2rem;margin-bottom:1rem">${label} (${before ? '치료 전' : '치료 후'})</h3>
-      <img src="${single}" alt="${txName} ${before ? '치료 전' : '치료 후'} (${label})" style="width:100%;border-radius:4px" loading="lazy">
+      <img src="${single}" alt="${altOf(before ? '치료 전' : '치료 후')}" style="width:100%;${face ? 'max-width:440px;display:block;margin:0 auto;' : ''}border-radius:4px" loading="lazy">
     </div>`
   }
 
@@ -223,7 +232,7 @@ export function CaseDetailPage(cs: CaseItem, isMember = false, siblings: CaseIte
     <div class="container">
       <p class="eyebrow">${t?.name || 'Case'} Case</p>
       <h1 style="font-size:var(--t-h2)">${cs.title}</h1>
-      <p class="lead">${cs.ageGroup} ${cs.gender} · ${cs.regionLabel} · 치료기간 ${cs.duration}</p>
+      ${raw(caseMetaLine(cs, true) ? `<p class="lead">${caseMetaLine(cs, true)}</p>` : '')}
     </div>
   </section>
   ${Breadcrumb(crumb)}
@@ -243,6 +252,7 @@ export function CaseDetailPage(cs: CaseItem, isMember = false, siblings: CaseIte
           </div>
           ${raw(pair('구내 사진', cs.images.intraBefore, cs.images.intraAfter))}
           ${raw(pair('파노라마', cs.images.panoBefore, cs.images.panoAfter))}
+          ${raw(pair('안모(얼굴)', cs.images.faceBefore, cs.images.faceAfter, true))}
           <div class="prose" data-reveal>
             <h2>치료 이야기</h2>
             ${raw(autoLink(cs.description.split('\n').filter(Boolean).map((p) => `<p>${p}</p>`).join(''), 8))}
@@ -280,7 +290,7 @@ export function CaseDetailPage(cs: CaseItem, isMember = false, siblings: CaseIte
   `
   const path = `/cases/${cs.slug}`
   const url = BASE + path
-  const pubImg = cs.images.intraBefore || cs.images.panoBefore // 공개 사진 = 치료 전만
+  const pubImg = cs.images.intraBefore || cs.images.panoBefore // 공개 사진 = 치료 전만 (안모는 절대 사용 금지)
   const bc: any = breadcrumbSchema(crumb); delete bc['@context']; bc['@id'] = url + '#breadcrumb'
   const desc = clipSentences(`${cs.title}. ${flatText(cs.description) || summary}`, 155, 60)
   // MedicalWebPage (Review·Rating 없음 — 의료법)

@@ -7,7 +7,7 @@ import { doctors } from './data/doctors'
 import { encyclopedia } from './data/encyclopedia'
 import { glossary, resolveGlossaryAlias } from './data/glossary'
 import { isThinEncyclo, isThinGlossary, NOINDEX_FOLLOW } from './lib/thin-content'
-import { CONTENT_DATES, PAGE_DATES, latestDate } from './lib/content-dates'
+import { CONTENT_DATES, PAGE_DATES, latestDate, treatmentReviewed } from './lib/content-dates'
 import { getPricing } from './lib/pricing-store'
 
 import { areaCombos } from './data/facilities'
@@ -268,7 +268,7 @@ async function sitemapPagesUrls(env: Bindings): Promise<SmUrl[]> {
 
 function sitemapTreatmentUrls(): SmUrl[] {
   const base = clinic.domain
-  return treatments.map((t) => ({ loc: `${base}/treatments/${t.slug}`, priority: t.category === 'core' ? '0.9' : '0.7', changefreq: 'monthly', lastmod: CONTENT_DATES.treatments }))
+  return treatments.map((t) => ({ loc: `${base}/treatments/${t.slug}`, priority: t.category === 'core' ? '0.9' : '0.7', changefreq: 'monthly', lastmod: treatmentReviewed(t.slug) }))
 }
 
 // 얇은 용어(lib/thin-content.ts, noindex, follow)는 제외 — 본문 보강 시 자동 복귀

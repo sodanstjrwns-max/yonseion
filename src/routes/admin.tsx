@@ -495,7 +495,9 @@ admin.post('/upload', async (c) => {
   if (!(file instanceof File)) return c.json({ ok: false, error: '파일이 없습니다.' }, 400)
   if (file.size > 8 * 1024 * 1024) return c.json({ ok: false, error: '8MB 이하 이미지만 가능합니다.' }, 400)
   const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '')
-  const key = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}.${ext}`
+  // 안모(얼굴) 사진은 face- 접두어 → /api/images 가 noimageindex 헤더를 붙임
+  const prefix = String(form.kind || '') === 'face' ? 'face-' : ''
+  const key = `${prefix}${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}.${ext}`
   const store = new Store(c.env.R2)
   await store.putImage(`images/${key}`, await file.arrayBuffer(), file.type || 'image/jpeg')
   return c.json({ ok: true, url: `/api/images/${key}` })
@@ -504,10 +506,11 @@ admin.post('/upload', async (c) => {
 // 업로드 위젯 스크립트 (폼 안에서 사용)
 const uploadScript = `
 <script>
-async function upload(input, targetId) {
+async function upload(input, targetId, kind) {
   var f = input.files && input.files[0];
   if (!f) return;
   var fd = new FormData(); fd.append('file', f);
+  if (kind) fd.append('kind', kind);
   var note = input.nextElementSibling;
   if (note) note.textContent = '업로드 중…';
   var res = await fetch('/admin/upload', { method: 'POST', body: fd });
@@ -808,17 +811,19 @@ admin.get('/cases', async (c) => {
 function caseForm(cs?: CaseItem, opts: { error?: string; origSlug?: string } = {}) {
   const txOpts = treatments.map((t) => `<option value="${t.slug}" ${cs?.treatmentSlug === t.slug ? 'selected' : ''}>${t.name}</option>`).join('')
   const docOpts = doctors.map((d) => `<option value="${d.slug}" ${cs?.doctorSlug === d.slug ? 'selected' : ''}>${d.name} ${d.role}</option>`).join('')
-  const imgField = (id: string, label: string, val?: string) => `
+  const imgField = (id: string, label: string, val?: string, kind = '') => `
     <label>${label}</label>
-    <input type="text" id="${id}" name="${id}" value="${val || ''}" placeholder="/api/images/... (직접 입력 또는 업로드)">
-    <input type="file" accept="image/*" onchange="upload(this,'${id}')" style="margin-top:.3rem"><small class="muted"></small>`
+    <input type="text" id="${id}" name="${id}" value="${esc(val || '')}" placeholder="/api/images/... (직접 입력 또는 업로드)">
+    <input type="file" accept="image/*" onchange="upload(this,'${id}'${kind ? `,'${kind}'` : ''})" style="margin-top:.3rem"><small class="muted"></small>`
+  // 이미 저장된 케이스에 안모가 있으면 동의 체크 유지 (새 글 오류 재표시 때는 다시 체크하게 함)
+  const hasFace = !!opts.origSlug && !!(cs?.images?.faceBefore || cs?.images?.faceAfter)
   return `${opts.error ? `<div class="panel" style="border:1px solid #C25B4A;color:#C25B4A;margin-bottom:1rem"><i class="fas fa-circle-exclamation"></i> ${esc(opts.error)}</div>` : ''}
   <form class="panel" method="POST">
     <label>케이스 제목 *</label><input name="title" id="f-title" required value="${esc(cs?.title || '')}" placeholder="예: 50대 남성 — 상악 전치부 심미보철">
     ${slugField('case', opts.origSlug ? cs?.id : undefined, cs?.slug || '', opts.origSlug || '')}
     <div class="row3">
       <div><label>나이대</label><input name="ageGroup" value="${cs?.ageGroup || ''}" placeholder="50대"></div>
-      <div><label>성별</label><select name="gender">${['남성', '여성'].map((g) => `<option ${cs?.gender === g ? 'selected' : ''}>${g}</option>`).join('')}</select></div>
+      <div><label>성별</label><select name="gender">${['남성', '여성'].map((g) => `<option ${cs?.gender === g ? 'selected' : ''}>${g}</option>`).join('')}<option value="" ${cs && !cs.gender ? 'selected' : ''}>표기 안 함</option></select></div>
       <div><label>치료 기간</label><input name="duration" value="${cs?.duration || ''}" placeholder="3개월"></div>
     </div>
     <div class="row2">
@@ -838,6 +843,15 @@ function caseForm(cs?: CaseItem, opts: { error?: string; origSlug?: string } = {
       <div>${imgField('panoBefore', '파노라마 — 치료 전', cs?.images?.panoBefore)}</div>
       <div>${imgField('panoAfter', '파노라마 — 치료 후', cs?.images?.panoAfter)}</div>
     </div>
+    <fieldset id="face-slot" style="border:1px solid #E6DFD2;border-radius:6px;padding:.4rem 1rem 1rem;margin:1rem 0 0">
+      <legend style="font-size:.85rem;padding:0 .4rem;color:#8A6A2F"><i class="far fa-face-smile"></i> 안모(얼굴) 사진 <small class="muted">— 선택</small></legend>
+      <p class="muted" style="font-size:.8rem;margin:.2rem 0 .4rem;line-height:1.6">환자분께 <b>얼굴 사진 게시 동의</b>를 받은 경우에만 올려 주세요. 치료 후 사진은 구내·파노라마와 같이 <b>회원 로그인 후에만</b> 보이고, 목록 썸네일·SNS 공유 이미지·검색 결과 이미지에는 쓰이지 않습니다.</p>
+      <div class="row2">
+        <div>${imgField('faceBefore', '안모 — 치료 전', cs?.images?.faceBefore, 'face')}</div>
+        <div>${imgField('faceAfter', '안모 — 치료 후', cs?.images?.faceAfter, 'face')}</div>
+      </div>
+      <label><input type="checkbox" name="faceConsent" style="width:auto;margin-right:.5rem" ${hasFace ? 'checked' : ''}>환자분의 안모(얼굴) 사진 게시 동의를 받았습니다 (안모 사진을 올릴 때 필수)</label>
+    </fieldset>
     <label><input type="checkbox" name="published" style="width:auto;margin-right:.5rem" ${cs?.published !== false ? 'checked' : ''}>게시 (체크 해제 시 비공개 저장)</label>
     <label><input type="checkbox" name="consent" style="width:auto;margin-right:.5rem" required ${cs ? 'checked' : ''}>환자 동의를 받았으며, 동일 환자·동일 부위 사진임을 확인합니다 (의료법 §56)</label>
     <button class="btn" style="margin-top:1.2rem"><i class="fas fa-floppy-disk"></i> 저장</button>
@@ -872,9 +886,14 @@ async function saveCase(c: any, existing?: CaseItem): Promise<{ error: string; d
       panoAfter: String(f.panoAfter || '') || undefined,
       intraBefore: String(f.intraBefore || '') || undefined,
       intraAfter: String(f.intraAfter || '') || undefined,
+      faceBefore: String(f.faceBefore || '').trim() || undefined,
+      faceAfter: String(f.faceAfter || '').trim() || undefined,
     },
     published: !!f.published,
     createdAt: existing?.createdAt || new Date().toISOString(),
+  }
+  if ((cs.images.faceBefore || cs.images.faceAfter) && !f.faceConsent) {
+    return { error: '안모(얼굴) 사진을 올리려면 "안모 사진 게시 동의를 받았습니다"에 체크해 주세요.', draft: cs }
   }
   const r = await resolveSlug(store, 'case', f.slug, title, existing)
   if (r.error !== undefined) return { error: r.error, draft: cs }

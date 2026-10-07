@@ -16,6 +16,10 @@ export interface CaseItem {
     panoAfter?: string          // 파노라마 후
     intraBefore?: string        // 구내 전
     intraAfter?: string         // 구내 후
+    // 안모(얼굴) — 환자 초상 사용 동의를 받은 경우에만. 치료 후는 회원 전용(구내·파노라마와 동일),
+    // og:image·JSON-LD·사이트맵·목록 썸네일에는 절대 쓰지 않는다. 키는 images/face-* (X-Robots-Tag noimageindex)
+    faceBefore?: string         // 안모 전
+    faceAfter?: string          // 안모 후
   }
   published: boolean
   createdAt: string

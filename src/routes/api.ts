@@ -140,10 +140,11 @@ api.get('/images/:key{.+}', async (c) => {
   const key = c.req.param('key')
   const obj = await c.env.R2.get(`images/${key}`)
   if (!obj) return c.notFound()
-  return new Response(obj.body, {
-    headers: {
-      'Content-Type': obj.httpMetadata?.contentType || 'image/jpeg',
-      'Cache-Control': 'public, max-age=86400',
-    },
-  })
+  const headers: Record<string, string> = {
+    'Content-Type': obj.httpMetadata?.contentType || 'image/jpeg',
+    'Cache-Control': 'public, max-age=86400',
+  }
+  // 안모(얼굴) 사례 사진 — 이미지 검색 색인 제외
+  if (key.startsWith('face-')) headers['X-Robots-Tag'] = 'noindex, noimageindex'
+  return new Response(obj.body, { headers })
 })

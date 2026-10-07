@@ -13,6 +13,15 @@ export const CONTENT_DATES = {
   glossary: '2026-06-13',
 } as const
 
+/** 진료별 개별 검토일 — 해당 진료 본문만 고친 경우 (없으면 CONTENT_DATES.treatments) */
+export const TREATMENT_DATES: Record<string, string> = {
+  /** All-on-X — 원장 자료(인사말·학회 발표 증례·감사장·옛 전용 페이지 설계서) 반영, 사례 링크 (2026-10-07) */
+  'all-on-x': '2026-10-07',
+}
+export function treatmentReviewed(slug: string): string {
+  return latestDate(CONTENT_DATES.treatments, TREATMENT_DATES[slug])
+}
+
 // ============================================================================
 // 사이트맵 lastmod 용 페이지별 콘텐츠 수정일 (2026-09-29 산출, 같은 원칙)
 // 값 = 해당 페이지 본문/데이터를 실제로 고친 커밋 날짜 — WebP 전환·스키마·레이아웃·버그 수정 커밋은 제외.

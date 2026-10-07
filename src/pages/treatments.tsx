@@ -8,7 +8,7 @@ import { faqGroups } from '../data/faqs'
 import { getEntry } from '../data/encyclopedia'
 import { breadcrumbSchema, procedureSchema, speakableSchema, howToSchema, medicalWebPageSchema, itemListSchema, compareQaSchema } from '../lib/schema'
 import { autoLink } from '../lib/inlink'
-import { CONTENT_DATES } from '../lib/content-dates'
+import { treatmentReviewed } from '../lib/content-dates'
 
 // ---------- 진료 전체 목록 ----------
 export function TreatmentsIndex() {
@@ -85,6 +85,8 @@ export function TreatmentDetail(slug: string, relCols: { slug: string; title: st
     ...(faqGroup?.faqs || []).filter((g) => !(t.faqs || []).some((f) => f.q === g.q)),
   ]
   // 백과사전 크로스링크 (존재하는 엔트리만)
+  const reviewed = treatmentReviewed(t.slug)
+  const letter = t.doctorLetter ? docs.find((d) => d!.greeting) : undefined
   const encRefs = (t.encyclopediaRefs || [])
     .map((s) => { const e = getEntry(s); return e ? { slug: s, term: e.term } : null })
     .filter(Boolean) as { slug: string; term: string }[]
@@ -110,10 +112,14 @@ export function TreatmentDetail(slug: string, relCols: { slug: string; title: st
             <ul>
               ${t.symptoms?.length ? '<li><a href="#tx-symptoms">이런 분께 권합니다</a></li>' : ''}
               ${t.sections.slice(0, 4).map((s, i) => `<li><a href="#tx-sec-${i}">${s.q.replace(/<[^>]+>/g, '')}</a></li>`).join('')}
+              ${t.highlights ? '<li><a href="#tx-highlights">진료 원칙</a></li>' : ''}
               ${t.compare ? '<li><a href="#tx-compare">비교 한눈에 보기</a></li>' : ''}
               ${t.process?.length ? '<li><a href="#tx-process">진료 과정</a></li>' : ''}
+              ${t.research ? '<li><a href="#tx-research">학회 발표 증례</a></li>' : ''}
               ${t.aftercare?.length ? '<li><a href="#tx-aftercare">회복·관리</a></li>' : ''}
               ${t.videos?.length ? '<li><a href="#tx-videos">영상으로 보기</a></li>' : ''}
+              ${t.caseCta ? '<li><a href="#tx-case-cta">실제 치료 사례</a></li>' : ''}
+              ${letter ? '<li><a href="#tx-letter">대표원장 인사말</a></li>' : ''}
               ${mergedFaqs.length ? '<li><a href="#tx-faq">자주 묻는 질문</a></li>' : ''}
             </ul>
           </nav>`)}
@@ -136,6 +142,19 @@ export function TreatmentDetail(slug: string, relCols: { slug: string; title: st
               ${s.image.caption ? `<figcaption>${s.image.caption}</figcaption>` : ''}
             </figure>` : ''}
           </div>`).join(''), 12))}
+
+        ${t.highlights ? raw(`
+          <div class="tx-highlights reveal" id="tx-highlights">
+            <h2>${t.highlights.title}</h2>
+            <ol class="tx-hl-grid">
+              ${t.highlights.points.map((h, i) => `
+                <li class="tx-hl-card">
+                  <span class="tx-hl-num">${String(i + 1).padStart(2, '0')}</span>
+                  <h3>${h.title}</h3>
+                  <p>${h.desc}</p>
+                </li>`).join('')}
+            </ol>
+          </div>`) : ''}
 
         ${t.compare ? raw(`
           <div class="tx-compare reveal" id="tx-compare" style="margin-top:2.6rem">
@@ -172,6 +191,33 @@ export function TreatmentDetail(slug: string, relCols: { slug: string; title: st
                 <div><strong>${p.step}</strong><span>${p.desc}</span></div>
               </li>`).join('')}
           </ol>`) : ''}
+
+        ${t.research ? raw(`
+          <div class="tx-research reveal" id="tx-research">
+            <h2>${t.research.heading}</h2>
+            <p>${t.research.intro}</p>
+            <div class="tx-rs-wrap">
+              <div class="tx-rs-list">
+                ${t.research.items.map((it) => `
+                  <div class="tx-rs-item">
+                    <span class="tx-rs-label">${it.label}</span>
+                    <strong>${it.href ? `<a href="${it.href}" target="_blank" rel="noopener">${it.title} <i class="fas fa-arrow-up-right-from-square"></i></a>` : it.title}</strong>
+                    <small>${it.meta}</small>
+                  </div>`).join('')}
+                ${t.research.summary?.length ? `
+                <div class="tx-rs-summary">
+                  <h3>${t.research.summaryTitle || '증례 요약'}</h3>
+                  <ul>${t.research.summary.map((x) => `<li>${x}</li>`).join('')}</ul>
+                  ${t.research.note ? `<p class="tx-rs-note">${t.research.note}</p>` : ''}
+                </div>` : ''}
+              </div>
+              ${t.research.image ? `
+              <figure class="tx-rs-figure">
+                ${picture(t.research.image.src, `alt="${t.research.image.alt}" width="${t.research.image.width}" height="${t.research.image.height}" loading="lazy" decoding="async"`)}
+                <figcaption>${t.research.image.caption}</figcaption>
+              </figure>` : ''}
+            </div>
+          </div>`) : ''}
 
         ${t.procedures ? raw(`
           <h2 class="reveal" style="margin-top:2.5rem">세부 시술</h2>
@@ -246,9 +292,18 @@ export function TreatmentDetail(slug: string, relCols: { slug: string; title: st
             </div>
           </div>`) : ''}
 
+        ${t.caseCta ? raw(`
+          <a href="/cases/gallery?treatment=${t.slug}" class="tx-case-cta reveal" id="tx-case-cta">
+            <span class="tx-cc-icon"><i class="fas fa-images"></i></span>
+            <span class="tx-cc-body">
+              <strong>${t.caseCta.title} <i class="fas fa-arrow-right"></i></strong>
+              <span>${t.caseCta.desc}</span>
+            </span>
+          </a>`) : ''}
+
         <p class="reveal" style="margin-top:2rem;font-size:.82rem;color:var(--muted);border-top:1px solid var(--line);padding-top:1rem">
           <i class="fas fa-user-md" style="color:var(--gold);margin-right:.4rem"></i>이 내용은 <a href="/doctors/kim-kyunghee" style="color:var(--navy);font-weight:600">${docs[0]?.name || '대표원장'} ${docs[0]?.role || '원장'}</a>의 감수를 거쳤습니다. 진단·치료 결과는 개인의 구강 상태에 따라 다를 수 있습니다.
-          <span style="display:block;margin-top:.35rem">감수: ${docs[0]?.name || '김경희'} ${docs[0]?.role || '대표원장'} · 최종 검토 <time datetime="${CONTENT_DATES.treatments}">${CONTENT_DATES.treatments}</time></span>
+          <span style="display:block;margin-top:.35rem">감수: ${docs[0]?.name || '김경희'} ${docs[0]?.role || '대표원장'} · 최종 검토 <time datetime="${reviewed}">${reviewed}</time></span>
         </p>
       </div>
 
@@ -285,6 +340,22 @@ export function TreatmentDetail(slug: string, relCols: { slug: string; title: st
       </div>` : '')}
     </div>
   </section>` : ''}
+
+  ${letter?.greeting ? raw(`
+  <section class="section--tight tx-letter-sec" id="tx-letter">
+    <div class="container tx-letter">
+      <figure class="tx-letter-photo reveal">
+        ${picture(letter.photo, `alt="${letter.name} ${letter.role}" width="1000" height="1500" loading="lazy" decoding="async"`)}
+      </figure>
+      <div class="tx-letter-body reveal reveal-d1">
+        <p class="eyebrow">Letter from the Director</p>
+        <h2>${letter.greeting.headline.map((l) => letter.greeting!.headlineAccent && l.includes(letter.greeting!.headlineAccent) ? l.replace(letter.greeting!.headlineAccent, `<span class="gold">${letter.greeting!.headlineAccent}</span>`) : l).join('<br>')}</h2>
+        ${letter.greeting.paragraphs.map((p) => `<p>${p}</p>`).join('')}
+        <p class="tx-letter-sign">${letter.greeting.sign}<small>${letter.title}</small></p>
+        <a href="/doctors/${letter.slug}" class="link-arrow">의료진 소개·경력 보기 <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </div>
+  </section>`) : ''}
 
   ${mergedFaqs.length ? html`
   <section class="section bg-paper2" id="tx-faq">
@@ -367,6 +438,49 @@ export function TreatmentDetail(slug: string, relCols: { slug: string; title: st
     .tx-ev-value{ display:block;font-size:1.05rem;color:var(--navy);font-family:var(--serif-kr) }
     .tx-ev-note{ display:block;font-size:.76rem;color:var(--muted);margin-top:.3rem }
 
+    /* 진료 원칙 카드 (원장 자료 기반) */
+    .tx-highlights{ margin-top:2.8rem }
+    .tx-hl-grid{ list-style:none;margin:1.2rem 0 0;padding:0 !important;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem }
+    .tx-hl-card{ margin:0 !important;background:#fff;border:1px solid var(--line);border-top:3px solid var(--gold);border-radius:12px;padding:1.3rem 1.4rem }
+    .tx-hl-num{ display:block;font-family:var(--serif-kr);color:var(--gold);font-size:1.3rem;margin-bottom:.3rem }
+    .tx-hl-card h3{ font-size:1.02rem;margin:0 0 .45rem;color:var(--navy) }
+    .tx-hl-card p{ margin:0;font-size:.9rem;color:var(--ink-soft);line-height:1.7 }
+    @media (max-width:720px){ .tx-hl-grid{ grid-template-columns:1fr } }
+    /* 학회 발표 증례 */
+    .tx-research{ margin-top:2.8rem }
+    .tx-rs-wrap{ display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:1.6rem;align-items:start;margin-top:1.2rem }
+    .tx-rs-item{ background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:1rem 1.2rem;margin-bottom:.8rem }
+    .tx-rs-label{ display:inline-block;font-size:.74rem;letter-spacing:.04em;color:#fff;background:var(--navy);border-radius:999px;padding:.15rem .7rem;margin-bottom:.45rem }
+    .tx-rs-item strong{ display:block;color:var(--navy);font-size:.98rem;line-height:1.5 }
+    .tx-rs-item strong a{ color:inherit;text-decoration:underline;text-decoration-color:var(--gold);text-underline-offset:3px }
+    .tx-rs-item strong i{ font-size:.7rem;color:var(--gold) }
+    .tx-rs-item small{ display:block;margin-top:.3rem;color:var(--muted);font-size:.82rem;line-height:1.55 }
+    .tx-rs-summary h3{ font-size:1rem;margin:1.2rem 0 .5rem;color:var(--navy) }
+    .tx-rs-summary ul{ margin:0;padding-left:1.1rem }
+    .tx-rs-summary li{ font-size:.9rem;color:var(--ink-soft);line-height:1.7;margin-bottom:.35rem }
+    .tx-rs-note{ font-size:.8rem !important;color:var(--muted) !important;margin:.6rem 0 0 }
+    .tx-rs-figure{ margin:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 8px 26px rgba(20,30,55,.06) }
+    .tx-rs-figure img{ display:block;width:100%;height:auto }
+    .tx-rs-figure figcaption{ padding:.85rem 1rem;font-size:.82rem;color:var(--ink-soft);border-top:1px solid var(--line);line-height:1.6 }
+    @media (max-width:820px){ .tx-rs-wrap{ grid-template-columns:1fr } }
+    /* 실제 치료 사례 링크 카드 */
+    .tx-case-cta{ display:flex;gap:1.1rem;align-items:center;margin-top:2.6rem;padding:1.4rem 1.6rem;border-radius:14px;background:var(--navy);color:#fff;text-decoration:none;box-shadow:0 12px 34px rgba(20,30,55,.18);transition:transform .15s }
+    .tx-case-cta:hover{ transform:translateY(-2px) }
+    .tx-cc-icon{ flex-shrink:0;width:3rem;height:3rem;border-radius:50%;background:rgba(255,255,255,.12);display:grid;place-items:center;color:var(--gold-light);font-size:1.2rem }
+    .tx-cc-body strong{ display:block;font-size:1.08rem;color:#fff;margin-bottom:.3rem }
+    .tx-cc-body strong i{ font-size:.85rem;color:var(--gold-light);margin-left:.3rem }
+    .tx-cc-body span{ display:block;font-size:.86rem;color:rgba(255,255,255,.78);line-height:1.6 }
+    /* 대표원장 인사말 */
+    .tx-letter{ display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:3rem;align-items:center }
+    .tx-letter-photo{ margin:0;border-radius:14px;overflow:hidden;background:var(--paper-2) }
+    .tx-letter-photo img{ display:block;width:100%;height:auto }
+    .tx-letter-body h2{ font-family:var(--serif-kr);font-size:clamp(1.35rem,2.4vw,1.8rem);line-height:1.5;margin:.4rem 0 1.2rem }
+    .tx-letter-body h2 .gold{ color:var(--gold) }
+    .tx-letter-body p{ color:var(--ink-soft);line-height:1.9;font-size:.96rem;margin:0 0 1rem;word-break:keep-all }
+    .tx-letter-sign{ font-family:var(--serif-kr);color:var(--navy) !important;font-weight:600;margin-top:1.4rem !important }
+    .tx-letter-sign small{ display:block;font-family:inherit;font-weight:400;font-size:.8rem;color:var(--muted);margin-top:.2rem }
+    @media (max-width:820px){ .tx-letter{ grid-template-columns:1fr;gap:1.6rem } .tx-letter-photo{ max-width:280px } }
+
     /* 백과 크로스링크 칩 */
     .tx-enc-chips{ display:flex;flex-wrap:wrap;gap:.6rem }
     .tx-enc-chip{ display:inline-flex;align-items:center;gap:.4rem;font-size:.85rem;color:var(--navy);background:#fff;border:1px solid var(--line);border-radius:999px;padding:.45rem 1rem;text-decoration:none;transition:all .15s }
@@ -385,7 +499,8 @@ export function TreatmentDetail(slug: string, relCols: { slug: string; title: st
       path: '/treatments/' + t.slug,
       reviewerName: docs[0]?.name || '김경희',
       reviewerSlug: docs[0]?.slug || 'kim-kyunghee',
-      lastReviewed: CONTENT_DATES.treatments,
+      lastReviewed: reviewed,
+      citation: t.research?.citation,
       about: { type: 'MedicalProcedure', id: clinic.domain + '/treatments/' + t.slug + '#procedure', name: t.name },
     }),
     speakableSchema(['#tx-answer', '.answer']),

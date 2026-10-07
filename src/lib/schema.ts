@@ -360,10 +360,29 @@ export function medicalWebPageSchema(opts: {
   lastReviewed?: string;
   /** 페이지 주제 엔티티 — 진료 상세는 MedicalProcedure @id, 백과는 DefinedTerm @id */
   about?: { type: string; id: string; name: string };
+  /** 근거 학술 문헌 (원장 학회지 게재 증례 등) → ScholarlyArticle citation */
+  citation?: { headline: string; alternativeHeadline?: string; authors: string[]; datePublished: string; journal: string; issn?: string; volume?: string; issue?: string; pagination?: string; doi?: string };
 }) {
+  const ct = opts.citation
   return {
     '@context': 'https://schema.org',
     '@type': 'MedicalWebPage',
+    ...(ct ? {
+      citation: {
+        '@type': 'ScholarlyArticle',
+        headline: ct.headline,
+        ...(ct.alternativeHeadline ? { alternativeHeadline: ct.alternativeHeadline } : {}),
+        author: ct.authors.map((name) => ({ '@type': 'Person', name })),
+        datePublished: ct.datePublished,
+        ...(ct.pagination ? { pagination: ct.pagination } : {}),
+        isPartOf: {
+          '@type': 'PublicationIssue',
+          ...(ct.issue ? { issueNumber: ct.issue } : {}),
+          isPartOf: { '@type': ['PublicationVolume', 'Periodical'], name: ct.journal, ...(ct.volume ? { volumeNumber: ct.volume } : {}), ...(ct.issn ? { issn: ct.issn } : {}) },
+        },
+        ...(ct.doi ? { identifier: { '@type': 'PropertyValue', propertyID: 'DOI', value: ct.doi }, sameAs: 'https://doi.org/' + ct.doi, url: 'https://doi.org/' + ct.doi } : {}),
+      },
+    } : {}),
     '@id': BASE + opts.path + '#webpage',
     name: opts.title,
     description: opts.description,

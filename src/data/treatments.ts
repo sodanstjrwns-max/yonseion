@@ -40,6 +40,20 @@ export interface Treatment {
   evidence?: { label: string; value: string; note?: string }[] // 근거·기준 데이터
   videos?: { id: string; title: string; caption: string }[] // 진료 소개·후기 유튜브 영상 (VideoObject 스키마)
   caseImages?: { src: string; alt: string; caption: string }[] // 실제 진료 케이스 사진 갤러리
+  // --- 원장 자료 기반 확장 (2026-10-07 All-on-X 통합) ---
+  highlights?: { title: string; points: { title: string; desc: string }[] } // 진료 원칙·특징 카드
+  research?: {                      // 학회 발표·논문 (E-E-A-T, ScholarlyArticle citation)
+    heading: string
+    intro: string
+    items: { label: string; title: string; meta: string; href?: string }[]
+    summaryTitle?: string
+    summary?: string[]              // 증례 요약 (논문에 있는 사실만)
+    note?: string
+    image?: { src: string; alt: string; caption: string; width: number; height: number }
+    citation?: { headline: string; alternativeHeadline?: string; authors: string[]; datePublished: string; journal: string; issn?: string; volume?: string; issue?: string; pagination?: string; doi?: string }
+  }
+  doctorLetter?: boolean            // 대표원장 인사말(doctors.ts greeting) 섹션 노출
+  caseCta?: { title: string; desc: string } // 하단 "실제 치료 사례 보기" — 진료 페이지엔 전후 사진 직접 노출 금지(의료법), 사례 목록으로 연결
 }
 
 export const treatments: Treatment[] = [
@@ -199,16 +213,66 @@ export const treatments: Treatment[] = [
       '심한 치주질환으로 여러 치아가 흔들리는 경우',
     ],
     process: [
-      { step: '정밀 진단', desc: 'CT·구강스캔으로 골량·신경 위치·전신 상태를 평가합니다.' },
-      { step: '디지털 식립 계획', desc: '네비게이션 가이드로 임플란트 위치·각도·깊이를 설계합니다.' },
-      { step: '식립 수술', desc: '계획된 위치에 정밀 식립하고 필요 시 골이식을 병행합니다.' },
-      { step: '임시 보철·골유착', desc: '임시 보철로 생활하며 골과 임플란트가 결합하는 기간을 거칩니다.' },
-      { step: '최종 보철 장착', desc: '티타늄 바 기반 고정성 보철을 장착하고 교합을 조정합니다.' },
+      { step: '정밀 진단', desc: 'CT·구강스캔으로 골량·신경 위치·현재 교합(물리는 높이)과 전신 상태를 평가합니다.' },
+      { step: '디지털 식립 계획', desc: '스캔 데이터와 CT를 겹쳐 임플란트 위치·각도·깊이를 설계하고, 네비게이션 가이드와 임시 치아를 미리 디자인합니다.' },
+      { step: '식립 수술', desc: '가이드로 계획된 위치에 식립하고 필요 시 골이식을 병행합니다. 초기 고정력이 충분하면 당일 임시 치아를 연결합니다.' },
+      { step: '임시 보철·골유착', desc: '임시 보철로 생활하며 골과 임플란트가 결합하는 기간을 거치고, 이 기간에 교합 높이와 발음·외모를 함께 점검합니다.' },
+      { step: '최종 보철 장착', desc: '임시 보철로 확인한 교합 정보를 디지털로 옮겨 티타늄 바 기반 고정성 보철을 제작·장착하고 교합을 조정합니다.' },
     ],
+    highlights: {
+      title: '연세온치과 디지털 풀아치(All-on-X) 진료의 네 가지 원칙',
+      points: [
+        { title: '컴퓨터 분석 기반 식립 계획', desc: 'CT와 구강스캔 데이터를 겹쳐 잇몸뼈의 양과 신경 위치를 3차원으로 분석하고, 계획한 위치·각도대로 심을 수 있도록 디지털 가이드를 제작합니다.' },
+        { title: '수술 당일 임시 치아 연결 (가능한 경우)', desc: '골 상태와 초기 고정력이 충분하면 미리 제작한 임시 치아를 수술 당일 연결해 치아 없이 지내는 기간을 줄이도록 계획합니다. 연결 여부는 수술 중 고정력을 확인한 뒤 결정하며, 골유착 기간에는 부드러운 음식 위주의 식사를 권합니다.' },
+        { title: '진단부터 최종 보철까지 이어지는 디지털 데이터', desc: '진단 단계의 스캔·교합 정보를 수술 가이드·임시 치아·최종 보철 제작까지 이어 사용해, 반복 인상 채득 등 내원 과정을 줄이도록 계획합니다. 실제 내원 횟수와 기간은 골 상태와 치료 범위에 따라 달라집니다.' },
+        { title: '진단 후 항목별 비용 안내', desc: 'CT·구강스캔 진단을 마친 뒤 식립 개수·골이식 여부·보철 재료에 따라 비용을 항목별로 설명드립니다. 진단 전에는 일률적인 금액을 약속하지 않습니다.' },
+      ],
+    },
+    research: {
+      heading: '학회에서 발표한 All-on-4 디지털 증례',
+      intro: '김경희 대표원장은 연세대학교 원주세브란스기독병원 치과보철과 소속으로, 디지털 장비를 이용해 환자가 쓰던 틀니의 교합을 보존하며 All-on-4 임플란트 보철을 완성한 증례를 2018년 대한치과보철학회 학술대회에서 발표하고 학회지에 게재했습니다(제1저자).',
+      items: [
+        { label: '학술대회 발표', title: '완전 디지털 시스템으로 기존 교합을 보전한 All-on-4 임플란트 수복 증례', meta: '2018년 제80회 대한치과보철학회 학술대회 · 학회 감사장(2018.11.25)' },
+        { label: '학회지 게재', title: 'All-on-4 implant restoration with full-digital system preserving existing occlusion: A case report', meta: '대한치과보철학회지 56권 4호(2018년 10월) 330–337쪽 · 김경희, 정승미, 이예찬, 안설은, 최병호', href: 'https://doi.org/10.4047/jkap.2018.56.4.330' },
+      ],
+      summaryTitle: '발표 증례 요약',
+      summary: [
+        '아래턱에 치아가 없어 쓰던 총의치(전체 틀니)의 안정·유지가 부족해 큰 불편을 겪던 환자의 증례입니다.',
+        '환자가 이미 적응해 있던 틀니의 교합 높이(수직고경)와 물리는 위치를 구강스캐너·CBCT로 데이터화하고, 이를 기준으로 임플란트 위치를 계획했습니다.',
+        '잇몸을 절개하지 않는 수술 가이드로 임플란트 4개를 식립하고, 3D 프린터로 미리 만든 임시 보철을 수술 당일 연결했습니다.',
+        '약 3개월 뒤, 안정된 임시 보철의 교합 정보를 그대로 옮겨 티타늄 프레임과 지르코니아 치아로 최종 보철을 제작했습니다.',
+        '진단부터 최종 보철까지 디지털 데이터를 이어 쓰면 각 단계의 일관성을 높이고 과정을 단순하게 할 수 있음을 보고했습니다.',
+      ],
+      note: '※ 학술 증례 보고이며 같은 결과를 보장하지 않습니다. 치료 방법·기간은 개인의 구강 상태에 따라 달라집니다.',
+      image: {
+        src: '/static/img/allonx/kap-2018-certificate.jpg',
+        alt: '대한치과보철학회 2018년 제80회 학술대회 All-on-4 임플란트 수복 증례 발표 감사장',
+        caption: '2018년 제80회 대한치과보철학회 학술대회에서 증례를 발표한 연구진(김경희·정승미·이예찬·안설은)에게 학회가 수여한 감사장입니다. 학술 발표에 대한 감사의 의미이며, 치료 결과를 인증·보장하는 문서는 아닙니다.',
+        width: 1000,
+        height: 708,
+      },
+      citation: {
+        headline: '완전 디지털 시스템으로 기존 교합을 보전한 All-on-4 임플란트 수복증례',
+        alternativeHeadline: 'All-on-4 implant restoration with full-digital system preserving existing occlusion: A case report',
+        authors: ['김경희', '정승미', '이예찬', '안설은', '최병호'],
+        datePublished: '2018-10',
+        journal: '대한치과보철학회지 (The Journal of Korean Academy of Prosthodontics)',
+        issn: '0301-2875',
+        volume: '56',
+        issue: '4',
+        pagination: '330-337',
+        doi: '10.4047/jkap.2018.56.4.330',
+      },
+    },
+    doctorLetter: true,
+    caseCta: {
+      title: 'All-on-X 실제 치료 사례 보기',
+      desc: '치료 전후 구내·파노라마 사진과 안모(얼굴) 변화 기록은 비포/애프터 페이지에 사례별로 정리해 두었습니다. 치료 후 사진은 회원 로그인 후 열람할 수 있으며, 결과는 개인에 따라 다를 수 있습니다.',
+    },
     caution: 'All-on-X는 비급여 진료이며, 골 상태·전신 질환(당뇨·골다공증 등)·흡연 여부에 따라 적용과 예후가 달라질 수 있습니다. 수술 후 일시적 부기·불편감이 있을 수 있고, 정기적 위생 관리와 검진이 장기 유지에 필수적입니다. 모든 결과는 개인차가 있으며 정밀 진단 후 안내드립니다.',
     priceNote: '전체임플란트(All-on-X)는 비급여 진료입니다. 식립 개수·골이식 여부·보철 재료에 따라 비용이 달라지므로, CT 진단 후 상담 시 상세히 안내드립니다. 만 65세 이상 부분 임플란트 건강보험 적용은 별도 기준이 있어 진료 시 확인해 드립니다.',
     metaTitle: 'All-on-X 전체임플란트 (무치악 고정성 보철) | 부산 동래 연세온치과',
-    metaDescription: '치아 전체가 무너졌을 때, 소수의 임플란트로 전체 치열을 고정성으로 회복하는 All-on-X. 디지털 가이드 정밀 식립·티타늄 바 보철. 부산 동래 온천장역 연세온치과의원.',
+    metaDescription: '치아 전체가 무너졌을 때 소수의 임플란트로 전체 치열을 고정성으로 회복하는 All-on-X. 학회에서 All-on-4 디지털 증례를 발표한 보철과 전문의의 가이드 식립·티타늄 바 보철. 부산 동래 연세온치과의원.',
     compare: {
       title: 'All-on-X vs 틀니, 무엇이 다를까요?',
       cols: ['비교 항목', 'All-on-X (고정성)', '틀니 (가철성)'],
@@ -240,6 +304,7 @@ export const treatments: Treatment[] = [
       { q: '당뇨·골다공증이 있어도 가능한가요?', a: '전신 질환이 있어도 조절 상태가 양호하면 진행하는 경우가 많습니다. 다만 예후에 영향을 줄 수 있어, 정밀 진단과 전신 상태 평가 후 신중히 계획합니다.' },
       { q: '임플란트 개수는 몇 개나 필요한가요?', a: '전체 치열을 소수의 임플란트로 지지하는 설계이며, 골 상태와 보철 형태에 따라 개수가 달라집니다. CT 진단 후 가장 안정적인 개수와 위치를 계획해 안내드립니다.' },
       { q: '오래 쓰려면 어떻게 관리해야 하나요?', a: '임플란트 주위염 예방이 핵심입니다. 전용 칫솔·치간칫솔·구강세정기로 매일 관리하고, 정기 검진에서 보철·교합·잇몸 상태를 점검하는 것이 장기 유지에 중요합니다.' },
+      { q: 'All-on-X 치료 전후 사진(안모 포함)은 어디서 볼 수 있나요?', a: '진료 안내 페이지에는 전후 사진을 싣지 않고, 비포/애프터 페이지의 All-on-X 분류에 사례별로 정리해 두었습니다. 치료 후 사진은 회원 로그인 후 열람할 수 있으며, 결과는 개인에 따라 다를 수 있습니다.' },
     ],
     videos: [
       {
