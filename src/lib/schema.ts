@@ -359,6 +359,10 @@ export function medicalWebPageSchema(opts: {
   reviewerName?: string; reviewerSlug?: string;
   /** 고정 검토일(YYYY-MM-DD) — lib/content-dates.ts. 없으면 lastReviewed 생략(오늘 날짜 자동 생성 금지) */
   lastReviewed?: string;
+  /** true 면 reviewedBy·lastReviewed 를 내보내지 않는다 — 원장 검토 기록이 없는 페이지(백과 용어 등). 2026-10-08 */
+  noReview?: boolean;
+  /** 본문 실제 최종 수정일(YYYY-MM-DD 고정값) */
+  dateModified?: string;
   /** 페이지 주제 엔티티 — 진료 상세는 MedicalProcedure @id, 백과는 DefinedTerm @id */
   about?: { type: string; id: string; name: string };
   /** 근거 학술 문헌 (원장 학회지 게재 증례 등) → ScholarlyArticle citation */
@@ -391,16 +395,19 @@ export function medicalWebPageSchema(opts: {
     inLanguage: 'ko',
     isPartOf: { '@id': BASE + '/#website' },
     ...(opts.about ? { about: { '@type': opts.about.type, '@id': opts.about.id, name: opts.about.name } } : {}),
-    ...(opts.lastReviewed ? { lastReviewed: opts.lastReviewed } : {}),
-    reviewedBy: opts.reviewerName
-      ? {
-          '@type': ['Person', 'Physician'],
-          ...(opts.reviewerSlug ? { '@id': BASE + '/doctors/' + opts.reviewerSlug + '#person' } : {}),
-          name: opts.reviewerName,
-          url: opts.reviewerSlug ? BASE + '/doctors/' + opts.reviewerSlug : undefined,
-          worksFor: { '@id': BASE + '/#clinic' },
-        }
-      : { '@id': BASE + '/#clinic' },
+    ...(opts.dateModified ? { dateModified: opts.dateModified } : {}),
+    ...(opts.noReview ? {} : {
+      ...(opts.lastReviewed ? { lastReviewed: opts.lastReviewed } : {}),
+      reviewedBy: opts.reviewerName
+        ? {
+            '@type': ['Person', 'Physician'],
+            ...(opts.reviewerSlug ? { '@id': BASE + '/doctors/' + opts.reviewerSlug + '#person' } : {}),
+            name: opts.reviewerName,
+            url: opts.reviewerSlug ? BASE + '/doctors/' + opts.reviewerSlug : undefined,
+            worksFor: { '@id': BASE + '/#clinic' },
+          }
+        : { '@id': BASE + '/#clinic' },
+    }),
     publisher: { '@id': BASE + '/#clinic' },
   }
 }

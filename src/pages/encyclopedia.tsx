@@ -195,7 +195,7 @@ export function EncyclopediaDetail(slug: string) {
   const related = entry.relatedTreatments.map((s) => getTreatment(s)).filter(Boolean)
   const others = encyclopedia.filter((e) => e.category === entry.category && e.slug !== entry.slug)
 
-  // AEO 스키마: 본문 Q&A → FAQPage / 용어 → DefinedTerm / 의료감수 → MedicalWebPage
+  // AEO 스키마: 본문 Q&A → FAQPage / 용어 → DefinedTerm / 페이지 → MedicalWebPage(publisher 병원, 원장 감수 표기 없음)
   const enrich = getEnrichment(entry.slug)
   const reviewed = encycloEntryDate(entry.slug, 'encyclopedia', !!enrich)
   const faqEntries = [
@@ -219,7 +219,7 @@ export function EncyclopediaDetail(slug: string) {
         <article class="prose" data-reveal>
           ${raw(entry.body.map((b) => `<h2>${b.h}</h2><p>${b.p}</p>`).join(''))}
           ${raw(enrich ? ENRICH_STYLE + enrichHtml(enrich, entry.term) : '')}
-          <p class="muted enc-review" style="font-size:.82rem;margin-top:2.5rem">감수: <a href="/doctors/kim-kyunghee">김경희 대표원장</a> · 최종 검토 <time datetime="${reviewed}">${reviewed}</time></p>
+          <p class="muted enc-review" style="font-size:.82rem;margin-top:2.5rem">일반 건강정보입니다. 진료 판단은 내원 상담에서 원장이 직접 합니다. · 최종 수정 <time datetime="${reviewed}">${reviewed}</time></p>
           <p class="muted" style="font-size:.8rem;margin-top:.6rem">※ 본 내용은 일반적인 의학 정보이며, 개인의 상태에 따라 진단·치료 방법이 다를 수 있습니다. 정확한 내용은 내원하여 전문의와 상담하시기 바랍니다.</p>
         </article>
         <aside class="sidebar">
@@ -255,9 +255,8 @@ export function EncyclopediaDetail(slug: string) {
         title: `${entry.term}이란?`,
         description: entry.oneLiner,
         path: `/encyclopedia/${entry.slug}`,
-        reviewerName: '김경희',
-        reviewerSlug: 'kim-kyunghee',
-        lastReviewed: reviewed,
+        noReview: true, // 원장 검토 기록 없음 — 감수 신호 미표기 (2026-10-08)
+        dateModified: reviewed,
         about: { type: 'DefinedTerm', id: `${clinic.domain}/encyclopedia/${entry.slug}#term`, name: entry.term },
       }),
       ...(faqEntries.length ? [faqSchema(faqEntries)] : []),
@@ -305,7 +304,7 @@ export function GlossaryDetail(slug: string) {
           ${raw(enrich ? ENRICH_STYLE + enrichHtml(enrich, entry.term) : `<h2>${entry.term}(${entry.termEn})이란?</h2>
           <p>${entry.def}</p>
           ${related.length ? `<h2>관련 진료 안내</h2><p>${entry.term}와(과) 관련된 진료가 궁금하시다면 ${related.map((t) => `<a href="/treatments/${t!.slug}">${t!.name}</a>`).join(', ')} 페이지에서 더 자세한 내용을 확인하실 수 있습니다.</p>` : ''}`)}
-          <p class="muted enc-review" style="font-size:.82rem;margin-top:2.5rem">감수: <a href="/doctors/kim-kyunghee">김경희 대표원장</a> · 최종 검토 <time datetime="${reviewed}">${reviewed}</time></p>
+          <p class="muted enc-review" style="font-size:.82rem;margin-top:2.5rem">일반 건강정보입니다. 진료 판단은 내원 상담에서 원장이 직접 합니다. · 최종 수정 <time datetime="${reviewed}">${reviewed}</time></p>
           <p class="muted" style="font-size:.8rem;margin-top:.6rem">※ 본 내용은 일반적인 의학 정보이며, 개인의 상태에 따라 진단·치료 방법이 다를 수 있습니다. 정확한 내용은 내원하여 전문의와 상담하시기 바랍니다.</p>
         </article>
         <aside class="sidebar">
@@ -346,9 +345,8 @@ export function GlossaryDetail(slug: string) {
         title: `${entry.term}(${entry.termEn})이란?`,
         description: entry.def,
         path: `/encyclopedia/${entry.slug}`,
-        reviewerName: '김경희',
-        reviewerSlug: 'kim-kyunghee',
-        lastReviewed: reviewed,
+        noReview: true, // 원장 검토 기록 없음 — 감수 신호 미표기 (2026-10-08)
+        dateModified: reviewed,
         about: { type: 'DefinedTerm', id: `${clinic.domain}/encyclopedia/${entry.slug}#term`, name: entry.term },
       }),
       ...(enrich ? [faqSchema(enrich.faqs)] : []),

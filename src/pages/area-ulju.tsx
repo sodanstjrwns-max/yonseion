@@ -303,9 +303,8 @@ export function UljuAreaPage(treatmentSlug: string, treatmentName: string) {
         inLanguage: 'ko',
         isPartOf: { '@id': `${clinic.domain}/#website` },
         about: { '@id': `${clinic.domain}/#clinic` },
-        lastReviewed: ULJU_DATE,
         dateModified: ULJU_DATE,
-        reviewedBy: { '@id': `${clinic.domain}/doctors/${doc.slug}#person` },
+        publisher: { '@id': `${clinic.domain}/#clinic` },
         speakable: { '@type': 'SpeakableSpecification', cssSelector: ['h1', '#ulju-answer'] },
       },
       {

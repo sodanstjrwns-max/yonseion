@@ -369,9 +369,8 @@ export function OncheonjangHubPage() {
         isPartOf: { '@id': `${clinic.domain}/#website` },
         about: { '@id': `${clinic.domain}/#clinic` },
         mainEntity: { '@id': `${clinic.domain}/#clinic` },
-        lastReviewed: HUB_DATE,
         dateModified: HUB_DATE,
-        reviewedBy: { '@id': `${clinic.domain}/doctors/${doc.slug}#person` },
+        publisher: { '@id': `${clinic.domain}/#clinic` },
         speakable: { '@type': 'SpeakableSpecification', cssSelector: ['h1', '#hub-answer'] },
       },
       {
