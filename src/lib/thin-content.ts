@@ -51,5 +51,14 @@ export function glossaryTextLength(g: Pick<GlossaryEntry, 'slug' | 'def'>): numb
   return visibleTextLength(g.def) + enrichTextLength(getEnrichment(g.slug))
 }
 
+/**
+ * 얇은 공지 판정 (2026-10-08, esoldc thin-content 와 같은 기준)
+ *  - 공지 본문(contentHtml) 화면 글자 수(태그·공백 제외)가 300자 미만이면 noindex, follow + X-Robots-Tag + 사이트맵 제외.
+ *  - 색인 대상 공지가 하나도 없으면 /notice 목록도 noindex, follow·사이트맵 제외.
+ *  - 진료일정 이미지 한 장 + 짧은 안내 같은 공지가 대부분이라 검색 결과용이 아님. 본문을 충실히 쓰면 자동 복귀.
+ */
+export const THIN_NOTICE_MIN_CHARS = 300
+export const isThinNotice = (n: { contentHtml?: string | null }) => visibleTextLength(n.contentHtml) < THIN_NOTICE_MIN_CHARS
+
 export const isThinEncyclo = (e: Pick<EncycloEntry, 'slug' | 'oneLiner' | 'body'>) => encycloTextLength(e) < THIN_ENCYCLO_MIN_CHARS
 export const isThinGlossary = (g: Pick<GlossaryEntry, 'slug' | 'def'>) => glossaryTextLength(g) < THIN_ENCYCLO_MIN_CHARS

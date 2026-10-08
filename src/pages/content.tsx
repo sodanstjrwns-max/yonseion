@@ -8,6 +8,7 @@ import { breadcrumbSchema, articleSchema } from '../lib/schema'
 import type { CaseItem, Column, Notice } from '../data/types'
 import { autoLink } from '../lib/inlink'
 import { getMergedVideos } from '../lib/youtube'
+import { isThinNotice, NOINDEX_FOLLOW } from '../lib/thin-content'
 
 const fmt = (iso: string) => (iso || '').slice(0, 10).replace(/-/g, '.')
 const BASE = clinic.domain
@@ -551,6 +552,8 @@ export function ColumnDetailPage(col: Column, relCols: Column[] = [], relCases: 
 export function NoticesPage(items: Notice[]) {
   const crumb = [{ name: '홈', url: '/' }, { name: '공지사항', url: '/notice' }]
   const list = items.filter((x) => x.published).sort((a, b) => Number(b.pinned) - Number(a.pinned))
+  // 색인 대상(본문 300자 이상) 공지가 하나도 없으면 목록도 noindex, follow (lib/thin-content.ts)
+  const listThin = !list.some((n) => !isThinNotice(n))
   const body = html`
   <section class="page-hero">
     <div class="container"><p class="eyebrow">Notice</p><h1>공지사항</h1></div>
@@ -576,6 +579,7 @@ export function NoticesPage(items: Notice[]) {
     description: `${clinic.nameKo} 공지사항 — 진료 일정, 병원 소식 안내.`,
     path: '/notice',
     jsonLd: [breadcrumbSchema(crumb)],
+    robots: listThin ? NOINDEX_FOLLOW : undefined,
   }, body)
 }
 
@@ -605,6 +609,7 @@ export function NoticeDetailPage(n: Notice) {
     description: `${n.title} — ${clinic.nameKo} 공지사항. ${clinic.subway}. ${(n.contentHtml || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 100) || '진료 일정과 병원 소식을 안내드립니다.'}`,
     path: `/notice/${n.id}`,
     jsonLd: [breadcrumbSchema(crumb)],
+    robots: isThinNotice(n) ? NOINDEX_FOLLOW : undefined, // 본문 300자 미만 공지 → noindex, follow
   }, body)
 }
 

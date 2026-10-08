@@ -6,7 +6,7 @@ import { treatments } from './data/treatments'
 import { doctors } from './data/doctors'
 import { encyclopedia } from './data/encyclopedia'
 import { glossary, resolveGlossaryAlias } from './data/glossary'
-import { isThinEncyclo, isThinGlossary, NOINDEX_FOLLOW } from './lib/thin-content'
+import { isThinEncyclo, isThinGlossary, isThinNotice, NOINDEX_FOLLOW } from './lib/thin-content'
 import { CONTENT_DATES, PAGE_DATES, AREA_REGION_DATES, latestDate, treatmentReviewed, encycloEntryDate } from './lib/content-dates'
 import { getEnrichment } from './data/encyclopedia-enrich'
 import { getPricing } from './lib/pricing-store'
@@ -26,7 +26,7 @@ import {
   CasesGalleryPage, CaseDetailPage, ColumnsPage, ColumnDetailPage,
   NoticesPage, NoticeDetailPage, VideoPage,
 } from './pages/content'
-import { EncyclopediaIndex, EncyclopediaDetail } from './pages/encyclopedia'
+import { EncyclopediaIndex, EncyclopediaDetail, publicTermStats } from './pages/encyclopedia'
 import { AreaIndexPage, AreaPage, OncheonjangHubPage, HUB_SLUG, HUB_DATE } from './pages/area'
 
 // 라우트 모듈
@@ -210,12 +210,15 @@ app.get('/notice', async (c) => {
     const n = await store.getJSON<Notice>(`notices/${it.id}.json`)
     if (n) items.push(n)
   }
+  // 색인 대상 공지(본문 300자 이상)가 없으면 목록도 noindex, follow — meta 와 동일하게 헤더로도
+  if (!items.some((n) => n.published && !isThinNotice(n))) c.header('X-Robots-Tag', NOINDEX_FOLLOW)
   return c.html(NoticesPage(items))
 })
 app.get('/notice/:id', async (c) => {
   const store = new Store(c.env.R2)
   const n = await store.getJSON<Notice>(`notices/${c.req.param('id')}.json`)
   if (!n || !n.published) return c.notFound()
+  if (isThinNotice(n)) c.header('X-Robots-Tag', NOINDEX_FOLLOW) // 본문 300자 미만 공지
   return c.html(NoticeDetailPage(n))
 })
 
@@ -249,9 +252,29 @@ async function loadR2Dated(env: Bindings) {
 }
 const itemDate = (x: R2Dated) => latestDate(x.updatedAt, x.createdAt)
 
+// 공지 상세 — 본문까지 읽어 얇은 공지(300자 미만) 판정. lastmod = 실제 저장 시각(updatedAt, 없으면 createdAt)
+async function loadIndexableNotices(env: Bindings): Promise<Notice[]> {
+  try {
+    const store = new Store(env.R2)
+    const idx = await store.index<{ id: string; published?: boolean }>('notices')
+    const out: Notice[] = []
+    for (const it of idx.filter((x) => x.published !== false).slice(0, 200)) {
+      const n = await store.getJSON<Notice>(`notices/${it.id}.json`)
+      if (n && n.published && !isThinNotice(n)) out.push(n)
+    }
+    return out
+  } catch {
+    return []
+  }
+}
+async function sitemapNoticeUrls(env: Bindings): Promise<SmUrl[]> {
+  const base = clinic.domain
+  return (await loadIndexableNotices(env)).map((n) => ({ loc: `${base}/notice/${n.id}`, priority: '0.4', changefreq: 'monthly', lastmod: latestDate(n.updatedAt, n.createdAt) }))
+}
+
 async function sitemapPagesUrls(env: Bindings): Promise<SmUrl[]> {
   const base = clinic.domain
-  const r2 = await loadR2Dated(env)
+  const [r2, notices] = await Promise.all([loadR2Dated(env), loadIndexableNotices(env)])
   const staticPaths: { p: string; cf: string; lm: string }[] = [
     { p: '/', cf: 'weekly', lm: PAGE_DATES.home },
     { p: '/mission', cf: 'monthly', lm: PAGE_DATES.mission },
@@ -264,7 +287,8 @@ async function sitemapPagesUrls(env: Bindings): Promise<SmUrl[]> {
     { p: '/directions', cf: 'yearly', lm: PAGE_DATES.directions },
     { p: '/cases/gallery', cf: 'weekly', lm: latestDate(...r2.cases.map(itemDate)) },
     { p: '/column', cf: 'weekly', lm: latestDate(...r2.cols.map(itemDate)) },
-    { p: '/notice', cf: 'weekly', lm: latestDate(...r2.notices.map(itemDate)) },
+    // 공지 목록 — 색인 대상 공지가 있을 때만 (없으면 목록도 noindex, follow)
+    ...(notices.length ? [{ p: '/notice', cf: 'weekly', lm: latestDate(...r2.notices.map(itemDate)) }] : []),
     { p: '/video', cf: 'monthly', lm: '' }, // 유튜브 RSS 자동 반영 — 수정일을 알 수 없어 생략
     { p: '/encyclopedia', cf: 'monthly', lm: latestDate(CONTENT_DATES.encyclopedia, CONTENT_DATES.glossary, CONTENT_DATES.encyclopediaEnrich) },
     { p: '/area', cf: 'monthly', lm: latestDate(PAGE_DATES.area, PAGE_DATES.areaIndex) },
@@ -314,14 +338,15 @@ async function sitemapContentUrls(env: Bindings): Promise<SmUrl[]> {
 // --- sitemap.xml (인덱스) — 하위 사이트맵별 lastmod = 그 안 URL 의 최신 lastmod ---
 app.get('/sitemap.xml', async (c) => {
   const base = clinic.domain
-  const [pages, content] = await Promise.all([sitemapPagesUrls(c.env), sitemapContentUrls(c.env)])
-  const maps: [string, SmUrl[]][] = [
+  const [pages, content, notices] = await Promise.all([sitemapPagesUrls(c.env), sitemapContentUrls(c.env), sitemapNoticeUrls(c.env)])
+  const maps: [string, SmUrl[]][] = ([
     ['sitemap-pages.xml', pages],
     ['sitemap-treatments.xml', sitemapTreatmentUrls()],
     ['sitemap-encyclopedia.xml', sitemapEncyclopediaUrls()],
     ['sitemap-area.xml', sitemapAreaUrls()],
     ['sitemap-content.xml', content],
-  ]
+    ['sitemap-notices.xml', notices],
+  ] as [string, SmUrl[]][]).filter(([, urls]) => urls.length > 0) // 빈 하위 사이트맵은 인덱스에서 제외
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${maps.map(([m, urls]) => {
@@ -342,6 +367,8 @@ app.get('/sitemap-encyclopedia.xml', (c) => smResponse(c, sitemapEncyclopediaUrl
 app.get('/sitemap-area.xml', (c) => smResponse(c, sitemapAreaUrls()))
 // --- sitemap-content.xml (R2 동적 콘텐츠 — 케이스/칼럼) ---
 app.get('/sitemap-content.xml', async (c) => smResponse(c, await sitemapContentUrls(c.env)))
+// --- sitemap-notices.xml (본문 300자 이상 공지만 — 얇은 공지는 noindex, follow) ---
+app.get('/sitemap-notices.xml', async (c) => smResponse(c, await sitemapNoticeUrls(c.env)))
 
 // --- 네이버 서치어드바이저 소유확인 (HTML 파일 방식) ---
 app.get('/naver3bc6810af11b42a00b0184d0bfc74731.html', (c) =>
@@ -513,7 +540,7 @@ ${txList}
 - [진료 안내](${base}/treatments): 전체 진료 항목
 - [의료진](${base}/doctors): 김경희 대표원장 약력·전문 분야
 - [자주 묻는 질문](${base}/faq): 진료별 FAQ
-- [치과 백과사전](${base}/encyclopedia): 치과 용어 사전 (AEO 직답형, ${encyclopedia.length}+개 용어)
+- [치과 백과사전](${base}/encyclopedia): 치과 용어 사전 (AEO 직답형, 용어 ${publicTermStats().total}개)
 - [비급여 수가](${base}/pricing)
 - [오시는 길](${base}/directions)
 - [온천장 치과 안내](${base}/area/oncheonjang): 위치(온천장역 1·5번 출구 도보 3분)·진료시간·의료진·진료 범위·자주 묻는 질문

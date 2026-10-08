@@ -53,6 +53,7 @@ export interface Notice {
   popupUntil?: string           // 팝업 노출 종료일 (YYYY-MM-DD, 선택) — 이후 자동 숨김
   link?: string                 // 팝업 클릭 시 이동할 링크 (선택, 기본은 공지 상세)
   createdAt: string
+  updatedAt?: string            // 마지막 저장 시각 (2026-10-08~ 저장분부터 기록, 사이트맵 lastmod)
 }
 
 export interface User {

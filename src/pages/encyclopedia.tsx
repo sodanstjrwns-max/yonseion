@@ -2,7 +2,7 @@ import { html, raw } from 'hono/html'
 import { Layout, Breadcrumb } from '../components/layout'
 import { clinic } from '../data/clinic'
 import { encyclopedia, getEntry, encycloCategories } from '../data/encyclopedia'
-import { glossary, GlossaryEntry } from '../data/glossary'
+import { glossary, GlossaryEntry, GLOSSARY_ALIASES } from '../data/glossary'
 import { getTreatment } from '../data/treatments'
 import { breadcrumbSchema, speakableSchema, faqSchema, definedTermSchema, medicalWebPageSchema } from '../lib/schema'
 import { isThinEncyclo, isThinGlossary, NOINDEX_FOLLOW } from '../lib/thin-content'
@@ -21,6 +21,17 @@ const glossaryCategories = (() => {
   for (const e of glossary) if (!seen.includes(e.category)) seen.push(e.category)
   return seen
 })()
+
+/**
+ * 실제로 열리는 서로 다른 용어 수 (2026-10-08) — 리치 해설과 경량 용어가 같은 slug 면 한 페이지(리치)로 열리고,
+ * alias slug 는 301 이므로 제외. 예전 표기(encyclopedia.length + glossary.length = 634)는 겹치는 104개를 두 번 셌다.
+ */
+export function publicTermStats() {
+  const rich = new Set(encyclopedia.map((e) => e.slug))
+  const all = new Set<string>([...rich, ...glossary.map((g) => g.slug)].filter((s) => !GLOSSARY_ALIASES[s]))
+  const glossaryOnly = glossary.filter((g) => !rich.has(g.slug) && !GLOSSARY_ALIASES[g.slug]).length
+  return { total: all.size, rich: rich.size, glossaryOnly, overlap: glossary.length - glossaryOnly }
+}
 
 export function getGlossaryEntry(slug: string): GlossaryEntry | undefined {
   return glossary.find((e) => e.slug === slug)
@@ -61,7 +72,8 @@ const ENRICH_STYLE = `<style>
 
 export function EncyclopediaIndex() {
   const crumb = [{ name: '홈', url: '/' }, { name: '치과 백과사전', url: '/encyclopedia' }]
-  const total = encyclopedia.length + glossary.length
+  const stats = publicTermStats()
+  const total = stats.total
 
   // DefinedTermSet 스키마 (AEO)
   const termSetSchema = {
@@ -102,7 +114,7 @@ export function EncyclopediaIndex() {
 
       <!-- 용어 사전 (경량 레이어) -->
       <div id="glossary-section" data-reveal style="margin-top:4.5rem;padding-top:3rem;border-top:1px solid var(--line)">
-        <h2 style="font-family:var(--serif-kr);font-size:var(--t-h3);margin-bottom:.6rem">치과 용어 사전 <span style="font-size:.9rem;color:var(--mist);font-family:var(--sans)">${glossary.length}개 용어</span></h2>
+        <h2 style="font-family:var(--serif-kr);font-size:var(--t-h3);margin-bottom:.6rem">치과 용어 사전 <span style="font-size:.9rem;color:var(--mist);font-family:var(--sans)">검색 목록 ${glossary.length}개 · 그중 ${stats.overlap}개는 위 심층 해설로 연결</span></h2>
         <p class="muted" style="margin-bottom:1.6rem;font-size:.92rem">검색하거나 분류를 선택해 원하는 용어를 찾아보세요.</p>
 
         <div style="display:flex;flex-wrap:wrap;gap:.8rem;align-items:center;margin-bottom:1.8rem">

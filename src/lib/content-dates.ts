@@ -66,9 +66,11 @@ export const PAGE_DATES = {
 } as const
 
 /** YYYY-MM-DD 목록 중 가장 최근 날짜 (없으면 '') */
-/** 지역별 데이터를 실제로 고친 날 — facilities.ts seoRegions (동래: 정거장 수 정정 2026-10-08) */
+/** 지역별 데이터를 실제로 고친 날 — facilities.ts seoRegions (동래: 정거장 수 정정 2026-10-08)
+ *  울주: /area/ulju-* 4페이지 원거리 내원 안내로 본문 재작성 (src/pages/area-ulju.tsx ULJU_DATE, 2026-10-08) */
 export const AREA_REGION_DATES: Record<string, string> = {
   dongnae: '2026-10-08',
+  ulju: '2026-10-08',
 }
 
 export function latestDate(...dates: (string | undefined | null)[]): string {

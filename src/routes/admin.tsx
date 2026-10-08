@@ -1205,10 +1205,11 @@ async function saveNotice(c: any, existing?: Notice) {
     popupUntil: String(f.popupUntil || '') || undefined,
     link: String(f.link || '').trim() || undefined,
     createdAt: existing?.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(), // 실제 저장 시각 — 사이트맵 lastmod
   }
   await store.putJSON(`notices/${n.id}.json`, n)
   const idx = (await store.index<any>('notices')).filter((x: any) => x.id !== n.id)
-  idx.unshift({ id: n.id, title: n.title, createdAt: n.createdAt, published: n.published, pinned: n.pinned, popup: n.popup, popupUntil: n.popupUntil })
+  idx.unshift({ id: n.id, title: n.title, createdAt: n.createdAt, updatedAt: n.updatedAt, published: n.published, pinned: n.pinned, popup: n.popup, popupUntil: n.popupUntil })
   await store.setIndex('notices', idx)
   // 발행된 공지는 구글에 자동 색인 요청
   if (n.published) fireIndexNotify(c, `/notice/${n.id}`)

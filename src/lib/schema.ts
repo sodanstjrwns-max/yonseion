@@ -229,12 +229,13 @@ export function articleSchema(opts: {
 }
 
 // --- City / Place (지역 SEO) ---
-export function placeSchema(regionFull: string) {
+export function placeSchema(regionFull: string, regionAdmin?: string) {
   return {
     '@context': 'https://schema.org',
     '@type': 'City',
     name: regionFull,
-    containedInPlace: { '@type': 'AdministrativeArea', name: clinic.addressRegion },
+    // 상위 광역 행정구역 — 지역명 첫 단어(경상남도·울산광역시 등). 부산 외 지역이 '부산광역시'에 속한 것으로 나오던 오류 수정
+    containedInPlace: { '@type': 'AdministrativeArea', name: regionAdmin ? regionAdmin.split(' ')[0] : clinic.addressRegion },
   }
 }
 

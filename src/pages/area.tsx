@@ -6,6 +6,7 @@ import { getTreatment } from '../data/treatments'
 import { doctors, doctorsBySpecialty } from '../data/doctors'
 import { faqGroups } from '../data/faqs'
 import { breadcrumbSchema, faqSchema, placeSchema, areaServiceSchema, localServiceSchema, speakableSchema } from '../lib/schema'
+import { UljuAreaPage, ULJU_SLUG } from './area-ulju'
 
 // ============================================================================
 // 지역 SEO 페이지 — /area/[region]-[treatment] (14지역 × 4진료 = 56페이지)
@@ -48,9 +49,9 @@ export function AreaIndexPage() {
           <h2 style="font-family:var(--serif-kr);font-size:1.25rem;margin-bottom:1.4rem;color:var(--gold)">${g.label}</h2>
           ${g.regions.map((r) => `
             <div style="margin-bottom:1.6rem">
-              <h3 style="font-size:1rem;font-weight:600;color:var(--ink);margin-bottom:.7rem">${r.full} <span style="font-weight:400;color:var(--mist);font-size:.85rem">· ${r.transit.length > 28 ? r.distance : r.distance}</span></h3>
+              <h3 style="font-size:1rem;font-weight:600;color:var(--ink);margin-bottom:.7rem">${r.slug === ULJU_SLUG ? '울산 울주' : r.full} <span style="font-weight:400;color:var(--mist);font-size:.85rem">· ${r.slug === ULJU_SLUG ? '원거리 — 상담·내원 일정 안내' : r.distance}</span></h3>
               <div style="display:flex;gap:.6rem;flex-wrap:wrap">
-                ${seoTreatments.map((t) => `<a href="/area/${r.slug}-${t.slug}" class="faq-tab">${r.name} ${t.name}</a>`).join('')}
+                ${seoTreatments.map((t) => `<a href="/area/${r.slug}-${t.slug}" class="faq-tab">${r.slug === ULJU_SLUG ? `울주에서 ${t.name} 상담` : `${r.name} ${t.name}`}</a>`).join('')}
               </div>
             </div>`).join('')}
         </div>`).join(''))}
@@ -71,6 +72,8 @@ export function AreaPage(comboSlug: string) {
   const { region, treatment } = combo
   const tx = getTreatment(treatment.slug)
   if (!tx) return null
+  // 울산 울주(원거리) — 현지 병원처럼 보이는 템플릿 대신 정직한 원거리 내원 안내 (2026-10-08)
+  if (region.slug === ULJU_SLUG) return UljuAreaPage(treatment.slug, treatment.name)
 
   const docs = doctorsBySpecialty(treatment.slug)
   const doc = docs[0]
@@ -203,7 +206,7 @@ export function AreaPage(comboSlug: string) {
         treatmentName: treatment.name, treatmentSlug: treatment.slug,
         regionAdmin: region.admin, regionName: region.name,
       }),
-      placeSchema(region.full),
+      placeSchema(region.full, region.admin),
       faqSchema(faqs),
     ],
   }, body)
