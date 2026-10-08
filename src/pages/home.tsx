@@ -595,7 +595,7 @@ export function HomePage() {
       <div class="hub-grid">
         ${raw([
           { href: '/encyclopedia', ic: 'fa-book-open', t: '치과 백과사전', d: '생체모방치의학부터 임플란트·심미보철·잇몸 질환까지, 치과 용어와 치료 개념을 질문-답변형으로 정리한 ' + encyclopedia.length + '개 항목의 일반 치의학 정보입니다.' },
-          { href: '/column', ic: 'fa-pen-nib', t: '원장 칼럼', d: '대표원장이 직접 쓰는 진료 이야기와 구강 건강 정보를 연재합니다.' },
+          { href: '/column', ic: 'fa-pen-nib', t: '원장 칼럼', d: '진료 이야기와 구강 건강 정보를 연재합니다.' },
           { href: '/cases/gallery', ic: 'fa-images', t: '치료 사례', d: '진료과목·지역별로 정리한 치료 사례 기록입니다.' },
           { href: '/video', ic: 'fa-video', t: '진료 영상', d: '병원과 진료를 소개하는 공식 유튜브 영상 모음입니다.' },
           { href: '/faq', ic: 'fa-circle-question', t: '자주 묻는 질문', d: '심미보철·임플란트·접착수복·턱관절 등 진료별 질문 ' + Object.values(faqGroups).reduce((n, g) => n + g.faqs.length, 0) + '개를 모았습니다.' },

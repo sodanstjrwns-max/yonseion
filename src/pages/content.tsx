@@ -4,6 +4,7 @@ import { clinic } from '../data/clinic'
 import { getTreatment, treatments as ALL_TREATMENTS } from '../data/treatments'
 import { answerSummary, faqsFromArticleHtml, enhanceArticleImages, caseAutoSummary, flatText, clipSentences, kstYmd } from '../lib/column-seo'
 import { getDoctor } from '../data/doctors'
+import { columnDoctor, CLINIC_GENERAL_INFO_NOTE } from '../lib/authorship'
 import { breadcrumbSchema, articleSchema } from '../lib/schema'
 import type { CaseItem, Column, Notice } from '../data/types'
 import { autoLink } from '../lib/inlink'
@@ -346,7 +347,7 @@ export function ColumnsPage(items: Column[], pageQ = 1, treatment?: string) {
     <div class="container">
       <p class="eyebrow">Column</p>
       <h1>원장 칼럼</h1>
-      <p class="lead">치아 건강에 대해 알아두면 좋은 이야기를 원장이 직접 씁니다.</p>
+      <p class="lead">치아 건강에 대해 알아두면 좋은 이야기를 전합니다.</p>
     </div>
   </section>
   ${Breadcrumb(crumb)}
@@ -362,7 +363,7 @@ export function ColumnsPage(items: Column[], pageQ = 1, treatment?: string) {
       ${raw(list.length ? `
       <div class="col-grid">
         ${list.map((col, i) => {
-          const doc = getDoctor(col.authorSlug)
+          const doc = columnDoctor(col)
           const thumb = col.thumbnail
           const alt = `${col.title}${doc ? ` — ${doc.name} ${doc.role}` : ''}`
           const media = thumb
@@ -375,7 +376,7 @@ export function ColumnsPage(items: Column[], pageQ = 1, treatment?: string) {
               <span class="col-date">${fmt(col.createdAt)}</span>
               <span class="col-title">${col.title}</span>
               <span class="col-excerpt">${col.excerpt}</span>
-              ${doc ? `<span class="col-author"><i class="fas fa-user-doctor"></i> ${doc.name} ${doc.role}</span>` : ''}
+              ${doc ? `<span class="col-author"><i class="fas fa-user-doctor"></i> ${doc.name} ${doc.role}</span>` : `<span class="col-author"><i class="fas fa-hospital"></i> ${clinic.nameKo} 발행</span>`}
             </span>
           </a>`
         }).join('')}
@@ -405,7 +406,7 @@ export function ColumnsPage(items: Column[], pageQ = 1, treatment?: string) {
   return Layout({
     title: `${tx ? `${tx.name} ` : ''}원장 칼럼${pageSuffix} | ${clinic.nameKo}`,
     description: (tx
-      ? `${clinic.nameKo} ${tx.name} 칼럼 ${total}편 — 전문의가 직접 쓰고 감수한 ${tx.name} 진료 정보.`
+      ? `${clinic.nameKo} ${tx.name} 칼럼 ${total}편 — ${tx.name} 진료 전에 알아두면 좋은 정보.`
       : `${clinic.nameKo} 원장 칼럼 — 생체모방치의학, 심미보철, 임플란트(All-on-X), 충치·턱관절 치료에 대한 전문의의 깊이 있는 이야기를 ${clinic.addressLocality} 온천장역 연세온치과에서 전합니다.`) + pageSuffix,
     path,
     jsonLd: [collectionGraph({ path, name: `${tx ? `${tx.name} ` : ''}원장 칼럼 목록${pageSuffix}`, total, offset, items: list.map((x) => ({ name: x.title, path: `/column/${x.slug}` })), crumb })],
@@ -420,7 +421,8 @@ export function fixBareHrefs(h: string): string {
 }
 
 export function ColumnDetailPage(col: Column, relCols: Column[] = [], relCases: CaseItem[] = []) {
-  const doc = getDoctor(col.authorSlug)
+  // 대행사 투입 글·원장 미지정 글은 병원 발행 — 원장 저자·감수 표시 없음 (lib/authorship.ts)
+  const doc = columnDoctor(col)
   const related = (col.relatedTreatments || []).map((s) => getTreatment(s)).filter(Boolean)
   const mainTx = related[0]
   const crumb = [{ name: '홈', url: '/' }, { name: '원장 칼럼', url: '/column' }, ...(mainTx ? [{ name: mainTx.name, url: `/column?treatment=${mainTx.slug}` }] : []), { name: col.title, url: `/column/${col.slug}` }]
@@ -434,7 +436,7 @@ export function ColumnDetailPage(col: Column, relCols: Column[] = [], relCases: 
     <div class="container">
       <p class="eyebrow">Column · ${fmt(col.createdAt)}${raw(updated ? ` · 수정 ${fmt(col.updatedAt)}` : '')} · 읽기 ${mins}분</p>
       <h1 style="font-size:var(--t-h2)">${col.title}</h1>
-      ${raw(doc ? `<p class="lead" style="font-size:1rem;color:var(--mist)">글 · ${doc.name} ${doc.role} (${doc.title})</p>` : '')}
+      ${raw(doc ? `<p class="lead" style="font-size:1rem;color:var(--mist)">글 · ${doc.name} ${doc.role} (${doc.title})</p>` : `<p class="lead" style="font-size:1rem;color:var(--mist)">${clinic.nameKo} 발행 · ${CLINIC_GENERAL_INFO_NOTE}</p>`)}
     </div>
   </section>
   ${Breadcrumb(crumb)}
@@ -452,7 +454,13 @@ export function ColumnDetailPage(col: Column, relCols: Column[] = [], relCases: 
             <p style="font-weight:600;color:var(--ink);margin-bottom:.2rem"><a href="/doctors/${doc.slug}">${doc.name} ${doc.role}</a></p>
             <p class="muted" style="font-size:.88rem">${doc.licenses.join(' · ')}</p>
             <p class="muted" style="font-size:.82rem;margin-top:.4rem">게시 ${fmt(col.createdAt)}${reviewed ? ` · 최종 검토 ${reviewed.replace(/-/g, '.')}` : ''}</p>
-          </div>` : '')}
+          </div>` : `
+          <div style="border-top:1px solid var(--line);margin-top:3.5rem;padding-top:2rem">
+            <p class="muted" style="font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.6rem">Published by</p>
+            <p style="font-weight:600;color:var(--ink);margin-bottom:.2rem">${clinic.nameKo}</p>
+            <p class="muted" style="font-size:.88rem">${CLINIC_GENERAL_INFO_NOTE}</p>
+            <p class="muted" style="font-size:.82rem;margin-top:.4rem">게시 ${fmt(col.createdAt)}${updated ? ` · 수정 ${fmt(col.updatedAt)}` : ''}</p>
+          </div>`)}
           <p class="muted" style="font-size:.78rem;margin-top:1.4rem;line-height:1.8">※ 이 글은 일반적인 치과 건강 정보이며 진단을 대신하지 않습니다. 치료 방법과 결과는 개인의 구강 상태에 따라 다를 수 있으니 정확한 내용은 내원하여 전문의와 상담하시기 바랍니다.</p>
           ${raw(relCases.length ? `<div style="margin-top:2.5rem"><h2 style="font-size:1.25rem">${mainTx ? mainTx.name + ' ' : ''}치료 케이스</h2>${relCases.map((x) => `<a href="/cases/${x.slug}" class="link-arrow" style="display:block;padding:.4rem 0">${x.title} <i class="fas fa-arrow-right"></i></a>`).join('')}</div>` : '')}
           ${raw(relCols.length ? `<div style="margin-top:2rem"><h2 style="font-size:1.25rem">함께 읽으면 좋은 칼럼</h2>${relCols.map((x) => `<a href="/column/${x.slug}" class="link-arrow" style="display:block;padding:.4rem 0">${x.title} <i class="fas fa-arrow-right"></i></a>`).join('')}</div>` : '')}
@@ -526,7 +534,7 @@ export function ColumnDetailPage(col: Column, relCols: Column[] = [], relCases: 
       breadcrumb: { '@id': url + '#breadcrumb' },
       ...(mainTx ? { about: { '@id': BASE + '/treatments/' + mainTx.slug + '#procedure' } } : {}),
       ...(authorId ? { reviewedBy: { '@id': authorId } } : {}),
-      ...(reviewed ? { lastReviewed: reviewed } : {}),
+      ...(authorId && reviewed ? { lastReviewed: reviewed } : {}),
       datePublished: col.createdAt,
       dateModified: col.updatedAt || col.createdAt,
       medicalAudience: { '@type': 'MedicalAudience', audienceType: 'Patient' },

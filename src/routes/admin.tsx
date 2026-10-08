@@ -949,7 +949,9 @@ admin.get('/columns', async (c) => {
 })
 
 function columnForm(col?: Column, opts: { error?: string; origSlug?: string } = {}) {
-  const docOpts = doctors.map((d) => `<option value="${d.slug}" ${col?.authorSlug === d.slug ? 'selected' : ''}>${d.name} ${d.role}</option>`).join('')
+  // 기본값 = 병원 발행(원장 이름 자동 부여 금지, 2026-10-08). 원장이 직접 쓰거나 검토한 글만 원장을 고른다.
+  const docOpts = `<option value="clinic" ${!doctors.some((d) => d.slug === col?.authorSlug) ? 'selected' : ''}>병원 발행 (원장 작성·검토 아님)</option>`
+    + doctors.map((d) => `<option value="${d.slug}" ${col?.authorSlug === d.slug ? 'selected' : ''}>${d.name} ${d.role} (직접 작성·검토)</option>`).join('')
   const txOpts = treatments.map((t) => `<option value="${t.slug}" ${col?.relatedTreatments?.includes(t.slug) ? 'selected' : ''}>${esc(t.name)}</option>`).join('')
   const initial = col?.contentHtml || '<h2>소제목을 입력하세요</h2><p>본문을 입력하세요. 사진은 본문 안으로 끌어다 놓거나 붙여넣으면 바로 삽입됩니다.</p>'
   return `${opts.error ? `<div class="panel" style="border:1px solid #C25B4A;color:#C25B4A;margin-bottom:1rem"><i class="fas fa-circle-exclamation"></i> ${esc(opts.error)}</div>` : ''}
@@ -1074,7 +1076,7 @@ async function saveColumn(c: any, existing?: Column): Promise<{ error: string; d
     contentHtml: String(f.contentHtml || ''),
     thumbnail: String(f.thumbnail || '') || undefined,
     images: existing?.images || [],
-    authorSlug: String(f.authorSlug || doctors[0].slug),
+    authorSlug: String(f.authorSlug || 'clinic'), // 미지정 = 병원 발행 (lib/authorship.ts)
     relatedTreatments: rel,
     metaTitle: String(f.metaTitle || '') || undefined,
     metaDescription: String(f.metaDescription || '') || undefined,

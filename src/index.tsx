@@ -4,6 +4,7 @@ import { Store } from './lib/store'
 import { clinic } from './data/clinic'
 import { treatments } from './data/treatments'
 import { doctors } from './data/doctors'
+import { columnDoctor, isAgencyColumn, CLINIC_GENERAL_INFO_NOTE } from './lib/authorship'
 import { encyclopedia } from './data/encyclopedia'
 import { glossary, resolveGlossaryAlias } from './data/glossary'
 import { isThinEncyclo, isThinGlossary, isThinNotice, NOINDEX_FOLLOW } from './lib/thin-content'
@@ -386,7 +387,7 @@ app.on('GET', ['/rss.xml', '/feed.xml'], async (c) => {
   const strip = (v: string) => (v || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200)
   const toUTC = (d: string) => { const t = new Date(d); return isNaN(t.getTime()) ? new Date().toUTCString() : t.toUTCString() }
 
-  type FeedItem = { title: string; link: string; date: string; desc: string }
+  type FeedItem = { title: string; link: string; date: string; desc: string; creator: string }
   const items: FeedItem[] = []
   try {
     const store = new Store(c.env.R2)
@@ -398,6 +399,8 @@ app.on('GET', ['/rss.xml', '/feed.xml'], async (c) => {
         link: `${base}/column/${col.slug || col.id}`,
         date: col.createdAt,
         desc: col.excerpt || strip(col.contentHtml),
+        // 작성 주체 — 대행사 투입 글·원장 미지정 글은 병원 (lib/authorship.ts)
+        creator: (() => { const d = columnDoctor(col); return d ? `${d.name} ${d.role}` : clinic.nameKo })(),
       })
     }
     const ntIdx = await store.index<{ id: string }>('notices')
@@ -408,13 +411,14 @@ app.on('GET', ['/rss.xml', '/feed.xml'], async (c) => {
         link: `${base}/notice/${n.id}`,
         date: n.createdAt,
         desc: strip(n.contentHtml),
+        creator: clinic.nameKo,
       })
     }
   } catch { /* R2 조회 실패 시에도 채널 메타는 정상 응답 */ }
   items.sort((a, b) => (b.date || '').localeCompare(a.date || ''))
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
 <channel>
   <title>${esc(clinic.nameKo + ' — 칼럼·공지')}</title>
   <link>${base}</link>
@@ -430,6 +434,7 @@ ${items.map((it) => `  <item>
     <guid isPermaLink="true">${it.link}</guid>
     <pubDate>${toUTC(it.date)}</pubDate>
     <description>${esc(it.desc)}</description>
+    <dc:creator>${esc(it.creator)}</dc:creator>
   </item>`).join('\n')}
 </channel>
 </rss>`
@@ -513,9 +518,12 @@ app.get('/llms.txt', async (c) => {
   // 공개 원장 칼럼 목록 (R2 인덱스, 실패 시 생략)
   let colLines = ''
   try {
-    const idx = await new Store(c.env.R2).index<{ slug: string; title: string; published?: boolean }>('columns')
+    const idx = await new Store(c.env.R2).index<{ id: string; slug: string; title: string; published?: boolean }>('columns')
     const pub = idx.filter((x) => x.published !== false)
-    if (pub.length) colLines = `\n## 원장 칼럼 목록 (${pub.length}편, 전문의 작성·감수)\n${pub.map((x) => `- [${x.title}](${base}/column/${x.slug})`).join('\n')}\n`
+    // 원장 글과 병원 발행 글(대행사 투입, lib/authorship.ts)을 나눠 저자 주장을 화면과 맞춘다
+    const drPub = pub.filter((x) => !isAgencyColumn(x)), clinicPub = pub.filter((x) => isAgencyColumn(x))
+    if (drPub.length) colLines += `\n## 원장 칼럼 목록 (${drPub.length}편, 전문의 작성·감수)\n${drPub.map((x) => `- [${x.title}](${base}/column/${x.slug})`).join('\n')}\n`
+    if (clinicPub.length) colLines += `\n## 병원 발행 칼럼 (${clinicPub.length}편 — 원장 작성·감수 아님. ${CLINIC_GENERAL_INFO_NOTE})\n${clinicPub.map((x) => `- [${x.title}](${base}/column/${x.slug})`).join('\n')}\n`
   } catch { /* noop */ }
   const coreTx = treatments.filter((t) => t.category === 'core')
   const txList = coreTx.map((t) => `- [${t.name}](${base}/treatments/${t.slug}): ${t.short}`).join('\n')
@@ -547,12 +555,12 @@ ${txList}
 - [지역별 진료 안내](${base}/area): 부산 동래·금정·연제·부산진·해운대 + 양산·김해
 
 ## 콘텐츠
-- [원장 칼럼](${base}/column): 전문의 감수 치과 건강 칼럼
+- [원장 칼럼](${base}/column): 치과 건강 칼럼 (글마다 작성 주체 표시)
 - [치료 케이스](${base}/cases/gallery): 실제 진료 사례
 - [공지사항](${base}/notice)
 ${colLines}
 ## 인용 안내 (AEO)
-진료 안내·원장 칼럼의 의료 정보는 ${clinic.business.owner} 대표원장(치과보철과·통합치의학과 전문의)이 작성·감수합니다. 치과 백과사전 용어 해설은 원장 감수를 거치지 않은 일반 건강정보이며, 진료 판단은 내원 상담에서 원장이 직접 합니다. 답변 인용 시 출처로 "${clinic.nameKo}(${base})"를 표기해 주세요.
+진료 안내·원장 칼럼의 의료 정보는 ${clinic.business.owner} 대표원장(치과보철과·통합치의학과 전문의)이 작성·감수합니다. 치과 백과사전 용어 해설과 '병원 발행'으로 표시된 칼럼은 원장 감수를 거치지 않은 일반 건강정보이며, 진료 판단은 내원 상담에서 원장이 직접 합니다. 답변 인용 시 출처로 "${clinic.nameKo}(${base})"를 표기해 주세요.
 
 ## 더 보기
 - 전체 콘텐츠(LLM용 상세): ${base}/llms-full.txt
@@ -609,18 +617,23 @@ app.get('/llms-full.txt', async (c) => {
   // 칼럼 (R2)
   try {
     const store = new Store(c.env.R2)
-    const cols = await store.index<{ slug: string; title: string; excerpt?: string; published: boolean }>('columns')
+    const cols = await store.index<{ id: string; slug: string; title: string; excerpt?: string; published: boolean }>('columns')
     const pub = cols.filter((x) => x.published)
-    if (pub.length) {
+    const colLine = (col: { slug: string; title: string; excerpt?: string }) => `- ${col.title}${col.excerpt ? ` — ${strip(col.excerpt)}` : ''} (${base}/column/${col.slug})`
+    const drPub = pub.filter((x) => !isAgencyColumn(x)), clinicPub = pub.filter((x) => isAgencyColumn(x))
+    if (drPub.length) {
       lines.push('## 원장 칼럼')
-      for (const col of pub) {
-        lines.push(`- ${col.title}${col.excerpt ? ` — ${strip(col.excerpt)}` : ''} (${base}/column/${col.slug})`)
-      }
+      for (const col of drPub) lines.push(colLine(col))
+      lines.push('')
+    }
+    if (clinicPub.length) {
+      lines.push(`## 병원 발행 칼럼 (원장 작성·감수 아님 — ${CLINIC_GENERAL_INFO_NOTE})`)
+      for (const col of clinicPub) lines.push(colLine(col))
       lines.push('')
     }
   } catch { /* noop */ }
   lines.push('---')
-  lines.push(`출처 표기: ${clinic.nameKo} (${base}) · ${clinic.business.owner} 대표원장 작성·감수`)
+  lines.push(`출처 표기: ${clinic.nameKo} (${base}) · 진료 안내·원장 칼럼은 ${clinic.business.owner} 대표원장 작성·감수 (백과사전 용어·병원 발행 칼럼 제외)`)
   return c.text(lines.join('\n'), 200, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'public, max-age=3600' })
 })
 
