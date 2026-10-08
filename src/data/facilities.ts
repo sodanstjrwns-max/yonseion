@@ -36,7 +36,7 @@ export const seoRegions: SeoRegion[] = [
   // --- 동래구 (소재지 — 최우선, 전동 커버) ---
   { slug: 'oncheonjang', name: '온천장', full: '부산 동래구 온천장', admin: '부산광역시 동래구', transit: '도시철도 1호선 온천장역 1·5번 출구 바로 앞', distance: '도보 3분', landmark: '온천장역·허심청·동래온천' },
   { slug: 'oncheon', name: '온천동', full: '부산 동래구 온천동', admin: '부산광역시 동래구', transit: '온천동 일대에서 도보 또는 1호선 온천장역', distance: '도보 5~10분', landmark: '동래온천·금강공원 입구' },
-  { slug: 'dongnae', name: '동래', full: '부산 동래구', admin: '부산광역시 동래구', transit: '1호선 동래역에서 온천장역 방면 1정거장', distance: '지하철 5분', landmark: '동래시장·동래읍성·롯데백화점 동래점' },
+  { slug: 'dongnae', name: '동래', full: '부산 동래구', admin: '부산광역시 동래구', transit: '1호선 동래역에서 온천장역 방면 2정거장(명륜역 다음)', distance: '지하철 5분', landmark: '동래시장·동래읍성·롯데백화점 동래점' },
   { slug: 'myeongnyun', name: '명륜동', full: '부산 동래구 명륜동', admin: '부산광역시 동래구', transit: '1호선 명륜역에서 온천장역 방면 1정거장', distance: '지하철 3분', landmark: '명륜역·동래고등학교' },
   { slug: 'sajik', name: '사직동', full: '부산 동래구 사직동', admin: '부산광역시 동래구', transit: '사직동에서 3호선 사직역→연산 환승 또는 버스로 온천장', distance: '차량 10분', landmark: '사직야구장·아시아드주경기장' },
   { slug: 'boksan', name: '복산동', full: '부산 동래구 복산동', admin: '부산광역시 동래구', transit: '복산동에서 버스 또는 차량으로 온천장 방면', distance: '차량 7분', landmark: '동래향교·복천박물관' },

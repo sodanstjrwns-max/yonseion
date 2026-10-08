@@ -21,9 +21,9 @@ const g = (slug: string, term: string, termEn: string, category: string, def: st
 // ============================================================================
 export const GLOSSARY_ALIASES: Record<string, string> = {
   'mock-up': 'mockup',                       // 목업
-  'mobility': 'tooth-mobility',              // 치아 동요도
-  'inlay-term': 'inlay',                     // 인레이
-  'abrasion': 'cervical-abrasion',           // 치경부 마모증
+  'mobility': 'mobile-tooth',                // 치아 동요도 (2026-10-08 대표 slug 변경: tooth-mobility → mobile-tooth)
+  'inlay-term': 'inlay-onlay',               // 인레이 (2026-10-08: inlay → inlay-onlay)
+  'abrasion': 'tooth-abrasion',              // 치경부 마모증 (2026-10-08: cervical-abrasion → tooth-abrasion)
   'gutta-percha-material': 'gutta-percha',   // 거타퍼차
   // 2026-09-29: 같은 개념이 다른 slug·표기로 두 번 등록된 경량 용어 8쌍 — 내부 링크가 더 많은 쪽을 대표로 301
   'wax-up': 'diagnostic-waxup',              // 진단 왁스업 (Diagnostic Wax-up)
@@ -34,13 +34,63 @@ export const GLOSSARY_ALIASES: Record<string, string> = {
   'curing-light': 'light-curing-unit',       // 광중합기
   'internal-bleaching': 'internal-whitening', // 실활치 미백
   'immediate-dentin-sealing-term': 'ids',    // 즉시상아질봉쇄(IDS) → 리치 레이어 심층 해설
+  // 2026-10-08: 경량 용어 ↔ 리치 해설이 같은 주제를 다른 slug 로 중복 제공하던 48개 → 리치 해설(보강본)로 301
+  //             + 리치 해설끼리 중복이던 가이드 수술 → 네비게이션 임플란트(본문 통합)
+  'cbct': 'dental-ct',                              // 콘빔CT (CBCT) → 치과 CT (콘빔 CT)
+  'tooth-mobility': 'mobile-tooth',                 // 치아 동요도 → 치아 흔들림
+  'pulp': 'dental-pulp',                            // 치수 → 치수 (치아 신경)
+  'deciduous-tooth': 'baby-tooth',                  // 유치 (젖니) → 유치
+  'primary-teeth': 'baby-tooth',                    // 유치(젖니) → 유치
+  'inlay': 'inlay-onlay',                           // 인레이 → 인레이
+  'onlay': 'onlay-overlay',                         // 온레이 → 온레이 · 오버레이
+  'overlay-term': 'onlay-overlay',                  // 오버레이 → 온레이 · 오버레이
+  'gic': 'glass-ionomer',                           // 글래스아이오노머 (GIC) → 글래스 아이오노머
+  'cervical-abrasion': 'tooth-abrasion',            // 치경부 마모증 → 치경부 마모증
+  'erosion': 'tooth-erosion',                       // 치아 부식 (산식증) → 치아 부식증
+  'acid-erosion': 'tooth-erosion',                  // 치아 산부식(침식) → 치아 부식증
+  'crack-tooth': 'cracked-tooth',                   // 치아 균열 (크랙) → 치아 균열 증후군
+  'cracked-tooth-syndrome': 'cracked-tooth',        // 균열치아증후군 → 치아 균열 증후군
+  'hypersensitivity': 'tooth-sensitivity',          // 지각과민 (시린이) → 시린이 (치아 과민증)
+  'root-canal-treatment': 'root-canal',             // 신경치료 (근관치료) → 신경치료 (근관치료)
+  'endo-retreatment': 'retreatment',                // 재신경치료 → 재신경치료
+  'rubber-dam-endo': 'rubber-dam',                  // 러버댐 격리 → 러버댐
+  'rubber-dam-material': 'rubber-dam',              // 러버댐 장비 → 러버댐
+  'impression': 'dental-impression',                // 인상채득(본뜨기) → 본뜨기 (인상 채득)
+  'veneer-term': 'veneer',                          // 베니어 → 비니어
+  'post-and-core': 'post-core',                     // 포스트 앤 코어 → 포스트·코어 (기둥 세우기)
+  'implant': 'dental-implant',                      // 임플란트 → 임플란트
+  'fixture': 'implant-fixture',                     // 픽스처(고정체) → 픽스처 (인공 치근)
+  'overdenture': 'implant-overdenture',             // 임플란트 틀니(오버덴처) → 임플란트 틀니 (오버덴처)
+  'sinus-graft': 'sinus-lift',                      // 상악동 골이식 → 상악동 거상술
+  'pocket-depth': 'periodontal-probing',            // 치주낭 측정 → 치주낭 검사 (탐침)
+  'periodontal-maintenance': 'maintenance-care',    // 치주 유지관리 → 치주 유지관리
+  'deep-bite': 'overbite',                          // 과개교합 → 과개교합
+  'lingual-ortho': 'lingual-braces',                // 설측교정 → 설측교정
+  'mini-screw': 'tad-mini-screw',                   // 교정용 미니스크류(TAD) → 교정용 미니스크류
+  'extraction-ortho': 'extraction-orthodontics',    // 발치교정 → 발치 교정
+  'relapse': 'orthodontic-relapse',                 // 교정 재발 → 교정 후 재발
+  'interceptive-ortho': 'growth-orthodontics',      // 차단교정(조기교정) → 성장기 교정 (1차 교정)
+  'orthognathic-surgery': 'surgical-orthodontics',  // 양악수술(악교정수술) → 양악수술 (수술교정)
+  'extraction': 'tooth-extraction',                 // 발치 → 발치
+  'osteonecrosis': 'medication-osteonecrosis',      // 약물 관련 턱뼈 괴사(MRONJ) → 약물 관련 턱뼈괴사
+  'toothbrushing-method': 'tooth-brushing',         // 올바른 칫솔질(회전법) → 올바른 칫솔질
+  'regular-checkup': 'dental-checkup',              // 정기검진 → 정기 구강검진
+  'stainless-crown': 'stainless-steel-crown',       // 기성금속관(SS크라운) → 기성 크라운 (유치 크라운)
+  'sedation-pediatric': 'pediatric-sedation',       // 소아 진정치료 → 소아 진정치료
+  'tmd': 'tmj-disorder',                            // 턱관절장애(TMD) → 턱관절 장애
+  'clicking': 'tmj-noise',                          // 관절음(클리킹) → 턱관절 잡음
+  'clenching': 'teeth-clenching',                   // 이악물기 → 이악물기
+  'night-guard': 'teeth-grinding-guard',            // 나이트가드 → 나이트가드
+  'treatment-consent': 'informed-consent',          // 치료 동의서 → 치료 동의
+  'candidiasis': 'oral-candidiasis',                // 구강 칸디다증 → 구강 칸디다증
+  'composite-resin-material': 'composite-resin',    // 복합레진 재료 → 레진 (복합레진)
+  'guided-surgery': 'navigation-implant',           // 가이드 수술 → 네비게이션 임플란트
 }
 export const resolveGlossaryAlias = (slug: string): string | undefined => GLOSSARY_ALIASES[slug]
 
 export const glossary: GlossaryEntry[] = [
   // ===================== 진단·검사 =====================
   g('panorama-xray', '파노라마 방사선사진', 'Panoramic Radiograph', '진단·검사', '위아래 턱 전체와 모든 치아를 한 장에 담는 방사선 사진으로, 치과 진단의 기본 검사입니다.'),
-  g('cbct', '콘빔CT (CBCT)', 'Cone Beam CT', '진단·검사', '턱뼈와 치아를 3차원으로 촬영하는 치과 전용 CT로, 임플란트 식립 계획과 매복치 진단 등에 사용됩니다.', ['all-on-x', 'implant-guide']),
   g('periapical-xray', '치근단 방사선사진', 'Periapical Radiograph', '진단·검사', '치아 1~3개와 그 뿌리 끝 주변 뼈를 정밀하게 보는 소형 방사선 사진입니다.'),
   g('bitewing-xray', '교익 방사선사진', 'Bitewing Radiograph', '진단·검사', '위아래 어금니의 인접면 충치와 치조골 높이를 확인하는 방사선 사진입니다.'),
   g('intraoral-photo', '구내 사진', 'Intraoral Photography', '진단·검사', '치료 전후 비교와 진단 기록을 위해 입안 치아·잇몸 상태를 촬영하는 임상 사진입니다.'),
@@ -55,7 +105,6 @@ export const glossary: GlossaryEntry[] = [
   g('shade-matching', '색조 측정 (쉐이드 매칭)', 'Shade Matching', '진단·검사', '보철물의 색을 자연치아와 맞추기 위해 치아 색조를 측정·기록하는 과정입니다.', ['esthetic-prosthetics']),
   g('caries-detector', '우식탐지액', 'Caries Detector', '진단·검사', '충치에 감염된 치질만 선택적으로 염색해 제거 범위를 정확히 정하도록 돕는 약제입니다.', ['adhesive-restoration']),
   g('transillumination', '투과조명검사', 'Transillumination', '진단·검사', '강한 빛을 치아에 투과시켜 균열이나 인접면 충치를 찾는 검사법입니다.'),
-  g('tooth-mobility', '치아 동요도', 'Tooth Mobility', '진단·검사', '치아가 흔들리는 정도를 측정한 값으로, 치주질환·외상·교합성 외상의 평가 지표입니다.'),
   g('radiolucency', '방사선 투과상', 'Radiolucency', '진단·검사', '방사선사진에서 검게 보이는 부위로, 충치·염증·낭종 등 병소를 시사할 수 있습니다.'),
   g('bone-density', '골밀도', 'Bone Density', '진단·검사', '뼈의 단단한 정도로, 임플란트 식립 계획 시 고정력 예측에 중요한 요소입니다.', ['all-on-x']),
   g('facebow', '안궁이전', 'Facebow Transfer', '진단·검사', '턱관절과 치아의 위치 관계를 교합기에 옮겨 기록하는 절차로, 정밀 보철 제작에 사용됩니다.'),
@@ -72,7 +121,6 @@ export const glossary: GlossaryEntry[] = [
   // ===================== 해부·구조 =====================
   g('enamel', '법랑질', 'Enamel', '해부·구조', '치아 가장 바깥층의 인체에서 가장 단단한 조직으로, 접착 치료의 핵심 접착면입니다.', ['adhesive-restoration']),
   g('dentin', '상아질', 'Dentin', '해부·구조', '법랑질 안쪽의 치아 본체를 이루는 조직으로, 노출되면 시린 증상이 나타날 수 있습니다.'),
-  g('pulp', '치수', 'Dental Pulp', '해부·구조', '치아 중심부의 신경과 혈관이 모인 조직으로, 흔히 치아 신경이라고 부릅니다.'),
   g('cementum', '백악질', 'Cementum', '해부·구조', '치아 뿌리 표면을 덮는 얇은 조직으로, 치주인대 섬유가 부착되는 곳입니다.'),
   g('periodontal-ligament', '치주인대', 'Periodontal Ligament', '해부·구조', '치아 뿌리와 잇몸뼈를 연결하는 섬유 조직으로, 씹는 힘을 완충하는 역할을 합니다.'),
   g('alveolar-bone', '치조골', 'Alveolar Bone', '해부·구조', '치아 뿌리를 감싸 지지하는 턱뼈 부분으로, 치주질환이나 발치 후 흡수될 수 있습니다.'),
@@ -106,7 +154,6 @@ export const glossary: GlossaryEntry[] = [
   g('premolar', '소구치 (작은어금니)', 'Premolar', '해부·구조', '송곳니와 큰어금니 사이의 치아로, 음식을 찢고 으깨는 역할을 합니다.'),
   g('molar', '대구치 (큰어금니)', 'Molar', '해부·구조', '치열 가장 안쪽의 큰 치아로, 음식을 갈아 으깨는 주된 역할을 합니다.'),
   g('wisdom-tooth', '사랑니 (제3대구치)', 'Wisdom Tooth', '해부·구조', '가장 늦게 나는 제일 안쪽 어금니로, 비스듬히 나거나 매복된 경우 발치를 고려합니다.'),
-  g('deciduous-tooth', '유치 (젖니)', 'Deciduous Tooth', '해부·구조', '생후 6개월경부터 나는 어린이 치아 20개로, 영구치 자리를 유지하는 중요한 역할을 합니다.'),
   g('dental-arch', '치열궁', 'Dental Arch', '해부·구조', '치아가 활 모양으로 배열된 전체 형태를 가리키는 용어입니다.'),
   g('midline', '정중선', 'Dental Midline', '해부·구조', '위아래 앞니 중앙을 지나는 가상의 선으로, 심미 치료에서 좌우 대칭의 기준이 됩니다.', ['esthetic-prosthetics']),
   g('gummy-smile', '거미스마일', 'Gummy Smile', '해부·구조', '웃을 때 잇몸이 과도하게 드러나는 상태로, 원인에 따라 다양한 개선 방법을 고려할 수 있습니다.', ['esthetic-prosthetics']),
@@ -125,26 +172,18 @@ export const glossary: GlossaryEntry[] = [
   g('remineralization', '재광화', 'Remineralization', '충치·보존', '침과 불소의 작용으로 초기 탈회 부위에 미네랄이 다시 침착되는 회복 현상입니다.'),
   g('composite-resin', '복합레진', 'Composite Resin', '충치·보존', '치아 색과 비슷한 충전 재료로, 충치 제거 후 접착해 치아 형태를 회복합니다.', ['adhesive-restoration']),
   g('direct-resin', '직접 레진수복', 'Direct Resin Restoration', '충치·보존', '진료실에서 레진을 직접 충전·성형해 한 번에 완성하는 수복 방법입니다.', ['adhesive-restoration']),
-  g('inlay', '인레이', 'Inlay', '충치·보존', '치아 안쪽 결손부에 맞춰 기공소에서 제작해 접착하는 부분 수복물입니다.', ['adhesive-restoration']),
-  g('onlay', '온레이', 'Onlay', '충치·보존', '교두 일부를 포함해 덮는 부분 수복물로, 크라운보다 치아 삭제가 적습니다.', ['adhesive-restoration']),
-  g('overlay-term', '오버레이', 'Overlay', '충치·보존', '씹는 면 전체를 덮되 치아 옆면은 최대한 보존하는 부분 수복물로, 크라운과 삭제 방식이 다른 별개의 치료입니다.', ['adhesive-restoration']),
   g('hybrid-inlay', '하이브리드 인레이', 'Hybrid Inlay', '충치·보존', '레진과 세라믹의 특성을 결합한 재료로 만드는 인레이입니다.', ['adhesive-restoration']),
   g('emax', '이맥스 (리튬디실리케이트)', 'IPS e.max', '충치·보존', '강도와 심미성을 겸비한 유리세라믹 재료로, 인레이·온레이·라미네이트·크라운에 널리 사용됩니다.', ['adhesive-restoration', 'esthetic-prosthetics']),
   g('gold-inlay', '골드 인레이', 'Gold Inlay', '충치·보존', '금 합금으로 제작하는 인레이로, 내구성과 적합성이 우수한 전통적 수복 재료입니다.'),
   g('amalgam', '아말감', 'Amalgam', '충치·보존', '은·주석·수은 합금의 전통적 충전 재료로, 현재는 레진 등으로 대체되는 추세입니다.'),
-  g('gic', '글래스아이오노머 (GIC)', 'Glass Ionomer Cement', '충치·보존', '불소를 방출하는 충전 재료로, 유치 치료나 임시 충전 등에 사용됩니다.'),
   g('cavity-prep', '와동 형성', 'Cavity Preparation', '충치·보존', '충치를 제거하고 충전물이 들어갈 공간을 다듬는 과정입니다.'),
   g('etching', '산부식 (에칭)', 'Acid Etching', '충치·보존', '접착 전 치아 표면을 산으로 처리해 미세한 요철을 만들어 접착력을 높이는 단계입니다.', ['adhesive-restoration']),
   g('bonding-agent', '접착제 (본딩제)', 'Bonding Agent', '충치·보존', '레진과 치아를 화학적·기계적으로 결합시키는 접착 재료입니다.', ['adhesive-restoration']),
   g('polymerization-shrinkage', '중합수축', 'Polymerization Shrinkage', '충치·보존', '레진이 굳으며 부피가 줄어드는 현상으로, 이를 줄이는 적층 충전 기법이 중요합니다.', ['adhesive-restoration']),
   g('matrix-band', '매트릭스 밴드', 'Matrix Band', '충치·보존', '인접면 충전 시 치아 옆면 형태를 만들어주는 얇은 금속·플라스틱 띠입니다.'),
-  g('cervical-abrasion', '치경부 마모증', 'Cervical Abrasion', '충치·보존', '잘못된 칫솔질 등으로 치아 목 부위가 패이는 비우식성 손상으로, 시린 증상의 흔한 원인입니다.', ['adhesive-restoration']),
   g('abfraction', '굴곡파절 (어브프랙션)', 'Abfraction', '충치·보존', '교합력에 의해 치아 목 부위가 미세하게 떨어져 나가는 비우식성 손상입니다.', ['tmj-occlusion']),
   g('attrition', '교모 (마모)', 'Attrition', '충치·보존', '위아래 치아가 맞닿아 씹는 면이 닳는 현상으로, 이갈이가 있으면 가속됩니다.', ['esthetic-prosthetics', 'tmj-occlusion']),
-  g('erosion', '치아 부식 (산식증)', 'Dental Erosion', '충치·보존', '탄산음료·위산 등 산성 물질에 의해 치아가 녹는 현상입니다.'),
-  g('crack-tooth', '치아 균열 (크랙)', 'Cracked Tooth', '충치·보존', '치아에 금이 간 상태로, 씹을 때 통증이 있고 진행되면 신경치료나 발치가 필요할 수 있습니다.'),
   g('tooth-fracture', '치아 파절', 'Tooth Fracture', '충치·보존', '외상이나 강한 교합력으로 치아가 깨진 상태로, 깨진 위치와 깊이에 따라 치료가 달라집니다.'),
-  g('hypersensitivity', '지각과민 (시린이)', 'Dentin Hypersensitivity', '충치·보존', '상아질이 노출되어 찬 것·단 것에 짧고 날카로운 통증을 느끼는 상태입니다.'),
   g('caries-removal', '우식 제거', 'Caries Excavation', '충치·보존', '감염된 치질만 선택적으로 제거하고 건강한 치질은 최대한 보존하는 충치 제거 과정입니다.', ['adhesive-restoration']),
   g('indirect-restoration', '간접 수복', 'Indirect Restoration', '충치·보존', '본을 떠 기공소에서 제작한 수복물을 접착하는 방식으로, 인레이·온레이·크라운이 해당됩니다.', ['adhesive-restoration']),
   g('temporary-filling', '임시 충전', 'Temporary Filling', '충치·보존', '최종 수복 전까지 치아를 보호하기 위해 임시 재료로 메우는 처치입니다.'),
@@ -152,7 +191,6 @@ export const glossary: GlossaryEntry[] = [
   g('selective-caries-removal', '선택적 우식 제거', 'Selective Caries Removal', '충치·보존', '신경 노출을 피하기 위해 깊은 부위의 연화 상아질을 일부 남기고 봉쇄하는 보존적 충치 제거 전략입니다.', ['adhesive-restoration']),
 
   // ===================== 신경치료 =====================
-  g('root-canal-treatment', '신경치료 (근관치료)', 'Root Canal Treatment', '신경치료', '감염되거나 손상된 치아 신경을 제거하고 빈 공간을 소독·충전해 치아를 살리는 치료입니다.'),
   g('pulpitis', '치수염', 'Pulpitis', '신경치료', '치아 신경에 염증이 생긴 상태로, 가역성이면 신경 보존을, 비가역성이면 신경치료를 고려합니다.'),
   g('pulp-necrosis', '치수 괴사', 'Pulp Necrosis', '신경치료', '치아 신경이 죽은 상태로, 통증이 없어도 염증이 뿌리 끝으로 번질 수 있어 신경치료가 필요합니다.'),
   g('apical-periodontitis', '치근단 치주염', 'Apical Periodontitis', '신경치료', '신경 감염이 뿌리 끝 주변 뼈로 번져 생기는 염증으로, 방사선사진에서 검은 음영으로 보입니다.'),
@@ -161,17 +199,14 @@ export const glossary: GlossaryEntry[] = [
   g('ni-ti-file', '니켈티타늄 파일', 'NiTi File', '신경치료', '휘어지는 신경관도 따라 들어가 신경 조직을 제거하는 유연한 기구입니다.'),
   g('apex-locator', '근관장 측정기', 'Electronic Apex Locator', '신경치료', '신경관의 길이를 전기적으로 측정해 정확한 치료 범위를 정하는 장비입니다.'),
   g('canal-irrigation', '근관 세척', 'Canal Irrigation', '신경치료', '소독액으로 신경관 내부의 세균과 잔사를 씻어내는 신경치료의 핵심 과정입니다.'),
-  g('endo-retreatment', '재신경치료', 'Endodontic Retreatment', '신경치료', '기존 신경치료가 실패했을 때 충전물을 제거하고 다시 소독·충전하는 치료입니다.'),
   g('apicoectomy', '치근단절제술', 'Apicoectomy', '신경치료', '재신경치료로 해결되지 않는 뿌리 끝 염증을 잇몸을 열어 직접 제거하는 수술입니다.'),
   g('pulp-capping', '치수복조술', 'Pulp Capping', '신경치료', '노출되거나 노출 직전의 신경을 보호 재료로 덮어 신경을 살리려는 보존적 처치입니다.'),
   g('pulpotomy', '치수절단술', 'Pulpotomy', '신경치료', '신경의 윗부분만 제거하고 뿌리 쪽 신경은 보존하는 치료로, 주로 유치나 미성숙 영구치에 시행합니다.'),
   g('mta', 'MTA', 'Mineral Trioxide Aggregate', '신경치료', '신경 보호와 천공 수리에 사용되는 생체친화성 시멘트 재료입니다.'),
   g('post-core', '포스트·코어', 'Post and Core', '신경치료', '신경치료 후 남은 치질이 적을 때 뿌리에 기둥을 세우고 머리 부분을 만들어 크라운을 지지하는 구조물입니다.'),
   g('ferrule', '페룰 효과', 'Ferrule Effect', '신경치료', '크라운이 건전한 치질을 띠처럼 감싸 치아 파절을 막는 효과로, 신경치료 치아 보철의 핵심 조건입니다.'),
-  g('rubber-dam-endo', '러버댐 격리', 'Rubber Dam Isolation', '신경치료', '신경치료·접착치료 중 침의 세균과 습기로부터 치아를 격리하는 표준 술식입니다.', ['adhesive-restoration']),
   g('working-length', '작업장 (근관장)', 'Working Length', '신경치료', '신경치료에서 기구가 들어가야 하는 신경관의 정확한 길이입니다.'),
   g('canal-sealer', '근관 실러', 'Root Canal Sealer', '신경치료', '거타퍼차와 신경관 벽 사이 미세한 틈을 메우는 충전 보조 재료입니다.'),
-  g('cracked-tooth-syndrome', '균열치아증후군', 'Cracked Tooth Syndrome', '신경치료', '눈에 잘 보이지 않는 치아 균열로 씹을 때 통증이 생기는 상태로, 진단이 까다로운 질환입니다.'),
   g('endodontic-microscope', '치과 현미경', 'Dental Operating Microscope', '신경치료', '신경관 입구와 내부를 확대해 보며 정밀 치료를 가능하게 하는 장비입니다.'),
   g('calcified-canal', '석회화 근관', 'Calcified Canal', '신경치료', '신경관이 좁아지거나 막힌 상태로, 신경치료의 난이도를 높이는 요인입니다.'),
   g('perforation', '천공', 'Perforation', '신경치료', '치아 벽이나 뿌리에 비정상적인 구멍이 생긴 상태로, MTA 등으로 수리를 시도합니다.'),
@@ -186,16 +221,13 @@ export const glossary: GlossaryEntry[] = [
   g('tooth-preparation', '치아 삭제(프렙)', 'Tooth Preparation', '보철·크라운', '보철물이 들어갈 공간을 만들기 위해 치아를 다듬는 과정으로, 삭제량 최소화가 치아 수명에 중요합니다.'),
   g('margin', '마진', 'Margin', '보철·크라운', '보철물과 치아가 만나는 경계선으로, 정밀한 마진은 2차 충치 예방의 핵심입니다.'),
   g('temporary-crown', '임시치아(템포러리)', 'Temporary Crown', '보철·크라운', '최종 보철물이 완성되기 전 치아를 보호하고 기능을 유지하는 임시 보철물입니다.'),
-  g('impression', '인상채득(본뜨기)', 'Dental Impression', '보철·크라운', '치아와 잇몸의 형태를 본떠 모형을 만드는 과정으로, 최근에는 구강스캐너로 디지털 채득이 가능합니다.'),
   g('bite-registration', '교합채득', 'Bite Registration', '보철·크라운', '위아래 치아가 물리는 관계를 기록하는 과정으로, 보철물의 편안한 교합에 필수입니다.'),
   g('cementation', '접착(합착)', 'Cementation', '보철·크라운', '완성된 보철물을 치아에 접착제로 고정하는 최종 단계입니다.', ['adhesive-restoration']),
   g('pfm-crown', 'PFM 크라운(금속도재관)', 'Porcelain Fused to Metal Crown', '보철·크라운', '금속 코핑 위에 도자기를 입힌 전통적 크라운으로, 잇몸 변연부 금속 노출이 단점입니다.'),
   g('gold-crown', '골드 크라운', 'Gold Crown', '보철·크라운', '금 합금으로 제작한 크라운으로, 자연치아와 유사한 마모도와 높은 적합성이 장점입니다.'),
   g('full-zirconia', '풀지르코니아', 'Full Zirconia', '보철·크라운', '전체를 지르코니아로 제작한 크라운으로, 높은 강도가 특징이라 구치부에 적합합니다.'),
   g('layered-zirconia', '레이어드 지르코니아', 'Layered Zirconia', '보철·크라운', '지르코니아 코어 위에 도자기를 쌓아 자연치아의 투명도를 재현한 심미 크라운입니다.'),
-  g('veneer-term', '베니어', 'Veneer', '보철·크라운', '치아 앞면에 얇은 세라믹을 붙여 색·형태를 개선하는 심미 보철로, 라미네이트와 같은 개념입니다.'),
   g('table-top', '테이블탑', 'Table Top', '보철·크라운', '교합면만 얇게 덮는 최소삭제 오버레이의 한 형태로, 치질 보존에 유리합니다.', ['conservative']),
-  g('post-and-core', '포스트 앤 코어', 'Post and Core', '보철·크라운', '신경치료 후 남은 치질이 부족할 때 기둥(포스트)과 코어를 세워 크라운 지지력을 확보하는 술식입니다.'),
   g('denture', '틀니(의치)', 'Denture', '보철·크라운', '여러 개 또는 전체 치아 상실 시 사용하는 탈착식 보철물입니다.'),
   g('full-denture', '완전틀니(전체의치)', 'Complete Denture', '보철·크라운', '치아가 모두 상실된 경우 잇몸 전체를 덮는 틀니로, 만 65세 이상 건강보험이 적용됩니다.'),
   g('partial-denture', '부분틀니(국소의치)', 'Removable Partial Denture', '보철·크라운', '남은 치아에 고리를 걸어 사용하는 탈착식 보철물입니다.'),
@@ -213,8 +245,6 @@ export const glossary: GlossaryEntry[] = [
   g('crown-lengthening', '치관연장술', 'Crown Lengthening', '보철·크라운', '잇몸·치조골을 다듬어 치아 머리 길이를 확보하는 수술로, 깊은 충치 수복이나 심미 개선에 활용됩니다.'),
 
   // ===== 임플란트 =====
-  g('implant', '임플란트', 'Dental Implant', '임플란트', '상실된 치아 뿌리를 대신해 턱뼈에 식립하는 티타늄 인공치근으로, 그 위에 크라운을 연결합니다.', ['implant-guide', 'all-on-x']),
-  g('fixture', '픽스처(고정체)', 'Fixture', '임플란트', '턱뼈 안에 심는 임플란트의 나사 모양 본체입니다.'),
   g('implant-abutment', '어버트먼트(지대주)', 'Implant Abutment', '임플란트', '픽스처와 크라운을 연결하는 중간 기둥 구조물입니다.'),
   g('implant-crown', '임플란트 크라운', 'Implant Crown', '임플란트', '임플란트 위에 올라가는 최종 인공치아 부분입니다.'),
   g('osseointegration', '골유착', 'Osseointegration', '임플란트', '임플란트 표면과 턱뼈가 단단히 결합하는 생물학적 과정으로, 임플란트 성공의 근본 원리입니다.'),
@@ -232,12 +262,10 @@ export const glossary: GlossaryEntry[] = [
   g('xenograft', '이종골', 'Xenograft', '임플란트', '소 등 동물 유래 뼈를 가공한 이식재로, 부피 유지에 우수합니다.'),
   g('alloplast', '합성골', 'Alloplastic Bone', '임플란트', '인공적으로 합성한 뼈이식 재료입니다.'),
   g('membrane', '차폐막', 'Barrier Membrane', '임플란트', '골이식 부위를 보호하고 뼈 재생 공간을 유지하는 막으로, 흡수성·비흡수성이 있습니다.'),
-  g('sinus-graft', '상악동 골이식', 'Sinus Bone Graft', '임플란트', '위턱 어금니 부위 뼈 높이가 부족할 때 상악동 점막을 들어 올리고 뼈를 이식하는 술식입니다.', ['implant-guide']),
   g('crestal-approach', '치조정 접근법(수직법)', 'Crestal Approach', '임플란트', '임플란트 식립 구멍을 통해 상악동을 들어 올리는 비교적 덜 침습적인 방법입니다.'),
   g('lateral-approach', '측방 접근법', 'Lateral Window Approach', '임플란트', '상악동 옆 벽에 창을 내어 점막을 들어 올리는 방법으로, 뼈가 많이 부족할 때 사용합니다.'),
   g('ridge-augmentation', '치조제 증대술', 'Ridge Augmentation', '임플란트', '좁아진 잇몸뼈의 폭이나 높이를 키우는 수술입니다.'),
   g('surgical-guide', '서지컬 가이드', 'Surgical Guide', '임플란트', 'CT 기반 식립 계획을 입안에 그대로 옮겨주는 맞춤 장치로, 정확하고 안전한 식립을 돕습니다.', ['navigation-implant']),
-  g('guided-surgery', '가이드 수술(디지털 임플란트)', 'Guided Implant Surgery', '임플란트', '디지털 설계대로 위치·깊이·각도를 제어하며 식립하는 수술 방식입니다.', ['navigation-implant']),
   g('flapless-surgery', '무절개 임플란트', 'Flapless Implant Surgery', '임플란트', '잇몸을 크게 절개하지 않고 식립하는 방법으로, 부기와 통증이 적고 회복이 빠릅니다.', ['navigation-implant']),
   g('initial-stability', '초기 고정(초기 안정성)', 'Primary Stability', '임플란트', '식립 직후 임플란트가 뼈에 기계적으로 고정된 정도로, 즉시 부하 가능 여부를 결정합니다.'),
   g('isq', 'ISQ(임플란트 안정성 지수)', 'Implant Stability Quotient', '임플란트', '임플란트의 안정성을 수치로 측정하는 지표로, 보철 시기 결정에 참고합니다.'),
@@ -246,7 +274,6 @@ export const glossary: GlossaryEntry[] = [
   g('screw-loosening', '나사 풀림', 'Screw Loosening', '임플란트', '임플란트 보철 나사가 풀리는 흔한 합병증으로, 정기검진에서 조이거나 교체합니다.'),
   g('screw-retained', '나사 유지형 보철', 'Screw-retained Prosthesis', '임플란트', '나사로 크라운을 고정하는 방식으로, 탈착과 유지관리가 쉬운 장점이 있습니다.'),
   g('cement-retained', '시멘트 유지형 보철', 'Cement-retained Prosthesis', '임플란트', '접착제로 크라운을 고정하는 방식으로, 심미성이 좋지만 잉여 시멘트 관리가 중요합니다.'),
-  g('overdenture', '임플란트 틀니(오버덴처)', 'Implant Overdenture', '임플란트', '임플란트 2~4개에 연결장치를 달아 틀니의 유지력을 크게 높인 보철 방식입니다.', ['all-on-x']),
   g('full-arch-implant', '전악 임플란트(풀아치)', 'Full Arch Implant', '임플란트', '치아가 거의 없는 턱 전체를 4~6개의 임플란트로 고정성 보철 수복하는 치료입니다.', ['all-on-x']),
   g('tilted-implant', '경사 식립', 'Tilted Implant', '임플란트', '해부학적 구조물을 피하고 뼈이식을 줄이기 위해 임플란트를 비스듬히 심는 All-on-X의 핵심 기법입니다.', ['all-on-x']),
   g('multi-unit-abutment', '멀티유닛 어버트먼트', 'Multi-unit Abutment', '임플란트', '풀아치 보철에서 여러 임플란트의 각도를 보정해 하나의 보철물로 연결해주는 부품입니다.', ['all-on-x']),
@@ -262,7 +289,6 @@ export const glossary: GlossaryEntry[] = [
   g('periodontitis', '치주염(잇몸병)', 'Periodontitis', '치주', '잇몸 염증이 치아를 지지하는 뼈까지 진행된 질환으로, 성인 치아 상실의 가장 큰 원인입니다.'),
   g('gingivitis', '치은염', 'Gingivitis', '치주', '잇몸에 국한된 초기 염증으로, 스케일링과 올바른 칫솔질로 회복이 가능합니다.'),
   g('periodontal-pocket', '치주낭', 'Periodontal Pocket', '치주', '잇몸병으로 잇몸과 치아 사이가 깊어진 틈으로, 깊이가 클수록 진행된 상태입니다.'),
-  g('pocket-depth', '치주낭 측정', 'Periodontal Probing', '치주', '가는 기구로 치주낭 깊이를 재는 검사로, 잇몸 건강 평가의 기본입니다.'),
   g('scaling', '스케일링', 'Scaling', '치주', '치아에 붙은 치석과 플라크를 초음파 기구로 제거하는 기본 잇몸 관리로, 연 1회 건강보험이 적용됩니다.'),
   g('root-planing', '치근활택술', 'Root Planing', '치주', '잇몸 속 치아 뿌리 표면의 치석과 오염층을 제거해 매끄럽게 하는 치료입니다.'),
   g('curettage', '치주소파술', 'Periodontal Curettage', '치주', '치주낭 안의 염증 조직을 긁어내는 잇몸 치료입니다.'),
@@ -273,7 +299,6 @@ export const glossary: GlossaryEntry[] = [
   g('gum-recession', '잇몸 퇴축', 'Gingival Recession', '치주', '잇몸이 내려가 치아 뿌리가 드러나는 상태로, 시린 증상과 심미 문제를 일으킵니다.'),
   g('gum-graft', '잇몸 이식술', 'Gum Graft', '치주', '퇴축된 잇몸 부위에 연조직을 이식해 뿌리를 덮고 잇몸 두께를 보강하는 수술입니다.'),
   g('bleeding-on-probing', '탐침 시 출혈', 'Bleeding on Probing (BOP)', '치주', '잇몸 검사 시 피가 나는 징후로, 활동성 염증이 있다는 신호입니다.'),
-  g('periodontal-maintenance', '치주 유지관리', 'Periodontal Maintenance', '치주', '잇몸 치료 후 3~6개월 간격으로 재발을 막는 정기 관리 프로그램입니다.'),
   g('gum-bleeding', '잇몸 출혈', 'Gum Bleeding', '치주', '칫솔질 시 잇몸에서 피가 나는 증상으로, 잇몸 염증의 가장 흔한 초기 신호입니다.'),
   g('halitosis', '구취(입냄새)', 'Halitosis', '치주', '입에서 나는 불쾌한 냄새로, 설태·잇몸병·충치 등이 주요 원인입니다.'),
   g('furcation', '치근이개부 병변', 'Furcation Involvement', '치주', '어금니 뿌리 갈림 부위까지 뼈가 녹은 상태로, 치주염이 많이 진행되었다는 의미입니다.'),
@@ -294,21 +319,14 @@ export const glossary: GlossaryEntry[] = [
   g('crowding', '총생(삐뚤빼뚤한 치아)', 'Crowding', '교정', '치아가 들어설 공간이 부족해 겹치고 비뚤어진 상태로, 가장 흔한 교정 사유입니다.'),
   g('protrusion', '돌출입', 'Protrusion', '교정', '앞니나 입 주변이 앞으로 튀어나온 상태로, 발치 교정 등으로 개선합니다.'),
   g('open-bite', '개방교합', 'Open Bite', '교정', '어금니를 물어도 앞니가 닿지 않고 떠 있는 교합 이상입니다.'),
-  g('deep-bite', '과개교합', 'Deep Bite', '교정', '위 앞니가 아래 앞니를 과도하게 덮는 상태입니다.'),
   g('crossbite', '반대교합(교차교합)', 'Crossbite', '교정', '위아래 치아의 맞물림이 반대로 된 상태로, 주걱턱 경향과 관련될 수 있습니다.'),
   g('bracket', '브라켓', 'Bracket', '교정', '치아 표면에 부착해 교정용 철사를 연결하는 장치입니다.'),
   g('archwire', '교정용 호선(와이어)', 'Archwire', '교정', '브라켓을 통해 치아에 힘을 전달하는 철사입니다.'),
   g('clear-aligner', '투명교정(클리어 얼라이너)', 'Clear Aligner', '교정', '투명한 탈착식 장치를 단계별로 교체하며 치아를 이동시키는 교정 방법입니다.'),
   g('invisalign', '인비절라인', 'Invisalign', '교정', '대표적인 글로벌 투명교정 시스템 브랜드입니다.'),
-  g('lingual-ortho', '설측교정', 'Lingual Orthodontics', '교정', '치아 안쪽(혀쪽)에 장치를 붙여 겉에서 보이지 않는 교정 방법입니다.'),
   g('self-ligating', '자가결찰 브라켓', 'Self-ligating Bracket', '교정', '와이어를 잡아주는 뚜껑이 내장된 브라켓으로, 마찰을 줄여 치료 효율을 높입니다.'),
-  g('mini-screw', '교정용 미니스크류(TAD)', 'Orthodontic Mini-screw', '교정', '잇몸뼈에 임시로 심는 작은 나사로, 치아 이동의 고정원으로 활용됩니다.'),
-  g('extraction-ortho', '발치교정', 'Extraction Orthodontics', '교정', '공간 확보를 위해 소구치 등을 발치하고 진행하는 교정으로, 돌출입·심한 총생에 적용됩니다.'),
   g('retainer', '유지장치(리테이너)', 'Retainer', '교정', '교정 완료 후 치아가 원래 자리로 돌아가지 않도록 유지하는 장치로, 장기간 착용이 중요합니다.'),
-  g('relapse', '교정 재발', 'Orthodontic Relapse', '교정', '교정 후 치아가 원래 위치로 되돌아가는 현상으로, 유지장치 착용으로 예방합니다.'),
-  g('interceptive-ortho', '차단교정(조기교정)', 'Interceptive Orthodontics', '교정', '성장기 어린이의 턱 성장과 습관을 조절해 부정교합을 미리 차단하는 교정입니다.'),
   g('growth-modification', '악정형 치료', 'Growth Modification', '교정', '성장기 턱뼈의 성장 방향과 양을 조절하는 장치 치료입니다.'),
-  g('orthognathic-surgery', '양악수술(악교정수술)', 'Orthognathic Surgery', '교정', '턱뼈 자체의 위치를 수술로 교정하는 치료로, 골격성 부정교합에 적용됩니다.'),
   g('ipr', '치간삭제(IPR)', 'Interproximal Reduction', '교정', '치아 옆면을 미세하게 다듬어 공간을 확보하는 술식으로, 투명교정에서 흔히 활용됩니다.'),
   g('elastics', '교정용 고무줄', 'Orthodontic Elastics', '교정', '위아래 치아에 걸어 턱 간 관계를 개선하는 고무줄로, 환자 협조가 치료 성패를 좌우합니다.'),
   g('partial-ortho', '부분교정', 'Partial Orthodontics', '교정', '앞니 등 일부 치아만 빠르게 배열하는 교정으로, 적응증 판단이 중요합니다.'),
@@ -317,7 +335,6 @@ export const glossary: GlossaryEntry[] = [
 
   // ===== 구강외과·발치 =====
   g('oral-surgery', '구강외과', 'Oral and Maxillofacial Surgery', '구강외과·발치', '발치·임플란트·낭종·외상 등 입과 턱 부위의 수술적 치료를 담당하는 분야입니다.'),
-  g('extraction', '발치', 'Tooth Extraction', '구강외과·발치', '보존이 불가능한 치아를 뽑는 처치로, 발치 후 수복 계획까지 함께 세우는 것이 중요합니다.'),
   g('impacted-tooth', '매복치', 'Impacted Tooth', '구강외과·발치', '잇몸이나 뼈 속에 묻혀 정상적으로 나오지 못한 치아입니다.'),
   g('surgical-extraction', '수술 발치(난발치)', 'Surgical Extraction', '구강외과·발치', '잇몸 절개나 뼈 삭제, 치아 분할이 필요한 고난도 발치입니다.'),
   g('dry-socket', '드라이소켓', 'Dry Socket', '구강외과·발치', '발치 후 혈병이 빠져나가 뼈가 노출되며 심한 통증이 생기는 합병증입니다.'),
@@ -329,7 +346,6 @@ export const glossary: GlossaryEntry[] = [
   g('post-op-care', '수술 후 주의사항', 'Post-operative Care', '구강외과·발치', '발치·수술 후 출혈·부기 관리, 금연·금주, 빨대 사용 금지 등 회복을 돕는 관리 수칙입니다.'),
   g('hemostasis', '지혈', 'Hemostasis', '구강외과·발치', '출혈을 멎게 하는 처치로, 거즈를 2시간가량 단단히 물고 있는 것이 기본입니다.'),
   g('anticoagulant', '항응고제와 발치', 'Anticoagulants in Dentistry', '구강외과·발치', '아스피린·와파린 등 혈전 예방약 복용 환자는 발치 전 주치의와 협의해 출혈 위험을 관리합니다.'),
-  g('osteonecrosis', '약물 관련 턱뼈 괴사(MRONJ)', 'Medication-Related Osteonecrosis of the Jaw', '구강외과·발치', '골다공증 약물 장기 복용자에게 발치 후 드물게 발생하는 턱뼈 괴사로, 사전 문진이 중요합니다.'),
   g('trismus', '개구장애', 'Trismus', '구강외과·발치', '입이 잘 벌어지지 않는 상태로, 사랑니 발치 후 일시적으로 나타나거나 턱관절 질환과 관련됩니다.', ['tmj-occlusion']),
   g('luxation', '치아 탈구', 'Tooth Luxation', '구강외과·발치', '외상으로 치아가 제 위치에서 밀려나거나 빠진 상태로, 빠른 응급처치가 예후를 좌우합니다.'),
   g('avulsed-tooth', '완전 탈구 치아 보존법', 'Avulsed Tooth First Aid', '구강외과·발치', '빠진 치아는 뿌리를 만지지 말고 우유·식염수에 담아 30분 이내 치과에 가져오는 것이 최선입니다.'),
@@ -340,17 +356,14 @@ export const glossary: GlossaryEntry[] = [
   g('fluoride-varnish', '불소 바니쉬', 'Fluoride Varnish', '예방·위생', '고농도 불소를 치아에 발라 충치 저항성을 높이는 전문가 도포법입니다.'),
   g('sealant', '실란트(치아홈메우기)', 'Dental Sealant', '예방·위생', '어금니의 깊은 홈을 미리 메워 충치를 예방하는 처치로, 만 18세 이하 건강보험이 적용됩니다.'),
   g('oral-prophylaxis', '전문가 치면세정술', 'Oral Prophylaxis', '예방·위생', '전문 기구로 치아 표면의 플라크와 착색을 제거하는 예방 관리입니다.'),
-  g('toothbrushing-method', '올바른 칫솔질(회전법)', 'Toothbrushing Technique', '예방·위생', '잇몸에서 치아 방향으로 쓸어내리듯 닦는 회전법이 표준으로 권장됩니다.'),
   g('bass-method', '바스법', 'Bass Method', '예방·위생', '칫솔모를 잇몸선에 45도로 대고 미세 진동을 주는 칫솔질로, 잇몸병 환자에게 권장됩니다.'),
   g('tongue-cleaning', '혀 클리닝(설태 제거)', 'Tongue Cleaning', '예방·위생', '혀 표면의 설태를 제거하는 관리로, 입냄새 개선에 효과적입니다.'),
   g('mouthwash', '구강청결제(가글)', 'Mouthwash', '예방·위생', '칫솔질의 보조 수단으로, 클로르헥시딘 가글은 치료 후 단기 사용에 활용됩니다.'),
   g('xylitol', '자일리톨', 'Xylitol', '예방·위생', '충치균이 이용하지 못하는 천연 감미료로, 무설탕 껌 등으로 충치 예방에 보조적 도움을 줍니다.'),
-  g('regular-checkup', '정기검진', 'Regular Dental Checkup', '예방·위생', '6개월~1년 주기의 검진으로 질환을 조기 발견해 치료 부담을 크게 줄이는 가장 경제적인 습관입니다.'),
   g('caries-risk-assessment', '충치 위험도 평가', 'Caries Risk Assessment', '예방·위생', '식습관·타액·위생 상태를 종합해 개인별 충치 위험도를 평가하고 맞춤 예방 전략을 세우는 과정입니다.'),
   g('saliva-function', '타액(침)의 기능', 'Saliva Function', '예방·위생', '침은 세정·완충·재광화·항균 작용으로 구강 건강을 지키는 천연 보호 시스템입니다.'),
   g('dry-mouth', '구강건조증', 'Xerostomia / Dry Mouth', '예방·위생', '침 분비가 줄어 입이 마르는 상태로, 충치·구취 위험을 높이며 약물 부작용이 흔한 원인입니다.'),
   g('diet-counseling', '식이 조절 상담', 'Diet Counseling', '예방·위생', '당 섭취 빈도와 산성 음료 습관을 조절해 충치·산부식을 예방하는 상담입니다.'),
-  g('acid-erosion', '치아 산부식(침식)', 'Dental Erosion', '예방·위생', '탄산음료·과일산·위산 등으로 법랑질이 녹는 현상으로, 충치와 다른 기전의 치아 손상입니다.'),
   g('desensitizer', '지각과민 처치제', 'Desensitizing Agent', '예방·위생', '노출된 상아세관을 막아 시린 증상을 완화하는 도포 약제입니다.'),
   g('electric-toothbrush', '전동칫솔', 'Electric Toothbrush', '예방·위생', '음파·회전 방식으로 플라크 제거를 돕는 칫솔로, 올바른 사용법이 더 중요합니다.'),
   g('oral-hygiene-instruction', '구강위생교육(TBI)', 'Oral Hygiene Instruction', '예방·위생', '개인별 구강 상태에 맞춘 칫솔질·치실 사용법 교육입니다.'),
@@ -359,19 +372,16 @@ export const glossary: GlossaryEntry[] = [
 
   // ===== 소아치과 =====
   g('pediatric-dentistry', '소아치과', 'Pediatric Dentistry', '소아', '어린이의 충치 예방·치료와 올바른 치열 발육을 관리하는 분야입니다.'),
-  g('primary-teeth', '유치(젖니)', 'Primary Teeth', '소아', '생후 6개월경부터 나는 20개의 첫 치아로, 영구치 자리를 지키는 중요한 역할을 합니다.'),
   g('permanent-teeth', '영구치', 'Permanent Teeth', '소아', '만 6세경부터 유치를 대체해 나는 평생 사용할 28~32개의 치아입니다.'),
   g('eruption-schedule', '치아 맹출 시기', 'Tooth Eruption Schedule', '소아', '유치는 생후 6개월~3세, 영구치는 만 6~13세에 걸쳐 나며, 시기 이상은 검진이 필요합니다.'),
   g('first-molar', '제1대구치(6세 구치)', 'First Permanent Molar', '소아', '만 6세경 유치 뒤에 새로 나는 첫 영구치 어금니로, 평생 교합의 기둥이라 실란트 보호가 권장됩니다.'),
   g('early-childhood-caries', '유아기 우식증(우유병 충치)', 'Early Childhood Caries', '소아', '수유 습관 등으로 어린 나이에 앞니부터 광범위하게 진행되는 충치입니다.'),
   g('space-maintainer', '공간유지장치', 'Space Maintainer', '소아', '유치를 일찍 잃었을 때 영구치 자리가 좁아지지 않도록 공간을 지켜주는 장치입니다.'),
-  g('stainless-crown', '기성금속관(SS크라운)', 'Stainless Steel Crown', '소아', '충치가 큰 유치 어금니에 씌우는 기성 크라운으로, 유치 수복의 표준입니다.'),
   g('thumb-sucking', '손가락 빨기 습관', 'Thumb Sucking', '소아', '만 3~4세 이후 지속되면 개방교합·돌출 등 부정교합을 유발할 수 있는 구강 습관입니다.'),
   g('mouth-breathing', '구호흡', 'Mouth Breathing', '소아', '입으로 숨 쉬는 습관으로, 치열·얼굴 발육과 구강 건강에 영향을 줄 수 있어 원인 평가가 필요합니다.'),
   g('tongue-thrust', '혀내밀기 습관', 'Tongue Thrusting', '소아', '삼킬 때 혀를 앞으로 미는 습관으로, 개방교합의 원인이 될 수 있습니다.'),
   g('dental-home', '덴탈홈(어린이 주치과)', 'Dental Home', '소아', '첫 돌 전후부터 정기적으로 다니는 어린이 전담 치과 개념으로, 평생 구강 건강의 출발점입니다.'),
   g('behavior-management', '소아 행동조절', 'Behavior Management', '소아', '어린이가 무서움 없이 치료받도록 돕는 말-시범-시행(Tell-Show-Do) 등 심리적 접근법입니다.'),
-  g('sedation-pediatric', '소아 진정치료', 'Pediatric Sedation', '소아', '협조가 어려운 어린이에게 약물로 얕은 진정 상태를 유도해 안전하게 치료하는 방법입니다.'),
   g('trauma-primary-tooth', '유치 외상', 'Primary Tooth Trauma', '소아', '넘어져 유치를 다친 경우로, 영구치 싹에 영향을 줄 수 있어 반드시 검진이 필요합니다.'),
   g('natal-tooth', '선천치(출생치)', 'Natal Tooth', '소아', '태어날 때부터 나 있는 치아로, 수유 문제나 흡인 위험 평가가 필요합니다.'),
   g('supernumerary-tooth', '과잉치', 'Supernumerary Tooth', '소아', '정상보다 많이 생긴 치아로, 위 앞니 사이에 흔하며 영구치 맹출을 방해하면 발치합니다.'),
@@ -379,17 +389,13 @@ export const glossary: GlossaryEntry[] = [
   g('fluorosis', '불소증', 'Dental Fluorosis', '소아', '치아 형성기에 과량의 불소에 노출되어 법랑질에 흰 반점이 생기는 현상입니다.'),
 
   // ===== 턱관절·교합 =====
-  g('tmd', '턱관절장애(TMD)', 'Temporomandibular Disorder', '턱관절·교합', '턱관절·저작근의 통증, 소리, 개구 제한을 포함하는 질환군입니다.', ['tmj-occlusion']),
   g('tmj-disc', '관절원판(디스크)', 'Articular Disc', '턱관절·교합', '턱관절 사이의 쿠션 역할 연골판으로, 위치 이상 시 소리와 통증이 생깁니다.', ['tmj-occlusion']),
   g('disc-displacement', '디스크 변위', 'Disc Displacement', '턱관절·교합', '관절원판이 제 위치를 벗어난 상태로, 딸깍 소리(클리킹)나 입벌림 제한의 원인입니다.', ['tmj-occlusion']),
-  g('clicking', '관절음(클리킹)', 'TMJ Clicking', '턱관절·교합', '입을 벌리거나 다물 때 턱에서 나는 딸깍 소리로, 디스크 위치 이상의 신호일 수 있습니다.', ['tmj-occlusion']),
   g('bruxism', '이갈이', 'Bruxism', '턱관절·교합', '수면 중 무의식적으로 이를 갈거나 악무는 습관으로, 치아 마모·파절·턱관절 부담의 주요 원인입니다.', ['tmj-occlusion']),
-  g('clenching', '이악물기', 'Clenching', '턱관절·교합', '주간에도 무의식적으로 이를 꽉 무는 습관으로, 저작근 통증과 치아 균열을 유발합니다.', ['tmj-occlusion']),
   g('occlusion', '교합', 'Occlusion', '턱관절·교합', '위아래 치아가 맞물리는 관계로, 치아·근육·관절이 조화될 때 건강한 교합이라 합니다.', ['tmj-occlusion']),
   g('centric-relation', '중심위', 'Centric Relation', '턱관절·교합', '턱관절이 가장 안정된 위치로, 전악 보철·교합 재구성의 기준점이 됩니다.', ['tmj-occlusion']),
   g('premature-contact', '조기접촉', 'Premature Contact', '턱관절·교합', '특정 치아가 먼저 닿아 교합을 방해하는 상태로, 교합조정의 대상입니다.', ['tmj-occlusion']),
   g('occlusal-trauma', '교합성 외상', 'Occlusal Trauma', '턱관절·교합', '과도한 교합력이 치아·치주조직에 손상을 주는 상태입니다.', ['tmj-occlusion']),
-  g('night-guard', '나이트가드', 'Night Guard', '턱관절·교합', '수면 중 착용해 이갈이로부터 치아와 턱관절을 보호하는 장치입니다.', ['tmj-occlusion']),
   g('stabilization-splint', '안정화 스플린트', 'Stabilization Splint', '턱관절·교합', '교합을 안정시키고 턱관절·근육의 부담을 줄이는 맞춤 교합안정장치입니다.', ['tmj-occlusion']),
   g('myofascial-pain', '근막동통', 'Myofascial Pain', '턱관절·교합', '저작근의 긴장과 통증유발점에서 비롯되는 턱·얼굴 통증입니다.', ['tmj-occlusion']),
   g('botox-masseter', '교근 보톡스', 'Masseter Botox', '턱관절·교합', '교근에 보툴리눔 톡신을 주사해 이갈이·이악물기 힘을 줄이는 보조 치료입니다.', ['tmj-occlusion']),
@@ -435,7 +441,6 @@ export const glossary: GlossaryEntry[] = [
   g('peg-lateral', '왜소치', 'Peg Lateral / Microdontia', '심미·미백', '정상보다 작게 형성된 치아로, 위 옆앞니에 흔하며 레진·라미네이트로 개선합니다.', ['esthetic-prosthetics']),
 
   // ===== 재료·장비 =====
-  g('composite-resin-material', '복합레진 재료', 'Composite Resin Material', '재료·장비', '레진 기질과 필러 입자로 구성된 치아색 수복 재료로, 광중합으로 굳힙니다.', ['adhesive-restoration']),
   g('light-curing-unit', '광중합기', 'Light Curing Unit', '재료·장비', '청색광으로 레진을 굳히는 장비로, 충분한 광조사가 수복물 강도를 좌우합니다.'),
   g('resin-cement', '레진 시멘트', 'Resin Cement', '재료·장비', '세라믹 수복물을 치아에 강력하게 접착하는 레진 기반 접착제입니다.', ['adhesive-restoration']),
   g('glass-ionomer', '글래스아이오노머', 'Glass Ionomer Cement', '재료·장비', '불소를 방출하는 수복·접착 재료로, 유치 수복과 임시 수복에 활용됩니다.'),
@@ -447,7 +452,6 @@ export const glossary: GlossaryEntry[] = [
   g('calcium-hydroxide', '수산화칼슘', 'Calcium Hydroxide', '재료·장비', '신경 보호와 근관 소독에 쓰이는 전통적 약재입니다.'),
   g('handpiece', '핸드피스', 'Dental Handpiece', '재료·장비', '치아를 삭제하는 회전 절삭 기구로, 환자마다 멸균된 것을 사용해야 합니다.'),
   g('ultrasonic-scaler', '초음파 스케일러', 'Ultrasonic Scaler', '재료·장비', '초음파 진동과 물로 치석을 제거하는 장비입니다.'),
-  g('rubber-dam-material', '러버댐 장비', 'Rubber Dam Kit', '재료·장비', '치료 치아만 격리하는 고무막과 클램프 세트로, 정밀 접착·신경치료의 필수 장비입니다.', ['adhesive-restoration']),
   g('intraoral-camera', '구강 카메라', 'Intraoral Camera', '재료·장비', '입안 상태를 모니터로 보여주는 카메라로, 환자 설명과 기록에 활용됩니다.'),
   g('dental-laser', '치과용 레이저', 'Dental Laser', '재료·장비', '연조직 절개·소독·통증 완화 등에 활용되는 장비로, 출혈이 적고 회복이 빠릅니다.'),
   g('autoclave', '고압증기멸균기(오토클레이브)', 'Autoclave', '재료·장비', '고온·고압 증기로 기구를 멸균하는 감염관리의 표준 장비입니다.'),
@@ -464,7 +468,6 @@ export const glossary: GlossaryEntry[] = [
   g('non-covered-treatment', '비급여 진료', 'Non-covered Treatment', '제도·보험', '건강보험이 적용되지 않아 병원별로 가격이 다른 진료로, 사전 고지와 동의가 의무화되어 있습니다.'),
   g('private-dental-insurance', '치아보험', 'Private Dental Insurance', '제도·보험', '민간 보험사의 치과 치료 보장 상품으로, 면책기간·감액기간 확인이 중요합니다.'),
   g('medical-deduction', '의료비 세액공제', 'Medical Expense Deduction', '제도·보험', '치과 치료비도 연말정산 의료비 세액공제 대상에 포함됩니다.'),
-  g('treatment-consent', '치료 동의서', 'Informed Consent', '제도·보험', '치료의 내용·대안·위험을 설명받고 동의하는 절차로, 환자의 알 권리를 보장합니다.'),
   g('medical-records-copy', '진료기록 사본 발급', 'Medical Records Request', '제도·보험', '환자는 본인의 진료기록·영상 사본을 요청할 권리가 있습니다.'),
   g('second-opinion', '세컨드 오피니언', 'Second Opinion', '제도·보험', '중요한 치료 결정 전 다른 의료진의 의견을 들어보는 것으로, 환자의 합리적 권리입니다.'),
   g('dental-specialist-system', '치과 전문의 제도', 'Dental Specialist System', '제도·보험', '보존과·보철과·치주과·교정과 등 11개 전문과목별로 수련을 마친 전문의를 인정하는 제도입니다.'),
@@ -517,7 +520,6 @@ export const glossary: GlossaryEntry[] = [
   g('oral-medicine', '구강내과', 'Oral Medicine', '구강내과·전신', '구강 점막질환·턱관절장애·구강안면통증·구취 등을 진단·치료하는 분야입니다.'),
   g('leukoplakia', '백반증', 'Leukoplakia', '구강내과·전신', '닦이지 않는 흰 반점 병변으로, 일부는 전암 병소일 수 있어 조직검사가 필요합니다.'),
   g('lichen-planus', '편평태선', 'Oral Lichen Planus', '구강내과·전신', '구강 점막에 그물 모양 흰 줄무늬가 생기는 만성 염증성 질환입니다.'),
-  g('candidiasis', '구강 칸디다증', 'Oral Candidiasis', '구강내과·전신', '곰팡이 감염으로 생기는 백태성 병변으로, 틀니 사용자·면역저하자에게 흔합니다.'),
   g('herpes-oral', '구순포진', 'Herpes Labialis', '구강내과·전신', '헤르페스 바이러스로 입술 주위에 물집이 생기는 질환으로, 활동기에는 치과 치료를 미루는 것이 좋습니다.'),
   g('geographic-tongue', '지도설(지도 모양 혀)', 'Geographic Tongue', '구강내과·전신', '혀 표면에 지도 모양 반점이 나타나는 양성 상태로, 대부분 치료가 필요 없습니다.'),
   g('osteoporosis-dental', '골다공증과 치과치료', 'Osteoporosis and Dental Care', '구강내과·전신', '골다공증 약물(비스포스포네이트) 복용자는 발치·임플란트 전 반드시 복용력을 알려야 합니다.'),

@@ -7,7 +7,8 @@ import { doctors } from './data/doctors'
 import { encyclopedia } from './data/encyclopedia'
 import { glossary, resolveGlossaryAlias } from './data/glossary'
 import { isThinEncyclo, isThinGlossary, NOINDEX_FOLLOW } from './lib/thin-content'
-import { CONTENT_DATES, PAGE_DATES, latestDate, treatmentReviewed } from './lib/content-dates'
+import { CONTENT_DATES, PAGE_DATES, AREA_REGION_DATES, latestDate, treatmentReviewed, encycloEntryDate } from './lib/content-dates'
+import { getEnrichment } from './data/encyclopedia-enrich'
 import { getPricing } from './lib/pricing-store'
 
 import { areaCombos } from './data/facilities'
@@ -26,7 +27,7 @@ import {
   NoticesPage, NoticeDetailPage, VideoPage,
 } from './pages/content'
 import { EncyclopediaIndex, EncyclopediaDetail } from './pages/encyclopedia'
-import { AreaIndexPage, AreaPage } from './pages/area'
+import { AreaIndexPage, AreaPage, OncheonjangHubPage, HUB_SLUG, HUB_DATE } from './pages/area'
 
 // 라우트 모듈
 import { api } from './routes/api'
@@ -63,6 +64,12 @@ app.use('*', async (c, next) => {
   if (url.hostname.startsWith('www.')) {
     url.hostname = url.hostname.slice(4)
     return c.redirect(url.toString(), 301)
+  }
+  // Pages 프로덕션 별칭(yeonseon-dental.pages.dev)도 본 도메인으로 301 — 중복 색인 방지 (2026-10-08)
+  // 해시 미리보기 배포(<hash>.yeonseon-dental.pages.dev)는 검증용이라 그대로 둔다.
+  if (url.hostname === 'yeonseon-dental.pages.dev') {
+    const to = new URL(url.pathname + url.search, clinic.domain)
+    return c.redirect(to.toString(), 301)
   }
   await next()
 })
@@ -125,6 +132,8 @@ app.get('/encyclopedia/:slug', (c) => {
 // --- 지역 SEO ---
 app.get('/area', (c) => c.html(AreaIndexPage()))
 app.get('/area/:combo', (c) => {
+  // 대표 키워드 허브 "온천장 치과" (2026-10-08)
+  if (c.req.param('combo') === HUB_SLUG) return c.html(OncheonjangHubPage())
   const page = AreaPage(c.req.param('combo'))
   return page ? c.html(page) : c.notFound()
 })
@@ -257,8 +266,8 @@ async function sitemapPagesUrls(env: Bindings): Promise<SmUrl[]> {
     { p: '/column', cf: 'weekly', lm: latestDate(...r2.cols.map(itemDate)) },
     { p: '/notice', cf: 'weekly', lm: latestDate(...r2.notices.map(itemDate)) },
     { p: '/video', cf: 'monthly', lm: '' }, // 유튜브 RSS 자동 반영 — 수정일을 알 수 없어 생략
-    { p: '/encyclopedia', cf: 'monthly', lm: latestDate(CONTENT_DATES.encyclopedia, CONTENT_DATES.glossary) },
-    { p: '/area', cf: 'monthly', lm: PAGE_DATES.area },
+    { p: '/encyclopedia', cf: 'monthly', lm: latestDate(CONTENT_DATES.encyclopedia, CONTENT_DATES.glossary, CONTENT_DATES.encyclopediaEnrich) },
+    { p: '/area', cf: 'monthly', lm: latestDate(PAGE_DATES.area, PAGE_DATES.areaIndex) },
   ]
   return [
     ...staticPaths.map((s) => ({ loc: base + s.p, priority: s.p === '/' ? '1.0' : '0.8', changefreq: s.cf, lastmod: s.lm })),
@@ -276,8 +285,9 @@ function sitemapEncyclopediaUrls(): SmUrl[] {
   const base = clinic.domain
   const seen = new Set<string>()
   return [
-    ...encyclopedia.filter((e) => !isThinEncyclo(e)).map((e) => ({ loc: `${base}/encyclopedia/${e.slug}`, priority: '0.6', changefreq: 'monthly', lastmod: CONTENT_DATES.encyclopedia })),
-    ...glossary.filter((e) => !isThinGlossary(e)).map((e) => ({ loc: `${base}/encyclopedia/${e.slug}`, priority: '0.5', changefreq: 'yearly', lastmod: CONTENT_DATES.glossary })),
+    // lastmod = 항목별 실제 수정일 (보강본 2026-10-08 / 원 데이터 커밋일 — lib/content-dates.ts encycloEntryDate)
+    ...encyclopedia.filter((e) => !isThinEncyclo(e)).map((e) => ({ loc: `${base}/encyclopedia/${e.slug}`, priority: '0.6', changefreq: 'monthly', lastmod: encycloEntryDate(e.slug, 'encyclopedia', !!getEnrichment(e.slug)) })),
+    ...glossary.filter((e) => !isThinGlossary(e)).map((e) => ({ loc: `${base}/encyclopedia/${e.slug}`, priority: '0.5', changefreq: 'monthly', lastmod: encycloEntryDate(e.slug, 'glossary', !!getEnrichment(e.slug)) })),
   ].filter((u) => !seen.has(u.loc) && seen.add(u.loc)) // 리치/경량 레이어에 같은 slug 가 있으면 한 번만 등록
 }
 
@@ -285,7 +295,11 @@ function sitemapEncyclopediaUrls(): SmUrl[] {
 function sitemapAreaUrls(): SmUrl[] {
   const base = clinic.domain
   const lm = latestDate(PAGE_DATES.area, CONTENT_DATES.treatments, PAGE_DATES.doctors, PAGE_DATES.faq)
-  return areaCombos().map((a) => ({ loc: `${base}/area/${a.slug}`, priority: '0.6', changefreq: 'monthly', lastmod: lm }))
+  return [
+    // 대표 키워드 허브 "온천장 치과" — 실제 작성일
+    { loc: `${base}/area/${HUB_SLUG}`, priority: '0.9', changefreq: 'monthly', lastmod: HUB_DATE },
+    ...areaCombos().map((a) => ({ loc: `${base}/area/${a.slug}`, priority: '0.6', changefreq: 'monthly', lastmod: latestDate(lm, AREA_REGION_DATES[a.region.slug]) })),
+  ]
 }
 
 async function sitemapContentUrls(env: Bindings): Promise<SmUrl[]> {
@@ -502,6 +516,7 @@ ${txList}
 - [치과 백과사전](${base}/encyclopedia): 치과 용어 사전 (AEO 직답형, ${encyclopedia.length}+개 용어)
 - [비급여 수가](${base}/pricing)
 - [오시는 길](${base}/directions)
+- [온천장 치과 안내](${base}/area/oncheonjang): 위치(온천장역 1·5번 출구 도보 3분)·진료시간·의료진·진료 범위·자주 묻는 질문
 - [지역별 진료 안내](${base}/area): 부산 동래·금정·연제·부산진·해운대 + 양산·김해
 
 ## 콘텐츠

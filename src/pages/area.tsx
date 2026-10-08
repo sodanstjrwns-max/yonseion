@@ -3,7 +3,7 @@ import { Layout, Breadcrumb } from '../components/layout'
 import { clinic } from '../data/clinic'
 import { seoRegions, seoTreatments, areaCombos } from '../data/facilities'
 import { getTreatment } from '../data/treatments'
-import { doctorsBySpecialty } from '../data/doctors'
+import { doctors, doctorsBySpecialty } from '../data/doctors'
 import { faqGroups } from '../data/faqs'
 import { breadcrumbSchema, faqSchema, placeSchema, areaServiceSchema, localServiceSchema, speakableSchema } from '../lib/schema'
 
@@ -38,6 +38,7 @@ export function AreaIndexPage() {
   ${Breadcrumb(crumb)}
   <section class="section--tight">
     <div class="container">
+      <p data-reveal style="max-width:62ch;margin-bottom:1.4rem;line-height:1.8">병원 위치·진료시간·의료진·진료 범위를 한 번에 보시려면 <a href="/area/oncheonjang" class="link-arrow">온천장 치과 안내</a>를 확인하세요.</p>
       <p class="muted" data-reveal style="max-width:62ch;margin-bottom:2.4rem;line-height:1.8">
         아래에서 거주 지역과 진료를 선택하시면, 해당 지역에서 ${clinic.nameShort}까지 오시는 길과
         진료별 핵심 안내를 확인하실 수 있습니다. 총 <strong>${seoRegions.length}개 지역 × ${seoTreatments.length}개 진료</strong> 안내가 준비되어 있습니다.
@@ -166,6 +167,11 @@ export function AreaPage(comboSlug: string) {
             <a href="tel:${clinic.phoneRaw}">${clinic.phone}</a>
             <a href="/directions">오시는 길</a>
           </div>
+          ${raw(region.admin === '부산광역시 동래구' ? `
+          <div class="sidebar-box">
+            <h4>병원 종합 안내</h4>
+            <a href="/area/oncheonjang">온천장 치과 — 위치·진료시간·의료진</a>
+          </div>` : '')}
           <div class="sidebar-box">
             <h4>인근 지역 안내</h4>
             ${raw(seoRegions.filter((r) => r.slug !== region.slug).slice(0, 4).map((r) => `<a href="/area/${r.slug}-${treatment.slug}">${r.name} ${treatment.name}</a>`).join(''))}
@@ -198,6 +204,189 @@ export function AreaPage(comboSlug: string) {
         regionAdmin: region.admin, regionName: region.name,
       }),
       placeSchema(region.full),
+      faqSchema(faqs),
+    ],
+  }, body)
+}
+
+// ============================================================================
+// 대표 키워드 허브 — "온천장 치과" (/area/oncheonjang) · 2026-10-08 지역 SEO 웨이브
+// 지역×진료 조합 페이지(/area/oncheonjang-*)와 별개로, 온천장·동래 주민이 "온천장 치과"로
+// 찾을 때 병원 위치·교통·진료시간·의료진·진료 범위·FAQ를 한 페이지에서 답한다.
+// 사실 정보는 clinic.ts·doctors.ts·treatments.ts·facilities.ts 값만 사용.
+// ============================================================================
+export const HUB_SLUG = 'oncheonjang'
+export const HUB_DATE = '2026-10-08'
+
+export function OncheonjangHubPage() {
+  const path = `/area/${HUB_SLUG}`
+  const crumb = [{ name: '홈', url: '/' }, { name: '지역별 안내', url: '/area' }, { name: '온천장 치과', url: path }]
+  const doc = doctors[0]
+  const mapQuery = encodeURIComponent(clinic.address)
+  const txOrder = ['adhesive-restoration', 'esthetic-prosthetics', 'all-on-x', 'implant-guide', 'conservative', 'tmj-occlusion']
+  const txs = txOrder.map((s) => getTreatment(s)).filter(Boolean)
+  const nearRegions = ['oncheon', 'dongnae', 'myeongnyun', 'geumjeong']
+    .map((s) => seoRegions.find((r) => r.slug === s)).filter(Boolean) as typeof seoRegions
+
+  const faqs = [
+    { q: '온천장역 몇 번 출구로 나오면 되나요?', a: `도시철도 1호선 온천장역 1번 또는 5번 출구로 나오시면 걸어서 3분 거리입니다. 1층에 베스킨라빈스가 있는 허브메디컬타워 901호가 ${clinic.nameShort}입니다.` },
+    { q: '수요일이나 일요일에도 진료하나요?', a: '수요일과 일요일·공휴일은 휴진입니다. 월·화·목·금요일은 09:30~18:30(점심 13:00~14:00), 토요일은 09:30~13:00까지 점심시간 없이 진료합니다.' },
+    { q: '차를 가지고 가도 주차할 수 있나요?', a: `건물 주차장을 이용하실 수 있습니다. 주차 가능 시간 등 세부 사항은 방문 전 전화(${clinic.phone})로 확인해 주시면 안내해 드립니다.` },
+    { q: '동래역이나 명륜역 근처에 사는데 가기 편한가요?', a: '1호선 한 노선으로 이어져 명륜역에서는 한 정거장, 동래역에서는 두 정거장이면 온천장역에 도착합니다. 사직동·안락동 쪽에서는 버스나 차량으로 10분 안팎 걸립니다.' },
+    { q: '스케일링이나 충치 치료 같은 건강보험 진료도 하나요?', a: '네. 충치치료부터 잇몸치료, 스케일링까지 건강보험이 적용되는 보존·치주치료를 진료합니다. 보험 적용 여부는 항목과 조건에 따라 달라 진료 전에 미리 안내해 드립니다.' },
+    { q: '예약은 어떻게 하나요?', a: `홈페이지 예약 상담 신청, 전화(${clinic.phone}), 네이버 예약으로 하실 수 있습니다. 예약 후 내원하시면 대기 시간을 줄이는 데 도움이 됩니다.` },
+  ]
+
+  const body = html`
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">부산 동래구 온천동 · 온천장역 1·5번 출구 도보 3분</p>
+      <h1 style="font-size:var(--t-h2)">온천장 치과, ${clinic.nameKo}</h1>
+      <p class="lead" id="hub-answer">온천장 치과를 찾고 계신다면, ${clinic.nameKo}는 1호선 온천장역 1·5번 출구에서 걸어서 3분 거리인 ${clinic.address}에 있습니다. ${doc.title.replace(' (더블보더)', '')}인 ${doc.name} ${doc.role}이 충치·잇몸 같은 일상 진료부터 심미보철, All-on-X 전체임플란트까지 직접 진료합니다.</p>
+    </div>
+  </section>
+  ${Breadcrumb(crumb)}
+
+  <section class="section--tight">
+    <div class="container">
+      <div class="detail-grid">
+        <div>
+          <article class="prose" data-reveal>
+            <h2>온천장역에서 연세온치과까지</h2>
+            <p>${clinic.nameShort}는 온천장역 1·5번 출구에서 도보 3분, 1층에 베스킨라빈스가 있는 허브메디컬타워 901호에 있습니다. 동래온천·허심청이 있는 온천장 일대에서는 걸어서 오시는 분이 많고, 금강공원 입구 쪽 온천동에서도 도보 5~10분이면 도착합니다.</p>
+            <p>지하철은 1호선 한 노선으로 연결됩니다. 명륜역에서는 한 정거장, 동래역에서는 두 정거장이며, 부산대역·장전역 등 금정구 방면에서도 몇 정거장이면 온천장역에 닿습니다. 서면역에서도 환승 없이 15분 안팎입니다. 자가용으로 오시면 건물 주차장을 이용하실 수 있고, 주차 세부 사항은 방문 전 전화(<a href="tel:${clinic.phoneRaw}">${clinic.phone}</a>)로 확인해 주세요.</p>
+
+            <h2>진료시간 — 수요일은 휴진합니다</h2>
+            <table class="hub-hours">
+              <tbody>
+                ${raw(clinic.hours.map((h) => `<tr><th scope="row">${h.day}</th><td>${h.time}${h.note ? ` <span class="muted">(${h.note})</span>` : ''}</td></tr>`).join(''))}
+              </tbody>
+            </table>
+            <p>토요일은 오후 1시까지 점심시간 없이 진료합니다. 진료 내용에 따라 걸리는 시간이 달라, 예약하고 오시면 기다리는 시간을 줄이는 데 도움이 됩니다.</p>
+
+            <h2>진료하는 의료진</h2>
+            <p><a href="/doctors/${doc.slug}">${doc.name} ${doc.role}</a>은 ${doc.licenses.join('·')}입니다. ${doc.career.slice(0, 3).join(', ')} 경력을 바탕으로, 진단과 치료계획을 직접 설명하고 처음 안내한 계획대로 치료가 이어지도록 진료합니다.</p>
+
+            <h2>온천장 연세온치과에서 받을 수 있는 진료</h2>
+            <p>자연치아를 최대한 살리는 생체모방치의학을 진료의 중심에 두고, 아래 진료를 하고 있습니다. 각 항목을 누르면 진료 과정과 비용 안내를 보실 수 있습니다.</p>
+            <ul class="hub-tx">
+              ${raw(txs.map((t) => `<li><a href="/treatments/${t!.slug}"><strong>${t!.name}</strong></a> — ${t!.short}</li>`).join(''))}
+            </ul>
+            <p>동래 치과를 찾는 분들이 많이 묻는 비용은 <a href="/pricing">비급여 수가 안내</a>에서, 실제 진료 사례는 <a href="/cases/gallery">치료 케이스</a>에서 확인하실 수 있습니다.</p>
+          </article>
+
+          <div class="map-embed" data-reveal style="margin-top:2rem;border-radius:14px;overflow:hidden;box-shadow:0 8px 30px rgba(20,36,62,.08)">
+            <iframe src="https://maps.google.com/maps?q=${mapQuery}&z=17&output=embed"
+              width="100%" height="380" style="border:0;display:block;filter:grayscale(.12)"
+              loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+              title="온천장 치과 ${clinic.nameKo} 위치 — ${clinic.address}"></iframe>
+          </div>
+          <div data-reveal style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.9rem">
+            <a href="${clinic.mapUrl}" target="_blank" rel="noopener" class="faq-tab"><i class="fas fa-location-dot"></i> 네이버플레이스</a>
+            <a href="https://map.naver.com/v5/search/${mapQuery}" target="_blank" rel="noopener" class="faq-tab"><i class="fas fa-map-marker-alt"></i> 네이버지도</a>
+            <a href="https://map.kakao.com/?q=${mapQuery}" target="_blank" rel="noopener" class="faq-tab"><i class="fas fa-map"></i> 카카오맵</a>
+            <a href="/reservation" class="faq-tab"><i class="fas fa-calendar-check"></i> 예약 상담 신청</a>
+          </div>
+
+          <div class="prose" data-reveal style="margin-top:3rem">
+            <h2>동래 이웃이 자주 묻는 질문</h2>
+            <div class="enc-faq">
+              ${raw(faqs.map((f) => `<details><summary>${f.q}</summary><p>${f.a}</p></details>`).join(''))}
+            </div>
+          </div>
+
+          <div class="prose" data-reveal style="margin-top:2.5rem">
+            <h2>온천장 주변 지역에서 오시는 분께</h2>
+            <p>온천동·명륜동·동래역 일대와 부산대가 있는 금정구에서 오시는 분들을 위해 진료별 안내를 따로 정리했습니다.</p>
+            <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.4rem">
+              ${raw(seoTreatments.map((t) => `<a href="/area/oncheonjang-${t.slug}" class="faq-tab">온천장 ${t.name}</a>`).join(''))}
+              ${raw(nearRegions.map((r) => `<a href="/area/${r.slug}-implant-guide" class="faq-tab">${r.name} 임플란트</a>`).join(''))}
+              <a href="/area" class="faq-tab">지역별 안내 전체</a>
+            </div>
+          </div>
+        </div>
+        <aside class="sidebar">
+          <div class="sidebar-box">
+            <h4>${clinic.nameKo}</h4>
+            <p style="font-size:.86rem;line-height:1.7">${clinic.address}</p>
+            <p style="font-size:.86rem;font-weight:600;color:var(--ink);margin-top:.4rem">${clinic.subway}</p>
+          </div>
+          <div class="sidebar-box">
+            <h4>진료시간</h4>
+            <p style="font-size:.88rem;line-height:1.8">${clinic.hoursSummary}</p>
+            <p class="muted" style="font-size:.82rem">${clinic.closedDays}</p>
+          </div>
+          <div class="sidebar-box">
+            <h4>상담·예약</h4>
+            <a href="/reservation">예약 상담 신청</a>
+            <a href="tel:${clinic.phoneRaw}">${clinic.phone}</a>
+            <a href="${clinic.sns.naverBooking}" target="_blank" rel="noopener">네이버 예약</a>
+            <a href="/directions">오시는 길 상세</a>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+  <style>
+    .hub-hours{width:100%;max-width:30rem;border-collapse:collapse;margin:0 0 1.2rem;font-size:.95rem}
+    .hub-hours th,.hub-hours td{border-bottom:1px solid var(--line);padding:.55rem .4rem;text-align:left}
+    .hub-hours th{font-weight:600;color:var(--ink);width:9rem}
+    .hub-tx{list-style:none;margin:0 0 1.4rem;padding:0}
+    .hub-tx li{border-bottom:1px solid var(--line);padding:.7rem 0;margin:0}
+    .enc-faq details{border-bottom:1px solid var(--line);padding:.2rem 0}
+    .enc-faq summary{cursor:pointer;font-weight:600;color:var(--ink);padding:1rem 0;list-style:none}
+    .enc-faq summary::-webkit-details-marker{display:none}
+    .enc-faq summary::before{content:'Q. ';color:var(--gold-2)}
+    .enc-faq details p{margin:0 0 1rem}
+  </style>
+
+  <section class="section cta-band">
+    <div class="container">
+      <h2 data-reveal>온천장역 3분 거리,<br>상담부터 편하게 시작하세요.</h2>
+      <a href="/reservation" class="btn btn-primary" data-reveal data-reveal-delay="1" style="margin-top:2rem">예약 상담 신청 <i class="fas fa-arrow-right"></i></a>
+    </div>
+  </section>
+  `
+  const title = '온천장 치과 · 동래 치과 | 연세온치과'
+  const description = `온천장 치과 ${clinic.nameKo} — 1호선 온천장역 1·5번 출구 도보 3분(${clinic.address}). 치과보철과·통합치의학과 전문의 진료, ${clinic.hoursSummary}, ${clinic.closedDays}.`
+  return Layout({
+    title,
+    description,
+    path,
+    jsonLd: [
+      breadcrumbSchema(crumb),
+      {
+        '@context': 'https://schema.org',
+        '@type': 'MedicalWebPage',
+        '@id': `${clinic.domain}${path}#webpage`,
+        url: `${clinic.domain}${path}`,
+        name: title,
+        description,
+        inLanguage: 'ko',
+        isPartOf: { '@id': `${clinic.domain}/#website` },
+        about: { '@id': `${clinic.domain}/#clinic` },
+        mainEntity: { '@id': `${clinic.domain}/#clinic` },
+        lastReviewed: HUB_DATE,
+        dateModified: HUB_DATE,
+        reviewedBy: { '@id': `${clinic.domain}/doctors/${doc.slug}#person` },
+        speakable: { '@type': 'SpeakableSpecification', cssSelector: ['h1', '#hub-answer'] },
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': ['Dentist', 'LocalBusiness', 'MedicalBusiness'],
+        '@id': `${clinic.domain}/#clinic`,
+        name: clinic.nameKo,
+        url: clinic.domain,
+        telephone: clinic.phone,
+        address: { '@type': 'PostalAddress', streetAddress: clinic.address, addressLocality: clinic.addressLocality, addressRegion: clinic.addressRegion, postalCode: clinic.postalCode, addressCountry: 'KR' },
+        areaServed: [
+          { '@type': 'Place', name: '부산 동래구 온천장' },
+          { '@type': 'AdministrativeArea', name: '부산광역시 동래구 온천동' },
+          { '@type': 'AdministrativeArea', name: '부산광역시 동래구' },
+          { '@type': 'AdministrativeArea', name: '부산광역시 금정구' },
+          { '@type': 'AdministrativeArea', name: '부산광역시 연제구' },
+        ],
+      },
       faqSchema(faqs),
     ],
   }, body)

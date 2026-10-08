@@ -44,7 +44,7 @@ export function HomePage() {
   }))
   const allHomeFaqs = [...homeFaqs, ...homeFaqPicks.flatMap((g) => g.faqs)]
 
-  const meta_title = `${clinic.nameKo} | 부산 동래구 온천동 치과 (온천장역)`
+  const meta_title = `온천장 치과 | ${clinic.nameKo} — 부산 동래구 온천동 (온천장역 도보 3분)`
   const meta = {
     title: meta_title,
     description: `부산 동래구 온천동 ${clinic.nameKo}(온천장역 도보 3분). 자연치아를 닮은 생체모방치의학으로 중장년 심미보철·전체임플란트·접착수복을 정직하게 진료합니다.`,
@@ -110,7 +110,7 @@ export function HomePage() {
 
     <!-- 콘텐츠 : 태그라인이 주인공 -->
     <div class="hw-content">
-      <span class="hw-eyebrow" data-reveal>부산 동래구 온천동 · ${clinic.nameKo}</span>
+      <span class="hw-eyebrow" data-reveal>온천장 치과 · 부산 동래구 온천동 · ${clinic.nameKo}</span>
       <h1 class="hw-tagline" aria-label="미소의 젊음을 켜드립니다">${raw(kinetic('미소의 젊음을'))}<br class="hw-br"><span class="tg-gold">${raw(kinetic('켜드립니다'))}</span></h1>
       <p class="hw-mission" data-reveal data-reveal-delay="2">${clinic.mission}</p>
       <div class="hw-cta" data-reveal data-reveal-delay="3">
@@ -526,7 +526,7 @@ export function HomePage() {
         <h2 class="sec-title">동래 온천장에서,<br>부산 전역과 인근 도시까지.</h2>
       </div>
       <div class="region-text" data-reveal>
-        <p>${clinic.nameKo}은 ${clinic.address}에 있습니다. ${clinic.directions}이며, 도시철도 1호선 노선 위에 있어 부산 도심 어디서든 환승 부담이 적은 위치입니다. 건물 주차가 가능해 차량 내원도 편리합니다.</p>
+        <p><a href="/area/oncheonjang">온천장 치과</a> ${clinic.nameKo}은 ${clinic.address}에 있습니다. ${clinic.directions}이며, 도시철도 1호선 노선 위에 있어 부산 도심 어디서든 환승 부담이 적은 위치입니다. 건물 주차가 가능해 차량 내원도 편리합니다.</p>
         <p>병원이 자리한 동래구 온천동을 비롯해 명륜동·사직동·복산동·안락동·명장동 등 동래구 전역, 부산대학교가 있는 금정구(장전동·구서동), 연제구 연산동, 서면이 있는 부산진구에서는 지하철이나 버스로 대략 5~15분 안팎이면 도착합니다. 해운대구·수영구·남구·북구·동구 등에서도 1호선 환승 또는 차량으로 내원하고 계십니다.</p>
         <p>온천장은 경남·울산 방면 접근성도 좋은 편입니다. 양산(차량 약 25~30분), 김해(약 30~40분), 울산(약 40~50분)에서도 상담과 정기 진료를 위해 방문하십니다. 지역별 교통편과 진료 안내는 아래에서 자세히 확인하실 수 있습니다.</p>
       </div>
@@ -537,7 +537,8 @@ export function HomePage() {
         }).join(''))}
       </div>
       <div class="mt-3" data-reveal>
-        <a href="/area" class="link-arrow">지역별 안내 전체 보기 <i class="fas fa-arrow-right"></i></a>
+        <a href="/area/oncheonjang" class="link-arrow">온천장 치과 안내 <i class="fas fa-arrow-right"></i></a>
+        <a href="/area" class="link-arrow" style="margin-left:1.4rem">지역별 안내 전체 보기 <i class="fas fa-arrow-right"></i></a>
         <a href="/directions" class="link-arrow" style="margin-left:1.4rem">오시는 길 <i class="fas fa-arrow-right"></i></a>
       </div>
     </div>

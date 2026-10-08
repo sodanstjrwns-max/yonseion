@@ -6,7 +6,9 @@ import { glossary, GlossaryEntry } from '../data/glossary'
 import { getTreatment } from '../data/treatments'
 import { breadcrumbSchema, speakableSchema, faqSchema, definedTermSchema, medicalWebPageSchema } from '../lib/schema'
 import { isThinEncyclo, isThinGlossary, NOINDEX_FOLLOW } from '../lib/thin-content'
-import { CONTENT_DATES } from '../lib/content-dates'
+import { encycloEntryDate } from '../lib/content-dates'
+import { getEnrichment } from '../data/encyclopedia-enrich'
+import type { Enrichment } from '../data/encyclopedia-enrich/types'
 
 // ============================================================================
 // 치과 백과사전 — AEO 직답형 정적 콘텐츠 허브
@@ -27,6 +29,35 @@ export function getGlossaryEntry(slug: string): GlossaryEntry | undefined {
 function esc(s: string) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
+
+// slug → 용어명 (리치 우선, 보강본 관련 용어 링크용)
+function termName(slug: string): string | undefined {
+  return encyclopedia.find((e) => e.slug === slug)?.term || glossary.find((e) => e.slug === slug)?.term
+}
+
+// 보강본 렌더 (2026-10-08) — 본문 섹션 + FAQ(<details>, FAQPage 와 같은 텍스트) + 관련 용어·진료 링크
+function enrichHtml(x: Enrichment, term: string): string {
+  const terms = x.relatedTerms.map((s) => ({ s, t: termName(s) })).filter((r) => r.t)
+  const txs = (x.relatedTreatments || []).map((s) => getTreatment(s)).filter(Boolean)
+  return [
+    x.sections.map((b) => `<h2>${esc(b.h)}</h2><p>${esc(b.p)}</p>`).join(''),
+    `<h2>${esc(term)} 자주 묻는 질문</h2><div class="enc-faq">${x.faqs.map((f) => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('')}</div>`,
+    terms.length || txs.length
+      ? `<h2>함께 보면 좋은 내용</h2><ul class="enc-rel">${txs.map((t) => `<li><a href="/treatments/${t!.slug}">진료 안내 · ${esc(t!.name)}</a></li>`).join('')}${terms.map((r) => `<li><a href="/encyclopedia/${r.s}">${esc(r.t!)}</a></li>`).join('')}</ul>`
+      : '',
+  ].join('')
+}
+const ENRICH_STYLE = `<style>
+.enc-faq details{border-bottom:1px solid var(--line);padding:.2rem 0}
+.enc-faq summary{cursor:pointer;font-weight:600;color:var(--ink);padding:1rem 0;list-style:none}
+.enc-faq summary::-webkit-details-marker{display:none}
+.enc-faq summary::before{content:'Q. ';color:var(--gold-2)}
+.enc-faq details p{margin:0 0 1rem}
+.enc-rel{list-style:none;margin:0 0 1.4rem;padding:0;display:flex;flex-wrap:wrap;gap:.5rem}
+.enc-rel li{margin:0}
+.enc-rel a{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:.35rem .9rem;font-size:.86rem;text-decoration:none;color:var(--ink);background:#fff}
+.enc-rel a:hover{border-color:var(--gold);color:var(--gold-2)}
+</style>`
 
 export function EncyclopediaIndex() {
   const crumb = [{ name: '홈', url: '/' }, { name: '치과 백과사전', url: '/encyclopedia' }]
@@ -153,9 +184,12 @@ export function EncyclopediaDetail(slug: string) {
   const others = encyclopedia.filter((e) => e.category === entry.category && e.slug !== entry.slug)
 
   // AEO 스키마: 본문 Q&A → FAQPage / 용어 → DefinedTerm / 의료감수 → MedicalWebPage
-  const faqEntries = entry.body
-    .filter((b) => /[?？]\s*$/.test(b.h.trim()))
-    .map((b) => ({ q: b.h, a: b.p }))
+  const enrich = getEnrichment(entry.slug)
+  const reviewed = encycloEntryDate(entry.slug, 'encyclopedia', !!enrich)
+  const faqEntries = [
+    ...entry.body.filter((b) => /[?？]\s*$/.test(b.h.trim())).map((b) => ({ q: b.h, a: b.p })),
+    ...(enrich ? enrich.faqs : []),
+  ]
 
   const body = html`
   <section class="page-hero">
@@ -172,7 +206,8 @@ export function EncyclopediaDetail(slug: string) {
       <div class="detail-grid">
         <article class="prose" data-reveal>
           ${raw(entry.body.map((b) => `<h2>${b.h}</h2><p>${b.p}</p>`).join(''))}
-          <p class="muted enc-review" style="font-size:.82rem;margin-top:2.5rem">감수: <a href="/doctors/kim-kyunghee">김경희 대표원장</a> · 최종 검토 <time datetime="${CONTENT_DATES.encyclopedia}">${CONTENT_DATES.encyclopedia}</time></p>
+          ${raw(enrich ? ENRICH_STYLE + enrichHtml(enrich, entry.term) : '')}
+          <p class="muted enc-review" style="font-size:.82rem;margin-top:2.5rem">감수: <a href="/doctors/kim-kyunghee">김경희 대표원장</a> · 최종 검토 <time datetime="${reviewed}">${reviewed}</time></p>
           <p class="muted" style="font-size:.8rem;margin-top:.6rem">※ 본 내용은 일반적인 의학 정보이며, 개인의 상태에 따라 진단·치료 방법이 다를 수 있습니다. 정확한 내용은 내원하여 전문의와 상담하시기 바랍니다.</p>
         </article>
         <aside class="sidebar">
@@ -210,7 +245,7 @@ export function EncyclopediaDetail(slug: string) {
         path: `/encyclopedia/${entry.slug}`,
         reviewerName: '김경희',
         reviewerSlug: 'kim-kyunghee',
-        lastReviewed: CONTENT_DATES.encyclopedia,
+        lastReviewed: reviewed,
         about: { type: 'DefinedTerm', id: `${clinic.domain}/encyclopedia/${entry.slug}#term`, name: entry.term },
       }),
       ...(faqEntries.length ? [faqSchema(faqEntries)] : []),
@@ -227,6 +262,8 @@ export function GlossaryDetail(slug: string) {
   const related = (entry.related || []).map((s) => getTreatment(s)).filter(Boolean)
   const sameCategory = glossary.filter((e) => e.category === entry.category && e.slug !== entry.slug).slice(0, 12)
   const richSame = encyclopedia.filter((e) => (entry.related || []).some((r) => e.relatedTreatments.includes(r))).slice(0, 4)
+  const enrich = getEnrichment(entry.slug)
+  const reviewed = encycloEntryDate(entry.slug, 'glossary', !!enrich)
 
   const termSchema = {
     '@context': 'https://schema.org',
@@ -253,10 +290,10 @@ export function GlossaryDetail(slug: string) {
     <div class="container">
       <div class="detail-grid">
         <article class="prose" data-reveal>
-          <h2>${entry.term}(${entry.termEn})이란?</h2>
+          ${raw(enrich ? ENRICH_STYLE + enrichHtml(enrich, entry.term) : `<h2>${entry.term}(${entry.termEn})이란?</h2>
           <p>${entry.def}</p>
-          ${raw(related.length ? `<h2>관련 진료 안내</h2><p>${entry.term}와(과) 관련된 진료가 궁금하시다면 ${related.map((t) => `<a href="/treatments/${t!.slug}">${t!.name}</a>`).join(', ')} 페이지에서 더 자세한 내용을 확인하실 수 있습니다.</p>` : '')}
-          <p class="muted enc-review" style="font-size:.82rem;margin-top:2.5rem">감수: <a href="/doctors/kim-kyunghee">김경희 대표원장</a> · 최종 검토 <time datetime="${CONTENT_DATES.glossary}">${CONTENT_DATES.glossary}</time></p>
+          ${related.length ? `<h2>관련 진료 안내</h2><p>${entry.term}와(과) 관련된 진료가 궁금하시다면 ${related.map((t) => `<a href="/treatments/${t!.slug}">${t!.name}</a>`).join(', ')} 페이지에서 더 자세한 내용을 확인하실 수 있습니다.</p>` : ''}`)}
+          <p class="muted enc-review" style="font-size:.82rem;margin-top:2.5rem">감수: <a href="/doctors/kim-kyunghee">김경희 대표원장</a> · 최종 검토 <time datetime="${reviewed}">${reviewed}</time></p>
           <p class="muted" style="font-size:.8rem;margin-top:.6rem">※ 본 내용은 일반적인 의학 정보이며, 개인의 상태에 따라 진단·치료 방법이 다를 수 있습니다. 정확한 내용은 내원하여 전문의와 상담하시기 바랍니다.</p>
         </article>
         <aside class="sidebar">
@@ -299,9 +336,10 @@ export function GlossaryDetail(slug: string) {
         path: `/encyclopedia/${entry.slug}`,
         reviewerName: '김경희',
         reviewerSlug: 'kim-kyunghee',
-        lastReviewed: CONTENT_DATES.glossary,
+        lastReviewed: reviewed,
         about: { type: 'DefinedTerm', id: `${clinic.domain}/encyclopedia/${entry.slug}#term`, name: entry.term },
       }),
+      ...(enrich ? [faqSchema(enrich.faqs)] : []),
       speakableSchema(['#encyclo-answer']),
     ],
   }, body)

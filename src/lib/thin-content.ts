@@ -10,9 +10,15 @@
  *  - 리치 레이어(encyclopedia.ts) 200개: 한 줄 정의 + Q&A 본문 136~530자 (중앙 299)
  *  - 경량 레이어(glossary.ts, 리치와 slug 겹치지 않는 것) 379개: 한 문장 정의 17~49자
  *  → 49자와 136자 사이 빈 구간의 100자를 기준으로 경량 용어 전부 thin, 리치 해설은 색인 유지
+ *
+ * 2026-10-08 보강: 경량 용어 331개 전부 + 300자 미만 리치 해설·중복 통합 대상 125개에
+ *  용어별 본문 섹션·FAQ(src/data/encyclopedia-enrich)를 더해 700~1,200자로 보강 → 보강본 글자수를
+ *  합산하므로 기준(100자)을 넘어 자동으로 index·사이트맵 복귀. 기준값 자체는 유지(새 한 줄 용어 방어).
  */
 import type { EncycloEntry } from '../data/encyclopedia'
 import type { GlossaryEntry } from '../data/glossary'
+import { getEnrichment } from '../data/encyclopedia-enrich'
+import type { Enrichment } from '../data/encyclopedia-enrich/types'
 
 export const THIN_ENCYCLO_MIN_CHARS = 100
 export const NOINDEX_FOLLOW = 'noindex, follow'
@@ -27,10 +33,23 @@ export function visibleTextLength(s?: string | null): number {
     .length
 }
 
-/** 리치 해설: 한 줄 정의 + 본문 Q&A */
-export function encycloTextLength(e: Pick<EncycloEntry, 'oneLiner' | 'body'>): number {
-  return visibleTextLength(e.oneLiner) + e.body.reduce((n, b) => n + visibleTextLength(b.h) + visibleTextLength(b.p), 0)
+/** 보강본(섹션 + FAQ) 글자 수 */
+export function enrichTextLength(x?: Enrichment): number {
+  if (!x) return 0
+  return x.sections.reduce((n, s) => n + visibleTextLength(s.h) + visibleTextLength(s.p), 0)
+    + x.faqs.reduce((n, f) => n + visibleTextLength(f.q) + visibleTextLength(f.a), 0)
 }
 
-export const isThinEncyclo = (e: Pick<EncycloEntry, 'oneLiner' | 'body'>) => encycloTextLength(e) < THIN_ENCYCLO_MIN_CHARS
-export const isThinGlossary = (g: Pick<GlossaryEntry, 'def'>) => visibleTextLength(g.def) < THIN_ENCYCLO_MIN_CHARS
+/** 리치 해설: 한 줄 정의 + 본문 Q&A + 보강본 */
+export function encycloTextLength(e: Pick<EncycloEntry, 'slug' | 'oneLiner' | 'body'>): number {
+  return visibleTextLength(e.oneLiner) + e.body.reduce((n, b) => n + visibleTextLength(b.h) + visibleTextLength(b.p), 0)
+    + enrichTextLength(getEnrichment(e.slug))
+}
+
+/** 경량 용어: 한 문장 정의 + 보강본 */
+export function glossaryTextLength(g: Pick<GlossaryEntry, 'slug' | 'def'>): number {
+  return visibleTextLength(g.def) + enrichTextLength(getEnrichment(g.slug))
+}
+
+export const isThinEncyclo = (e: Pick<EncycloEntry, 'slug' | 'oneLiner' | 'body'>) => encycloTextLength(e) < THIN_ENCYCLO_MIN_CHARS
+export const isThinGlossary = (g: Pick<GlossaryEntry, 'slug' | 'def'>) => glossaryTextLength(g) < THIN_ENCYCLO_MIN_CHARS
