@@ -537,8 +537,7 @@ export function HomePage() {
         }).join(''))}
       </div>
       <div class="mt-3" data-reveal>
-        <a href="/area/oncheonjang" class="link-arrow">온천장 치과 안내 <i class="fas fa-arrow-right"></i></a>
-        <a href="/area" class="link-arrow" style="margin-left:1.4rem">지역별 안내 전체 보기 <i class="fas fa-arrow-right"></i></a>
+        <a href="/area" class="link-arrow">지역별 안내 전체 보기 <i class="fas fa-arrow-right"></i></a>
         <a href="/directions" class="link-arrow" style="margin-left:1.4rem">오시는 길 <i class="fas fa-arrow-right"></i></a>
       </div>
     </div>

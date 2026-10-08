@@ -2,6 +2,7 @@ import { html, raw } from 'hono/html'
 import { Layout, Breadcrumb, picture } from '../components/layout'
 import { FaqAccordion } from '../components/faq'
 import { clinic } from '../data/clinic'
+import { hubA } from '../lib/hub-link'
 import { treatments, getTreatment, coreTreatments, treatmentGroups, treatmentsByGroup, type Treatment } from '../data/treatments'
 import { getDoctor } from '../data/doctors'
 import { faqGroups } from '../data/faqs'
@@ -320,6 +321,7 @@ export function TreatmentDetail(slug: string, relCols: { slug: string; title: st
             ${related.map((r) => `<a href="/treatments/${r.slug}" class="mega-item" style="color:var(--ink-soft)">→ ${r.name}</a>`).join('')}` : '')}
           <a href="/cases/gallery?treatment=${t.slug}" class="btn btn-outline" style="width:100%;justify-content:center;margin-top:1.4rem;font-size:.88rem">관련 비포/애프터 <i class="fas fa-images"></i></a>
           <a href="/reservation" class="btn btn-navy" style="width:100%;justify-content:center;margin-top:.6rem;font-size:.88rem">예약 상담 <i class="fas fa-arrow-right"></i></a>
+          <p style="margin:1.2rem 0 0;font-size:.86rem;line-height:1.75;color:var(--ink-soft)"><i class="fas fa-location-dot" style="color:var(--gold);margin-right:.4rem"></i>${t.name} 상담 전 위치·진료시간은 ${raw(hubA('color:var(--navy);font-weight:600;text-decoration:underline'))} 안내에서 확인하세요.</p>
         </div>
       </aside>
     </div>

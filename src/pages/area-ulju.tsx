@@ -239,7 +239,7 @@ export function UljuAreaPage(treatmentSlug: string, treatmentName: string) {
             <h2>함께 보면 좋은 안내</h2>
             <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.4rem">
               ${raw(others.map((s) => `<a href="/area/${ULJU_SLUG}-${s}" class="faq-tab">${COPY[s].crumb}</a>`).join(''))}
-              <a href="/area/oncheonjang" class="faq-tab">온천장 치과 — 위치·진료시간</a>
+              <a href="/area/oncheonjang" class="faq-tab">온천장 치과</a>
               <a href="/pricing" class="faq-tab">비급여 수가 안내</a>
             </div>
           </div>

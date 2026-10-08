@@ -1,6 +1,7 @@
 import { html, raw } from 'hono/html'
 import { Layout, Breadcrumb } from '../components/layout'
 import { clinic } from '../data/clinic'
+import { columnHubLine, htmlHasHubLink } from '../lib/hub-link'
 import { getTreatment, treatments as ALL_TREATMENTS } from '../data/treatments'
 import { answerSummary, faqsFromArticleHtml, enhanceArticleImages, caseAutoSummary, flatText, clipSentences, kstYmd } from '../lib/column-seo'
 import { getDoctor } from '../data/doctors'
@@ -448,6 +449,7 @@ export function ColumnDetailPage(col: Column, relCols: Column[] = [], relCases: 
           ${raw(summary ? `<div class="answer-box"><p class="answer-label">KEY ANSWER · 핵심 답변</p><p class="answer-summary">${escA(summary)}</p></div>` : '')}
           ${raw(col.thumbnail ? `<img src="${col.thumbnail}" alt="${escA(col.metaTitle || col.title)}" style="width:100%;border-radius:4px;margin-bottom:2.5rem" fetchpriority="high" decoding="async">` : '')}
           ${raw(autoLink(anchoredHtml, 10))}
+          ${raw(htmlHasHubLink(col.contentHtml) ? '' : columnHubLine(col.slug))}
           ${raw(doc ? `
           <div style="border-top:1px solid var(--line);margin-top:3.5rem;padding-top:2rem">
             <p class="muted" style="font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.6rem">Written &amp; Reviewed by</p>

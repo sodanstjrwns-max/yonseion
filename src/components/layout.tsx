@@ -1,5 +1,6 @@
 import { html, raw } from 'hono/html'
 import { clinic } from '../data/clinic'
+import { HUB_PATH, hubA } from '../lib/hub-link'
 import { coreTreatments, treatmentGroups, treatmentsByGroup } from '../data/treatments'
 
 // 정적 CSS 캐시 버스팅용 버전 — app.css 변경 시 이 값을 올리면 엣지/브라우저 캐시가 갱신됨
@@ -128,7 +129,7 @@ function Header() {
 }
 
 // --------- FOOTER ---------
-function Footer() {
+function Footer(path = '') {
   const sns = []
   if (clinic.sns.instagram) sns.push(`<a href="${clinic.sns.instagram}" target="_blank" rel="noopener"><i class="fab fa-instagram"></i> 인스타그램</a>`)
   if (clinic.sns.youtube) sns.push(`<a href="${clinic.sns.youtube}" target="_blank" rel="noopener"><i class="fab fa-youtube"></i> 유튜브</a>`)
@@ -159,6 +160,7 @@ function Footer() {
         <div>
           <p class="foot-title">안내</p>
           <a href="/directions">오시는 길</a>
+          ${raw(path === HUB_PATH ? '' : hubA())}
           <a href="/pricing">비용 안내</a>
           <a href="/faq">자주 묻는 질문</a>
           <a href="/notice">공지사항</a>
@@ -289,7 +291,7 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
   <div class="scroll-progress" aria-hidden="true"><i></i></div>
   ${Header()}
   <main>${body}</main>
-  ${Footer()}
+  ${Footer(meta.path)}
   <nav class="sticky-cta" aria-label="빠른 상담">
     <a href="tel:${clinic.phoneRaw}" class="call"><i class="fas fa-phone"></i><span>전화</span></a>
     <a href="${clinic.sns.kakaoChannel}" target="_blank" rel="noopener" class="kakao"><i class="fas fa-comment"></i><span>카카오</span></a>

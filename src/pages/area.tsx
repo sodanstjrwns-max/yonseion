@@ -39,7 +39,7 @@ export function AreaIndexPage() {
   ${Breadcrumb(crumb)}
   <section class="section--tight">
     <div class="container">
-      <p data-reveal style="max-width:62ch;margin-bottom:1.4rem;line-height:1.8">병원 위치·진료시간·의료진·진료 범위를 한 번에 보시려면 <a href="/area/oncheonjang" class="link-arrow">온천장 치과 안내</a>를 확인하세요.</p>
+      <p data-reveal style="max-width:62ch;margin-bottom:1.4rem;line-height:1.8">병원 위치·진료시간·의료진·진료 범위를 한 번에 보시려면 <a href="/area/oncheonjang" class="link-arrow">온천장 치과</a> 안내를 확인하세요.</p>
       <p class="muted" data-reveal style="max-width:62ch;margin-bottom:2.4rem;line-height:1.8">
         아래에서 거주 지역과 진료를 선택하시면, 해당 지역에서 ${clinic.nameShort}까지 오시는 길과
         진료별 핵심 안내를 확인하실 수 있습니다. 총 <strong>${seoRegions.length}개 지역 × ${seoTreatments.length}개 진료</strong> 안내가 준비되어 있습니다.
@@ -102,6 +102,7 @@ export function AreaPage(comboSlug: string) {
       <div class="detail-grid">
         <div>
           <article class="prose" data-reveal>
+            <p class="hub-local-line muted" style="font-size:.9rem;line-height:1.75;margin-bottom:1.6rem"><i class="fas fa-location-dot" style="color:var(--gold);margin-right:.4rem"></i>병원 위치·진료시간·의료진 종합 안내: <a href="/area/oncheonjang" style="color:var(--navy);font-weight:600;text-decoration:underline">온천장 치과</a></p>
             <h2>${region.name}에서 ${treatment.keyword}, 어디서 받아야 할까요?</h2>
             <p>${tx.hero}</p>
             <h2>연세온치과의 ${tx.name}</h2>
@@ -170,11 +171,7 @@ export function AreaPage(comboSlug: string) {
             <a href="tel:${clinic.phoneRaw}">${clinic.phone}</a>
             <a href="/directions">오시는 길</a>
           </div>
-          ${raw(region.admin === '부산광역시 동래구' ? `
-          <div class="sidebar-box">
-            <h4>병원 종합 안내</h4>
-            <a href="/area/oncheonjang">온천장 치과 — 위치·진료시간·의료진</a>
-          </div>` : '')}
+          <!-- 병원 종합 안내(허브) 링크는 본문 첫 줄로 이동 — 페이지당 허브 링크 2개(본문 1 + 푸터 1) -->
           <div class="sidebar-box">
             <h4>인근 지역 안내</h4>
             ${raw(seoRegions.filter((r) => r.slug !== region.slug).slice(0, 4).map((r) => `<a href="/area/${r.slug}-${treatment.slug}">${r.name} ${treatment.name}</a>`).join(''))}

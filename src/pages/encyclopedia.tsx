@@ -1,6 +1,7 @@
 import { html, raw } from 'hono/html'
 import { Layout, Breadcrumb } from '../components/layout'
 import { clinic } from '../data/clinic'
+import { hubA } from '../lib/hub-link'
 import { encyclopedia, getEntry, encycloCategories } from '../data/encyclopedia'
 import { glossary, GlossaryEntry, GLOSSARY_ALIASES } from '../data/glossary'
 import { getTreatment } from '../data/treatments'
@@ -237,6 +238,7 @@ export function EncyclopediaDetail(slug: string) {
             <h3>상담</h3>
             <a href="/reservation">예약 상담 신청</a>
             <a href="tel:${clinic.phoneRaw}">${clinic.phone}</a>
+            <p style="margin:.8rem 0 0;font-size:.84rem;line-height:1.7">위치·진료시간 안내: ${raw(hubA())}</p>
           </div>
         </aside>
       </div>
@@ -327,6 +329,7 @@ export function GlossaryDetail(slug: string) {
             <h3>상담</h3>
             <a href="/reservation">예약 상담 신청</a>
             <a href="tel:${clinic.phoneRaw}">${clinic.phone}</a>
+            <p style="margin:.8rem 0 0;font-size:.84rem;line-height:1.7">위치·진료시간 안내: ${raw(hubA())}</p>
           </div>
         </aside>
       </div>
