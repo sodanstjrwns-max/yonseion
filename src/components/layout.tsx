@@ -274,8 +274,11 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
   <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"></noscript>
 
-  <link rel="icon" type="image/svg+xml" href="/static/img/favicon.svg">
-  <link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+  <link rel="icon" href="/favicon.ico?v=fav20261014" sizes="any">
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png?v=fav20261014">
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png?v=fav20261014">
+  <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png?v=fav20261014">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=fav20261014">
   <link rel="manifest" href="/site.webmanifest">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">

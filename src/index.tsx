@@ -652,8 +652,8 @@ app.get('/site.webmanifest', (c) => {
     dir: 'ltr',
     categories: ['medical', 'health'],
     icons: [
-      { src: '/static/img/favicon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
-      { src: '/static/img/apple-touch-icon.png', sizes: '180x180', type: 'image/png', purpose: 'maskable' },
+      { src: '/favicon-192.png?v=fav20261014', sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { src: '/favicon-512.png?v=fav20261014', sizes: '512x512', type: 'image/png', purpose: 'any' },
     ],
   }
   return c.json(manifest, 200, { 'Content-Type': 'application/manifest+json; charset=utf-8', 'Cache-Control': 'public, max-age=86400' })
@@ -668,7 +668,8 @@ app.notFound((c) => {
 <html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>페이지를 찾을 수 없습니다 | ${clinic.nameKo}</title>
 <meta name="robots" content="noindex">
-<link rel="icon" type="image/svg+xml" href="/static/img/favicon.svg">
+<link rel="icon" href="/favicon.ico?v=fav20261014" sizes="any">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png?v=fav20261014">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Noto+Serif+KR:wght@500;600&display=swap">
 <style>
