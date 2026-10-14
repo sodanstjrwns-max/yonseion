@@ -244,7 +244,7 @@ export function placeSchema(regionFull: string, regionAdmin?: string) {
 export function areaServiceSchema(opts: {
   regionName: string; regionFull: string; regionAdmin: string;
   treatmentName: string; treatmentSlug: string; treatmentKeyword: string;
-  path: string;
+  path: string; image?: string;
 }) {
   return {
     '@context': 'https://schema.org',
@@ -254,7 +254,7 @@ export function areaServiceSchema(opts: {
     description: `${opts.regionFull} ${opts.treatmentKeyword} — ${clinic.nameKo}. ${clinic.subway}.`,
     url: BASE + opts.path,
     telephone: clinic.phone,
-    image: BASE + '/static/img/og-default.jpg',
+    image: opts.image || BASE + '/static/img/og-default.jpg',
     priceRange: '₩₩',
     parentOrganization: { '@id': BASE + '/#clinic' },
     address: {

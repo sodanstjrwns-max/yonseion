@@ -29,6 +29,8 @@ import {
 } from './pages/content'
 import { EncyclopediaIndex, EncyclopediaDetail, publicTermStats } from './pages/encyclopedia'
 import { AreaIndexPage, AreaPage, OncheonjangHubPage, HUB_SLUG, HUB_DATE } from './pages/area'
+import { OncheonjangExtraPage, ONCHEONJANG_EXTRA_SLUGS, ONCHEONJANG_EXTRA_DATE } from './pages/area-oncheonjang'
+import { ONCHEONJANG_CARDS, cardOg, HUB_OG } from './lib/area-cards'
 
 // 라우트 모듈
 import { api } from './routes/api'
@@ -135,6 +137,8 @@ app.get('/area', (c) => c.html(AreaIndexPage()))
 app.get('/area/:combo', (c) => {
   // 대표 키워드 허브 "온천장 치과" (2026-10-08)
   if (c.req.param('combo') === HUB_SLUG) return c.html(OncheonjangHubPage())
+  // 온천장 전용 하위 페이지 (신경치료·턱관절, 2026-10-14)
+  if (ONCHEONJANG_EXTRA_SLUGS.includes(c.req.param('combo'))) return c.html(OncheonjangExtraPage(c.req.param('combo'))!)
   const page = AreaPage(c.req.param('combo'))
   return page ? c.html(page) : c.notFound()
 })
@@ -226,12 +230,13 @@ app.get('/notice/:id', async (c) => {
 // ============================================================================
 // Sitemap — index + 콘텐츠별 분할 (대형 사이트 신호 / 크롤 효율↑)
 // ============================================================================
-type SmUrl = { loc: string; priority: string; changefreq: string; lastmod: string }
+type SmUrl = { loc: string; priority: string; changefreq: string; lastmod: string; images?: { loc: string; title: string }[] }
+const xmlEsc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 // lastmod = 콘텐츠 실제 수정일(lib/content-dates.ts 고정값, R2 콘텐츠는 updatedAt/createdAt). 날짜를 모르면 태그 생략.
 // ※ new Date() 로 오늘 날짜를 찍지 않는다 (2026-09-29 SEO/AEO 감사).
 const smXml = (urls: SmUrl[]) => `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map((u) => `  <url><loc>${u.loc}</loc>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ''}<changefreq>${u.changefreq}</changefreq><priority>${u.priority}</priority></url>`).join('\n')}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+${urls.map((u) => `  <url><loc>${u.loc}</loc>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ''}<changefreq>${u.changefreq}</changefreq><priority>${u.priority}</priority>${(u.images || []).map((im) => `<image:image><image:loc>${im.loc}</image:loc><image:title>${xmlEsc(im.title)}</image:title></image:image>`).join('')}</url>`).join('\n')}
 </urlset>`
 const smResponse = (c: any, urls: SmUrl[]) => c.text(smXml(urls), 200, { 'Content-Type': 'application/xml; charset=utf-8' })
 
@@ -322,9 +327,15 @@ function sitemapAreaUrls(): SmUrl[] {
   const lm = latestDate(PAGE_DATES.area, CONTENT_DATES.treatments, PAGE_DATES.doctors, PAGE_DATES.faq)
   return [
     // 대표 키워드 허브 "온천장 치과" — 실제 작성일
-    { loc: `${base}/area/${HUB_SLUG}`, priority: '0.9', changefreq: 'monthly', lastmod: HUB_DATE },
-    ...areaCombos().map((a) => ({ loc: `${base}/area/${a.slug}`, priority: '0.6', changefreq: 'monthly', lastmod: latestDate(lm, AREA_REGION_DATES[a.region.slug]) })),
-  ]
+    { loc: `${base}/area/${HUB_SLUG}`, priority: '0.9', changefreq: 'monthly', lastmod: HUB_DATE, images: [{ loc: base + HUB_OG, title: `온천장 치과 ${clinic.nameKo} 리셉션` }] },
+    // 온천장 전용 하위 페이지 (신경치료·턱관절)
+    ...ONCHEONJANG_EXTRA_SLUGS.map((s) => ({ loc: `${base}/area/${s}`, priority: '0.8', changefreq: 'monthly', lastmod: ONCHEONJANG_EXTRA_DATE })),
+    ...areaCombos().map((a) => ({ loc: `${base}/area/${a.slug}`, priority: a.region.slug === HUB_SLUG ? '0.8' : '0.6', changefreq: 'monthly', lastmod: latestDate(lm, AREA_REGION_DATES[a.region.slug]) })),
+  ].map((u: SmUrl) => {
+    // 온천장 핵심 6개 — 대표 사진(og 와 같은 파일) image:image
+    const card = ONCHEONJANG_CARDS.find((c) => u.loc === `${base}/area/${c.slug}`)
+    return card ? { ...u, images: [{ loc: base + cardOg(card), title: `${card.name} — ${card.photoDesc}` }] } : u
+  })
 }
 
 async function sitemapContentUrls(env: Bindings): Promise<SmUrl[]> {

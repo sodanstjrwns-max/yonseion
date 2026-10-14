@@ -6,6 +6,7 @@ import { faqGroups } from '../data/faqs'
 import { seoRegions, seoTreatments } from '../data/facilities'
 import { encyclopedia } from '../data/encyclopedia'
 import { doctors } from '../data/doctors'
+import { areaCardGrid, AREA_CARD_CSS, areaCardItemList } from '../lib/area-cards'
 import { organizationSchema, websiteSchema, faqSchema, breadcrumbSchema, personSchema, reserveActionSchema } from '../lib/schema'
 
 // 실사진 제공 전 — 외부 placeholder 대신 깨끗한 CSS 톤 블록(.ph) 사용
@@ -57,6 +58,8 @@ export function HomePage() {
       personSchema(doctors[0]),
       reserveActionSchema(),
       breadcrumbSchema([{ name: '홈', url: '/' }]),
+      // 온천장 진료별 사진 카드 6개 — 화면 카드와 1:1
+      areaCardItemList('/'),
       // 홈 WebPage + speakable — 실제 DOM 의 히어로 태그라인·미션 문장만 지정
       {
         '@context': 'https://schema.org',
@@ -530,6 +533,11 @@ export function HomePage() {
         <p>병원이 자리한 동래구 온천동을 비롯해 명륜동·사직동·복산동·안락동·명장동 등 동래구 전역, 부산대학교가 있는 금정구(장전동·구서동), 연제구 연산동, 서면이 있는 부산진구에서는 지하철이나 버스로 대략 5~15분 안팎이면 도착합니다. 해운대구·수영구·남구·북구·동구 등에서도 1호선 환승 또는 차량으로 내원하고 계십니다.</p>
         <p>온천장은 경남·울산 방면 접근성도 좋은 편입니다. 양산(차량 약 25~30분), 김해(약 30~40분), 울산(약 40~50분)에서도 상담과 정기 진료를 위해 방문하십니다. 지역별 교통편과 진료 안내는 아래에서 자세히 확인하실 수 있습니다.</p>
       </div>
+      <div id="oncheonjang-care" style="margin-top:2.6rem">
+        <h3 class="onc-cards-head" data-reveal>온천장 치과, 진료별로 먼저 읽어보세요</h3>
+        ${raw(areaCardGrid('home-onc') + AREA_CARD_CSS)}
+      </div>
+      <style>.onc-cards-head{font-family:var(--serif-kr);font-size:1.3rem;font-weight:600;color:var(--ink);margin:0}</style>
       <div class="region-chips" data-reveal>
         ${raw(seoRegions.map((r, i) => {
           const t = seoTreatments[i % seoTreatments.length]

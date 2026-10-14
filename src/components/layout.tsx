@@ -12,6 +12,8 @@ export interface SeoMeta {
   path: string            // canonical path, e.g. /treatments/all-on-x
   keywords?: string       // 페이지별 키워드(선택). 없으면 기본 지역 키워드 사용
   ogImage?: string
+  ogImageAlt?: string     // og:image:alt (없으면 병원명 — 태그라인)
+  ogImageSize?: [number, number] | null // og:image 실제 크기. 기본 1200×630, null 이면 width/height 메타 생략(크기를 모르는 R2 사진)
   jsonLd?: object | object[]
   breadcrumb?: { name: string; url: string }[]
   robots?: string         // 기본 'index, follow, max-image-preview:large'. 얇은 용어·로그인 등은 'noindex, follow'
@@ -244,9 +246,9 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
   <meta property="og:description" content="${meta.description}">
   <meta property="og:url" content="${canonical}">
   <meta property="og:image" content="${ogImage}">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="${clinic.nameKo} — ${clinic.tagline}">
+  ${raw(meta.ogImageSize === null ? '' : `<meta property="og:image:width" content="${(meta.ogImageSize || [1200, 630])[0]}">
+  <meta property="og:image:height" content="${(meta.ogImageSize || [1200, 630])[1]}">`)}
+  <meta property="og:image:alt" content="${meta.ogImageAlt || `${clinic.nameKo} — ${clinic.tagline}`}">
   <meta property="og:locale" content="ko_KR">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${meta.title}">

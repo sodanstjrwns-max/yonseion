@@ -11,6 +11,7 @@ import type { CaseItem, Column, Notice } from '../data/types'
 import { autoLink } from '../lib/inlink'
 import { getMergedVideos } from '../lib/youtube'
 import { isThinNotice, NOINDEX_FOLLOW } from '../lib/thin-content'
+import { columnThumbLite } from '../lib/column-og'
 
 const fmt = (iso: string) => (iso || '').slice(0, 10).replace(/-/g, '.')
 const BASE = clinic.domain
@@ -320,6 +321,9 @@ export function CaseDetailPage(cs: CaseItem, isMember = false, siblings: CaseIte
     title: `${t ? `${t.name} 케이스 — ` : ''}${cs.title}${cs.duration ? ` (${cs.duration})` : ''} | ${clinic.nameKo}`,
     description: desc,
     path,
+    // og = 이 케이스의 공개 사진(치료 전 구내/파노라마 단독 사진, 전후 합성 아님 — 안모·치료 후 사진은 쓰지 않음).
+    // R2 원본이라 실제 크기를 몰라 og:image:width/height 는 생략
+    ...(pubImg ? { ogImage: BASE + pubImg, ogImageSize: null, ogImageAlt: `${txName} 치료 전 (${cs.images.intraBefore ? '구내 사진' : '파노라마'})` } : {}),
     ogType: 'article',
     article: { published: cs.createdAt, modified: (cs as any).updatedAt || cs.createdAt, section: t?.name },
     jsonLd: [{ '@context': 'https://schema.org', '@graph': graph }],
@@ -365,7 +369,7 @@ export function ColumnsPage(items: Column[], pageQ = 1, treatment?: string) {
       <div class="col-grid">
         ${list.map((col, i) => {
           const doc = columnDoctor(col)
-          const thumb = col.thumbnail
+          const thumb = columnThumbLite(col.thumbnail)?.src || col.thumbnail
           const alt = `${col.title}${doc ? ` — ${doc.name} ${doc.role}` : ''}`
           const media = thumb
             ? `<span class="col-thumb"><img src="${thumb}" alt="${alt.replace(/"/g, '&quot;')}" loading="lazy" decoding="async"></span>`
@@ -424,6 +428,7 @@ export function fixBareHrefs(h: string): string {
 export function ColumnDetailPage(col: Column, relCols: Column[] = [], relCases: CaseItem[] = []) {
   // 대행사 투입 글·원장 미지정 글은 병원 발행 — 원장 저자·감수 표시 없음 (lib/authorship.ts)
   const doc = columnDoctor(col)
+  const lite = columnThumbLite(col.thumbnail) // 대표 이미지 경량본 (og·Article.image·본문 첫 사진)
   const related = (col.relatedTreatments || []).map((s) => getTreatment(s)).filter(Boolean)
   const mainTx = related[0]
   const crumb = [{ name: '홈', url: '/' }, { name: '원장 칼럼', url: '/column' }, ...(mainTx ? [{ name: mainTx.name, url: `/column?treatment=${mainTx.slug}` }] : []), { name: col.title, url: `/column/${col.slug}` }]
@@ -447,7 +452,7 @@ export function ColumnDetailPage(col: Column, relCols: Column[] = [], relCases: 
       <div class="detail-grid">
         <article class="prose" data-reveal>
           ${raw(summary ? `<div class="answer-box"><p class="answer-label">KEY ANSWER · 핵심 답변</p><p class="answer-summary">${escA(summary)}</p></div>` : '')}
-          ${raw(col.thumbnail ? `<img src="${col.thumbnail}" alt="${escA(col.metaTitle || col.title)}" style="width:100%;border-radius:4px;margin-bottom:2.5rem" fetchpriority="high" decoding="async">` : '')}
+          ${raw(col.thumbnail ? `<img src="${lite?.src || col.thumbnail}" alt="${escA(col.metaTitle || col.title)}"${lite ? ` width="${lite.w}" height="${lite.h}"` : ''} style="width:100%;height:auto;border-radius:4px;margin-bottom:2.5rem" fetchpriority="high" decoding="async">` : '')}
           ${raw(autoLink(anchoredHtml, 10))}
           ${raw(htmlHasHubLink(col.contentHtml) ? '' : columnHubLine(col.slug))}
           ${raw(doc ? `
@@ -505,7 +510,7 @@ export function ColumnDetailPage(col: Column, relCols: Column[] = [], relCases: 
   const authorId = doc ? BASE + '/doctors/' + doc.slug + '#person' : undefined
   const faqs = faqsFromArticleHtml(col.contentHtml)
   const bc: any = breadcrumbSchema(crumb); delete bc['@context']; bc['@id'] = url + '#breadcrumb'
-  const image = col.thumbnail ? BASE + col.thumbnail : BASE + '/static/img/og-default.jpg'
+  const image = col.thumbnail ? BASE + (lite?.src || col.thumbnail) : BASE + '/static/img/og-default.jpg'
   const graph: any[] = [
     {
       '@type': 'BlogPosting',
@@ -549,7 +554,8 @@ export function ColumnDetailPage(col: Column, relCols: Column[] = [], relCases: 
     title: col.metaTitle || `${col.title} | ${clinic.nameKo}`,
     description: desc,
     path,
-    ogImage: col.thumbnail ? clinic.domain + col.thumbnail : undefined,
+    // 대표 이미지 경량본(≤300KB, 실제 크기) — 목록에 없으면 원본 + width/height 생략
+    ...(col.thumbnail ? { ogImage: clinic.domain + (lite?.src || col.thumbnail), ogImageSize: lite ? [lite.w, lite.h] as [number, number] : null, ogImageAlt: col.metaTitle || col.title } : {}),
     ogType: 'article',
     article: { published: col.createdAt, modified: col.updatedAt || col.createdAt, section: mainTx?.name },
     jsonLd: [{ '@context': 'https://schema.org', '@graph': graph }],

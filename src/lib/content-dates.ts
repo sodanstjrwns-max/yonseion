@@ -44,7 +44,7 @@ export function treatmentReviewed(slug: string): string {
 // ============================================================================
 export const PAGE_DATES = {
   /** 홈 — src/pages/home.tsx 콘텐츠 확충 (75ea339) */
-  home: '2026-10-08', // 온천장 치과 대표 키워드 title·eyebrow·허브 링크 (이전: 75ea339 2026-09-04)
+  home: '2026-10-14', // 온천장 진료별 사진 카드 6개 (이전: 2026-10-08 온천장 치과 대표 키워드 title·eyebrow·허브 링크, 75ea339 2026-09-04)
   /** 미션 — 원장님 수정요청 반영 (d03f279) */
   mission: '2026-06-24',
   /** 생체모방치의학 — 원장님 수정요청 반영 (d03f279) */
@@ -69,6 +69,7 @@ export const PAGE_DATES = {
 /** 지역별 데이터를 실제로 고친 날 — facilities.ts seoRegions (동래: 정거장 수 정정 2026-10-08)
  *  울주: /area/ulju-* 4페이지 원거리 내원 안내로 본문 재작성 (src/pages/area-ulju.tsx ULJU_DATE, 2026-10-08) */
 export const AREA_REGION_DATES: Record<string, string> = {
+  oncheonjang: '2026-10-14', // 온천장×진료 4페이지: 대표 사진(og·본문·JSON-LD)·온천장 하위 6개 상호 링크
   dongnae: '2026-10-08',
   ulju: '2026-10-08',
 }

@@ -7,6 +7,7 @@ import { doctors, doctorsBySpecialty } from '../data/doctors'
 import { faqGroups } from '../data/faqs'
 import { breadcrumbSchema, faqSchema, placeSchema, areaServiceSchema, localServiceSchema, speakableSchema } from '../lib/schema'
 import { UljuAreaPage, ULJU_SLUG } from './area-ulju'
+import { ONCHEONJANG_CARDS, getAreaCard, areaHeroFigure, AREA_HERO_FIG_CSS, cardOg, cardAlt, cardImageObject, areaCardGrid, AREA_CARD_CSS, areaCardItemList, HUB_OG } from '../lib/area-cards'
 
 // ============================================================================
 // 지역 SEO 페이지 — /area/[region]-[treatment] (14지역 × 4진료 = 56페이지)
@@ -75,6 +76,8 @@ export function AreaPage(comboSlug: string) {
   // 울산 울주(원거리) — 현지 병원처럼 보이는 템플릿 대신 정직한 원거리 내원 안내 (2026-10-08)
   if (region.slug === ULJU_SLUG) return UljuAreaPage(treatment.slug, treatment.name)
 
+  // 온천장 핵심 하위 페이지(6개 중 4개) — 고유 대표 사진(og·본문 첫 사진·JSON-LD·사이트맵 동일)
+  const card = region.slug === 'oncheonjang' ? getAreaCard(comboSlug) : undefined
   const docs = doctorsBySpecialty(treatment.slug)
   const doc = docs[0]
   const faqKey = faqKeyByTreatment[treatment.slug] || 'general'
@@ -93,6 +96,7 @@ export function AreaPage(comboSlug: string) {
       <p class="eyebrow">${region.full}</p>
       <h1 style="font-size:var(--t-h2)">${title},<br>연세온치과에서</h1>
       <p class="lead">${region.full}에서 ${treatment.keyword}를 알아보고 계신가요?<br>${clinic.nameKo}는 ${region.name}에서 ${region.distance} 거리(${region.transit})에 있어<br>가깝게 내원하실 수 있습니다.</p>
+      ${raw(card ? areaHeroFigure(card) + AREA_HERO_FIG_CSS : '')}
     </div>
   </section>
   ${Breadcrumb(crumb)}
@@ -131,7 +135,9 @@ export function AreaPage(comboSlug: string) {
             <h2>${region.name} 거주민을 위한 다른 진료</h2>
             <p>연세온치과는 ${region.full} 지역 환자분들께 ${treatment.keyword} 외에도 다양한 진료를 제공합니다.</p>
             <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.4rem">
-              ${raw(sameRegionTx.map((t) => `<a href="/area/${region.slug}-${t.slug}" class="faq-tab">${region.name} ${t.name}</a>`).join(''))}
+              ${raw(card
+                ? ONCHEONJANG_CARDS.filter((c) => c.slug !== card.slug).map((c) => `<a href="/area/${c.slug}" class="faq-tab">${c.name}</a>`).join('')
+                : sameRegionTx.map((t) => `<a href="/area/${region.slug}-${t.slug}" class="faq-tab">${region.name} ${t.name}</a>`).join(''))}
             </div>
           </div>
 
@@ -192,12 +198,27 @@ export function AreaPage(comboSlug: string) {
     title: `${title} | ${clinic.nameKo} — ${clinic.subway}`,
     description: `${region.full} ${treatment.keyword} — ${clinic.nameKo}. ${tx.short}. ${clinic.subway}, ${clinic.hoursSummary}.`,
     path: `/area/${comboSlug}`,
+    ...(card ? { ogImage: clinic.domain + cardOg(card), ogImageAlt: cardAlt(card) } : {}),
     jsonLd: [
       breadcrumbSchema(crumb),
+      ...(card ? [{
+        '@context': 'https://schema.org',
+        '@type': 'MedicalWebPage',
+        '@id': `${clinic.domain}/area/${comboSlug}#webpage`,
+        url: `${clinic.domain}/area/${comboSlug}`,
+        name: `${title} | ${clinic.nameKo} — ${clinic.subway}`,
+        inLanguage: 'ko',
+        isPartOf: { '@id': `${clinic.domain}/#website` },
+        about: { '@id': `${clinic.domain}/treatments/${tx.slug}#procedure` },
+        publisher: { '@id': `${clinic.domain}/#clinic` },
+        image: cardImageObject(card),
+        primaryImageOfPage: cardImageObject(card),
+      }] : []),
       areaServiceSchema({
         regionName: region.name, regionFull: region.full, regionAdmin: region.admin,
         treatmentName: treatment.name, treatmentSlug: treatment.slug, treatmentKeyword: treatment.keyword,
         path: `/area/${comboSlug}`,
+        ...(card ? { image: clinic.domain + cardOg(card) } : {}),
       }),
       localServiceSchema({
         treatmentName: treatment.name, treatmentSlug: treatment.slug,
@@ -216,7 +237,7 @@ export function AreaPage(comboSlug: string) {
 // 사실 정보는 clinic.ts·doctors.ts·treatments.ts·facilities.ts 값만 사용.
 // ============================================================================
 export const HUB_SLUG = 'oncheonjang'
-export const HUB_DATE = '2026-10-08'
+export const HUB_DATE = '2026-10-14' // 진료별 사진 카드 6개·대표 사진 (이전: 2026-10-08 허브 신설)
 
 export function OncheonjangHubPage() {
   const path = `/area/${HUB_SLUG}`
@@ -295,11 +316,16 @@ export function OncheonjangHubPage() {
             </div>
           </div>
 
+          <div class="prose" data-reveal style="margin-top:2.5rem" id="oncheonjang-care">
+            <h2>온천장 치과, 진료별로 먼저 읽어보세요</h2>
+            <p>임플란트부터 신경치료·턱관절까지, 온천장역 가까이에서 받으실 수 있는 진료를 한 장씩 정리했습니다.</p>
+          </div>
+          ${raw(areaCardGrid('hub-onc') + AREA_CARD_CSS)}
+
           <div class="prose" data-reveal style="margin-top:2.5rem">
             <h2>온천장 주변 지역에서 오시는 분께</h2>
             <p>온천동·명륜동·동래역 일대와 부산대가 있는 금정구에서 오시는 분들을 위해 진료별 안내를 따로 정리했습니다.</p>
             <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.4rem">
-              ${raw(seoTreatments.map((t) => `<a href="/area/oncheonjang-${t.slug}" class="faq-tab">온천장 ${t.name}</a>`).join(''))}
               ${raw(nearRegions.map((r) => `<a href="/area/${r.slug}-implant-guide" class="faq-tab">${r.name} 임플란트</a>`).join(''))}
               <a href="/area" class="faq-tab">지역별 안내 전체</a>
             </div>
@@ -353,8 +379,11 @@ export function OncheonjangHubPage() {
     title,
     description,
     path,
+    ogImage: clinic.domain + HUB_OG,
+    ogImageAlt: `온천장 치과 ${clinic.nameKo} 리셉션`,
     jsonLd: [
       breadcrumbSchema(crumb),
+      areaCardItemList(path),
       {
         '@context': 'https://schema.org',
         '@type': 'MedicalWebPage',
@@ -368,6 +397,7 @@ export function OncheonjangHubPage() {
         mainEntity: { '@id': `${clinic.domain}/#clinic` },
         dateModified: HUB_DATE,
         publisher: { '@id': `${clinic.domain}/#clinic` },
+        image: { '@type': 'ImageObject', url: clinic.domain + HUB_OG, width: 1200, height: 630, caption: `온천장 치과 ${clinic.nameKo} 리셉션` },
         speakable: { '@type': 'SpeakableSpecification', cssSelector: ['h1', '#hub-answer'] },
       },
       {
