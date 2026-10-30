@@ -272,6 +272,7 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&display=swap">
   <link rel="preload" as="style" href="/static/css/app.css?v=${ASSET_VER}">
   <link rel="stylesheet" href="/static/css/app.css?v=${ASSET_VER}">
+  ${meta.path === '/' ? raw(`<link rel="stylesheet" href="/static/css/immersive.css?v=${__IMMERSIVE_CSS_V__}">`) : ''}
   <!-- FontAwesome 는 아이콘 전용 — 본문 렌더링 차단 방지 위해 비동기 로드 -->
   <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"></noscript>
@@ -307,6 +308,10 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
   ${raw(fabHtml)}
   <script src="/static/js/regions.js?v=${ASSET_VER}" defer></script>
   <script src="/static/js/minimal.js?v=${ASSET_VER}" defer></script>
+  ${meta.path === '/' ? raw(`<!-- 메인 스크롤 몰입 연출 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+  <script src="/static/js/immersive.js?v=${__IMMERSIVE_JS_V__}" defer></script>`) : ''}
 </body>
 </html>`
 }

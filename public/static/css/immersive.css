@@ -1,0 +1,25 @@
+/* 연세온치과 메인 스크롤 몰입 연출 — static/js/immersive.js 가 html.mx 를 붙였을 때만 작동 */
+/* 주소 #앵커로 들어올 때 부드러운 스크롤이 ScrollTrigger 계산과 겹쳐 멈추지 않도록 */
+html.mx { scroll-behavior: auto !important; }
+/* 낱말 마스크(제목) */
+html.mx .mx-w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .12em; margin-bottom: -.12em; }
+html.mx .mx-wi { display: inline-block; will-change: transform; transform-origin: 0 100%; }
+/* 철학 문장: 낱말이 하나씩 켜진다 */
+html.mx .mx-read .mx-w { overflow: visible; }
+/* 인용문은 줄(span)마다 display:block 규칙이 있어 낱말 span 은 다시 인라인으로 */
+html.mx #home-quote .quote-big .mx-w, html.mx #home-quote .quote-big .mx-wi { display: inline-block; white-space: nowrap; }
+html.mx .mx-read .mx-wi { opacity: .12; }
+/* 신뢰 지표: 위쪽 금빛 선 */
+html.mx .trust-stat { position: relative; }
+html.mx .trust-stat .mx-line { position: absolute; left: 0; right: 0; top: -14px; height: 1px; background: linear-gradient(90deg, var(--gold), transparent); transform-origin: 0 50%; pointer-events: none; }
+/* 중심 진료 사진 시차: picture 를 블록으로 */
+html.mx .cf-media > picture { display: block; height: 100%; will-change: transform; }
+/* 진료 여정: 지금 지나는 단계에 금빛 불 */
+html.mx .journey-step { transition: transform .6s cubic-bezier(.19,1,.22,1), box-shadow .6s, border-color .6s, background-color .6s; }
+html.mx .journey-step.mx-on { transform: translateY(-6px); border-color: var(--gold); background-color: #fff; box-shadow: 0 22px 44px -26px rgba(174,138,76,.55), inset 0 0 0 1px var(--gold); }
+html.mx .journey-step.mx-on .js-step { color: var(--gold-2, #AE8A4C); }
+/* 상담 띠: 카드 → 전체 화면 */
+html.mx .cta-band { will-change: clip-path; }
+/* 좌우에서 들어오는 카드가 가로 스크롤을 만들지 않도록 */
+html.mx .txall-section, html.mx .journey-section { overflow-x: clip; }
+@media (max-width: 767px) { html.mx .journey-step.mx-on { transform: none; } }

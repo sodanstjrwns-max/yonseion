@@ -75,6 +75,8 @@ app.use('*', async (c, next) => {
     return c.redirect(to.toString(), 301)
   }
   await next()
+  // 해시·브랜치 미리보기(<x>.yeonseon-dental.pages.dev)는 검색 제외 — 미리보기 주소가 색인되지 않도록
+  if (url.hostname.endsWith('.yeonseon-dental.pages.dev')) c.header('X-Robots-Tag', 'noindex, nofollow')
 })
 
 app.route('/api', api)
