@@ -7,11 +7,34 @@ import type { Treatment } from '../data/treatments'
 
 const BASE = clinic.domain
 
-// --- Dentist / LocalBusiness / Organization (전역) ---
+// --- 진료시간 → OpeningHoursSpecification (clinic.hours 화면 표시값에서 생성, 휴진일 제외) ---
+const DAY_EN: Record<string, string> = {
+  '월요일': 'Monday', '화요일': 'Tuesday', '수요일': 'Wednesday', '목요일': 'Thursday',
+  '금요일': 'Friday', '토요일': 'Saturday', '일요일·공휴일': 'Sunday', '일요일': 'Sunday',
+}
+export function openingHoursSchema() {
+  const groups: { opens: string; closes: string; days: string[] }[] = []
+  for (const h of clinic.hours) {
+    const m = h.time.match(/^(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})$/)
+    const day = DAY_EN[h.day]
+    if (!m || !day) continue
+    let g = groups.find((x) => x.opens === m[1] && x.closes === m[2])
+    if (!g) { g = { opens: m[1], closes: m[2], days: [] }; groups.push(g) }
+    g.days.push(day)
+  }
+  return groups.map((g) => ({
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: g.days.length === 1 ? g.days[0] : g.days,
+    opens: g.opens,
+    closes: g.closes,
+  }))
+}
+
+// --- Dentist / MedicalClinic / LocalBusiness / Organization (전역, @id #clinic) ---
 export function organizationSchema() {
   return {
     '@context': 'https://schema.org',
-    '@type': ['Dentist', 'LocalBusiness', 'MedicalBusiness'],
+    '@type': ['Dentist', 'MedicalClinic', 'MedicalBusiness', 'LocalBusiness', 'Organization'],
     '@id': BASE + '/#clinic',
     name: clinic.nameKo,
     alternateName: clinic.nameEn,
@@ -46,6 +69,9 @@ export function organizationSchema() {
     hasMap: clinic.mapUrl,
     // 서비스 제공 지역 — 로컬팩(지도) 진입 핵심 시그널
     areaServed: [
+      // 1차 상권 — 온천장·온천동 (허브 /area/oncheonjang 의 #clinic 정의와 동일)
+      { '@type': 'Place', name: '부산 동래구 온천장' },
+      { '@type': 'AdministrativeArea', name: '부산광역시 동래구 온천동' },
       ...clinic.areaServed.map((a) => ({ '@type': 'AdministrativeArea', name: a })),
       // 서비스 반경(GeoCircle) — 병원 중심 도달 범위 명시
       {
@@ -62,10 +88,7 @@ export function organizationSchema() {
     availableLanguage: { '@type': 'Language', name: 'Korean' },
     currenciesAccepted: 'KRW',
     paymentAccepted: '현금, 카드',
-    openingHoursSpecification: [
-      { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Thursday', 'Friday'], opens: '09:30', closes: '18:30' },
-      { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Saturday', opens: '09:30', closes: '13:00' },
-    ],
+    openingHoursSpecification: openingHoursSchema(),
     // 핵심 진료 서비스 — makesOffer (검색 의도 매칭)
     makesOffer: [
       { '@type': 'Offer', itemOffered: { '@type': 'MedicalProcedure', name: '임플란트', url: BASE + '/treatments/implant-guide' } },
@@ -73,7 +96,7 @@ export function organizationSchema() {
       { '@type': 'Offer', itemOffered: { '@type': 'MedicalProcedure', name: '심미보철', url: BASE + '/treatments/esthetic-prosthetics' } },
       { '@type': 'Offer', itemOffered: { '@type': 'MedicalProcedure', name: '충치치료(접착수복)', url: BASE + '/treatments/adhesive-restoration' } },
     ],
-    sameAs: [clinic.sns.instagram, clinic.sns.youtube, clinic.sns.blog, clinic.sns.naverPlace].filter(Boolean),
+    sameAs: [clinic.sns.instagram, clinic.sns.youtube, clinic.sns.blog, clinic.sns.naverPlace, clinic.sns.kakaoChannel].filter(Boolean),
   }
 }
 
@@ -267,10 +290,7 @@ export function areaServiceSchema(opts: {
     },
     geo: { '@type': 'GeoCoordinates', latitude: clinic.geo.lat, longitude: clinic.geo.lng },
     hasMap: clinic.mapUrl,
-    openingHoursSpecification: [
-      { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Thursday', 'Friday'], opens: '09:30', closes: '18:30' },
-      { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Saturday', opens: '09:30', closes: '13:00' },
-    ],
+    openingHoursSpecification: openingHoursSchema(),
     areaServed: { '@type': 'AdministrativeArea', name: opts.regionAdmin },
     makesOffer: {
       '@type': 'Offer',

@@ -2,6 +2,7 @@ import { html, raw } from 'hono/html'
 import { clinic } from '../data/clinic'
 import { HUB_PATH, hubA } from '../lib/hub-link'
 import { coreTreatments, treatmentGroups, treatmentsByGroup } from '../data/treatments'
+import { organizationSchema } from '../lib/schema'
 
 // 정적 CSS 캐시 버스팅용 버전 — app.css 변경 시 이 값을 올리면 엣지/브라우저 캐시가 갱신됨
 const ASSET_VER = '20260622z10'
@@ -199,7 +200,12 @@ function Footer(path = '') {
 export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
   const canonical = clinic.domain + meta.path
   const ogImage = meta.ogImage || clinic.domain + '/static/img/og-default.jpg'
-  const jsonLdArr = meta.jsonLd ? (Array.isArray(meta.jsonLd) ? meta.jsonLd : [meta.jsonLd]) : []
+  const pageJsonLd = meta.jsonLd ? (Array.isArray(meta.jsonLd) ? meta.jsonLd : [meta.jsonLd]) : []
+  // 지역 SEO: 전역 병원 엔티티(#clinic — Dentist/MedicalClinic/LocalBusiness)를 모든 페이지에 노출.
+  // 홈·지역 허브처럼 페이지가 같은 @id 를 직접 정의하면 중복 주입하지 않는다.
+  const clinicId = clinic.domain + '/#clinic'
+  const hasClinic = pageJsonLd.some((j) => j && typeof j === 'object' && (j as Record<string, unknown>)['@id'] === clinicId)
+  const jsonLdArr = hasClinic ? pageJsonLd : [organizationSchema(), ...pageJsonLd]
 
   const fabItems = [
     clinic.sns.naverBooking ? `<a href="${clinic.sns.naverBooking}" target="_blank" rel="noopener" class="fab-item fab-naver" data-label="네이버 예약"><i class="fas fa-calendar-check"></i></a>` : '',
