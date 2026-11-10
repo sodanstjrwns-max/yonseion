@@ -27,17 +27,22 @@ export function isGoogleCrawler(ua: string | null | undefined): boolean {
 }
 
 /**
- * 구글에 남기는 지역 페이지 — 병원 소재지(온천장) 허브와 온천장 전용으로 따로 쓴 본문 2쪽.
- * (19지역 × 4진료 템플릿 조합 /area/{지역}-{진료} 76쪽은 가린다)
+ * 구글에 남기는 지역 페이지 — 병원 소재지(온천장) 7쪽.
+ *  - 허브 /area/oncheonjang, 온천장 전용으로 따로 쓴 본문 2쪽(신경치료·턱관절)
+ *  - 홈 사진 카드로 연결된 온천장×진료 4쪽 — 병원 소재 지역의 목표 검색어 착지 페이지라 남긴다
+ * (나머지 18지역 × 4진료 템플릿 조합 /area/{지역}-{진료} 72쪽은 가린다)
  */
-const AREA_KEEP = new Set(['oncheonjang', 'oncheonjang-root-canal', 'oncheonjang-tmj-occlusion'])
+const AREA_KEEP = new Set([
+  'oncheonjang', 'oncheonjang-root-canal', 'oncheonjang-tmj-occlusion',
+  'oncheonjang-implant-guide', 'oncheonjang-all-on-x', 'oncheonjang-esthetic-prosthetics', 'oncheonjang-adhesive-restoration',
+])
 
 /**
  * 구글에만 검색 제외할 경로인가. (대상 경로 판정은 이 함수 하나에 모은다)
  *  가린다: /encyclopedia, /encyclopedia/* (백과사전 목록·용어 전체)
  *          /area (지역 조합 목록), /area/* 중 AREA_KEEP 밖 전부(지역×진료 조합)
  *  남긴다: 그 밖의 모든 경로 — 홈, 진료, 의료진, 비용, 미션, 오시는 길, 예약, FAQ, 공지,
- *          케이스, 칼럼(R2 발행분), 영상, /area/oncheonjang 허브와 온천장 전용 2쪽
+ *          케이스, 칼럼(R2 발행분), 영상, 온천장 지역 페이지 7쪽(AREA_KEEP)
  */
 export function isGoogleHiddenPath(pathname: string): boolean {
   let p = pathname
