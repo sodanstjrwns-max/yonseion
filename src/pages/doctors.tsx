@@ -39,7 +39,8 @@ export function DoctorsIndex() {
     title: `의료진 | ${clinic.nameKo}`,
     description: `${clinic.nameKo} 의료진 소개. 치과보철과·통합치의학과 전문의 김경희 대표원장. 자연치 보존을 중시하는 생체모방치의학 진료.`,
     path: '/doctors',
-    jsonLd: [breadcrumbSchema(crumb)],
+    // 목록에도 의료진 Physician 엔티티(상세와 같은 @id) — 화면 카드의 이름·직함·사진과 1:1
+    jsonLd: [breadcrumbSchema(crumb), ...doctors.map((d) => personSchema(d))],
   }, body)
 }
 

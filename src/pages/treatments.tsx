@@ -545,7 +545,7 @@ export function TreatmentDetail(slug: string, relCols: { slug: string; title: st
   }
 
   return Layout({
-    title: t.metaTitle || `${t.name} | ${clinic.nameKo} · 부산 동래`,
+    title: t.metaTitle || `${t.name} | ${clinic.nameKo} · 부산 동래 온천장`,
     description: t.metaDescription || t.hero.slice(0, 155),
     path: '/treatments/' + t.slug,
     jsonLd,

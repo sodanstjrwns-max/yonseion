@@ -109,7 +109,11 @@ export function personSchema(doc: Doctor) {
     '@id': BASE + '/doctors/' + doc.slug + '#person',
     name: doc.name,
     jobTitle: doc.role + ' · ' + doc.title,
-    medicalSpecialty: 'https://schema.org/Dentistry',
+    // 전문과목 — 화면의 전문의 자격(doc.licenses)에서만 가져온다 ('치과보철과 전문의' → '치과보철과')
+    medicalSpecialty: [
+      'https://schema.org/Dentistry',
+      ...doc.licenses.filter((l) => /전문의$/.test(l)).map((l) => ({ '@type': 'MedicalSpecialty', name: l.replace(/\s*전문의$/, '') })),
+    ],
     worksFor: { '@id': BASE + '/#clinic' },
     image: BASE + doc.photo,
     url: BASE + '/doctors/' + doc.slug,
@@ -117,7 +121,8 @@ export function personSchema(doc: Doctor) {
       '@type': 'EducationalOccupationalCredential',
       name: c,
     })),
-    memberOf: doc.memberships.map((m) => ({ '@type': 'Organization', name: m })),
+    // 학회명만 — 화면 표기('대한치과보철학회 평생회원')에서 회원 등급 꼬리말을 뗀다
+    memberOf: doc.memberships.map((m) => ({ '@type': 'Organization', name: m.replace(/\s*(평생회원|정회원|회원)$/, '') })),
   }
 }
 
@@ -414,7 +419,8 @@ export function medicalWebPageSchema(opts: {
     url: BASE + opts.path,
     inLanguage: 'ko',
     isPartOf: { '@id': BASE + '/#website' },
-    ...(opts.about ? { about: { '@type': opts.about.type, '@id': opts.about.id, name: opts.about.name } } : {}),
+    // 같은 페이지에 정의된 엔티티를 @id 로만 참조 (이름을 다시 쓰면 같은 @id 를 두 번 정의하는 셈)
+    ...(opts.about ? { about: { '@id': opts.about.id } } : {}),
     ...(opts.dateModified ? { dateModified: opts.dateModified } : {}),
     ...(opts.noReview ? {} : {
       ...(opts.lastReviewed ? { lastReviewed: opts.lastReviewed } : {}),

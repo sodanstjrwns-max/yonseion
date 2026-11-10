@@ -114,7 +114,7 @@ export async function PricingPage(r2: R2Bucket) {
   </section>
   `
   return Layout({
-    title: `비용 안내 | ${clinic.nameKo}`,
+    title: `온천장 치과 비용 안내 (비급여 진료비) | ${clinic.nameKo}`,
     description: `${clinic.nameKo} 비급여 진료비용 고지 — 임플란트, 보철, 심미치료 비용 안내. 정밀 진단 후 정확한 치료계획과 비용을 안내드립니다.`,
     path: '/pricing',
     jsonLd: [breadcrumbSchema(crumb)],

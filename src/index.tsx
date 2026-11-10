@@ -11,6 +11,7 @@ import { isThinEncyclo, isThinGlossary, isThinNotice, NOINDEX_FOLLOW } from './l
 import { CONTENT_DATES, PAGE_DATES, AREA_REGION_DATES, latestDate, treatmentReviewed, encycloEntryDate } from './lib/content-dates'
 import { getEnrichment } from './data/encyclopedia-enrich'
 import { getPricing } from './lib/pricing-store'
+import { llmsFactBlock } from './lib/llms-facts'
 
 import { areaCombos } from './data/facilities'
 import type { CaseItem, Column, Notice } from './data/types'
@@ -234,9 +235,12 @@ type SmUrl = { loc: string; priority: string; changefreq: string; lastmod: strin
 const xmlEsc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 // lastmod = 콘텐츠 실제 수정일(lib/content-dates.ts 고정값, R2 콘텐츠는 updatedAt/createdAt). 날짜를 모르면 태그 생략.
 // ※ new Date() 로 오늘 날짜를 찍지 않는다 (2026-09-29 SEO/AEO 감사).
+// <loc> 는 sitemaps.org 규격대로 URL 인코딩(한글 slug → %XX) + XML 엔티티 이스케이프 (2026-11-10).
+// 이미 ASCII 인 주소는 그대로 — 기존 %XX 를 이중 인코딩하지 않도록 비ASCII·공백만 바꾼다.
+const smLoc = (u: string) => xmlEsc(u.replace(/[^\x21-\x7e]+/gu, (m) => { try { return encodeURIComponent(m) } catch { return m } }))
 const smXml = (urls: SmUrl[]) => `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-${urls.map((u) => `  <url><loc>${u.loc}</loc>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ''}<changefreq>${u.changefreq}</changefreq><priority>${u.priority}</priority>${(u.images || []).map((im) => `<image:image><image:loc>${im.loc}</image:loc><image:title>${xmlEsc(im.title)}</image:title></image:image>`).join('')}</url>`).join('\n')}
+${urls.map((u) => `  <url><loc>${smLoc(u.loc)}</loc>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ''}<changefreq>${u.changefreq}</changefreq><priority>${u.priority}</priority>${(u.images || []).map((im) => `<image:image><image:loc>${smLoc(im.loc)}</image:loc><image:title>${xmlEsc(im.title)}</image:title></image:image>`).join('')}</url>`).join('\n')}
 </urlset>`
 const smResponse = (c: any, urls: SmUrl[]) => c.text(smXml(urls), 200, { 'Content-Type': 'application/xml; charset=utf-8' })
 
@@ -536,11 +540,15 @@ app.get('/llms.txt', async (c) => {
     if (drPub.length) colLines += `\n## 원장 칼럼 목록 (${drPub.length}편, 전문의 작성·감수)\n${drPub.map((x) => `- [${x.title}](${base}/column/${x.slug})`).join('\n')}\n`
     if (clinicPub.length) colLines += `\n## 병원 발행 칼럼 (${clinicPub.length}편 — 원장 작성·감수 아님. ${CLINIC_GENERAL_INFO_NOTE})\n${clinicPub.map((x) => `- [${x.title}](${base}/column/${x.slug})`).join('\n')}\n`
   } catch { /* noop */ }
+  // 표준 사실 블록 — 공개 수가표(R2) 값 포함. R2 실패 시 가격 줄만 빠진다
+  const factBlock = llmsFactBlock(await getPricing(c.env.R2).catch(() => null))
   const coreTx = treatments.filter((t) => t.category === 'core')
   const txList = coreTx.map((t) => `- [${t.name}](${base}/treatments/${t.slug}): ${t.short}`).join('\n')
   return c.text(`# ${clinic.nameKo} (${clinic.nameEn})
 
 > 부산 동래구 온천장의 생체모방치의학(Biomimetic Dentistry) 중심 치과. 자연치아의 형태·기능을 최대한 보존하는 접착수복·심미보철과 All-on-X 전체임플란트를 진료합니다. 김경희 대표원장 — 치과보철과·통합치의학과 더블보더 전문의.
+
+${factBlock}
 
 - 병원명: ${clinic.nameKo} (${clinic.nameEn})
 - 대표원장: ${clinic.business.owner} (치과보철과 전문의 · 통합치의학과 전문의)
@@ -587,6 +595,9 @@ app.get('/llms-full.txt', async (c) => {
   lines.push(`# ${clinic.nameKo} — 전체 정보 (LLM 인용용)`)
   lines.push('')
   lines.push(`${clinic.mission}`)
+  lines.push('')
+  // 표준 사실 블록 (llms.txt 와 동일)
+  lines.push(llmsFactBlock(await getPricing(c.env.R2).catch(() => null)))
   lines.push('')
   lines.push('## 병원 개요')
   lines.push(`- 병원명: ${clinic.nameKo} (${clinic.nameEn})`)
