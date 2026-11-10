@@ -5,7 +5,7 @@ import { coreTreatments, treatmentGroups, treatmentsByGroup } from '../data/trea
 import { organizationSchema } from '../lib/schema'
 
 // 정적 CSS 캐시 버스팅용 버전 — app.css 변경 시 이 값을 올리면 엣지/브라우저 캐시가 갱신됨
-const ASSET_VER = '20261110a'
+const ASSET_VER = '20261110b'
 
 export interface SeoMeta {
   title: string
@@ -310,7 +310,7 @@ export function Layout(meta: SeoMeta, body: ReturnType<typeof html>) {
     <a href="/reservation" class="book"><i class="fas fa-calendar-check"></i><span>예약 신청</span></a>
   </nav>
 
-  <!-- 우하단 플로팅 빠른 연결 — 기본 접힘, 모바일은 하단 고정 바 위쪽 -->
+  <!-- 우하단 플로팅 빠른 연결 — PC 는 항상 펼침(원장 요청), 모바일은 기본 접힘·하단 고정 바 위쪽 -->
   ${raw(fabHtml)}
   <script src="/static/js/regions.js?v=${ASSET_VER}" defer></script>
   <script src="/static/js/minimal.js?v=${ASSET_VER}" defer></script>

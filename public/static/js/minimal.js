@@ -268,13 +268,16 @@
       e.stopPropagation();
       fab.classList.contains('open') ? close() : open();
     });
-    // 기본은 접힘(2026-11-10) — 펼친 채로 두면 모바일에서 첫 화면 글자와 하단 바 '예약 신청' 버튼을 가린다. 눌러야 펼쳐진다.
-    // 펼친 뒤 바깥을 누르거나 Esc 를 누르면 다시 접힌다.
+    // PC(하단 고정 바가 없는 폭, 861px 이상)는 항상 펼침(원장 요청) — 클릭 없이 외부 채널이 바로 보이게 한다.
+    // 모바일(하단 고정 바가 있는 폭, 860px 이하)은 펼친 채로 두면 첫 화면 글자와 하단 '예약 신청' 버튼을 가려 기본 접힘 — 눌러야 펼쳐진다.
+    var pc = window.matchMedia ? window.matchMedia('(min-width: 861px)') : { matches: true };
+    if (pc.matches) open();
+    // 모바일에서만: 펼친 뒤 바깥을 누르거나 Esc 를 누르면 다시 접힌다. (PC 는 토글 버튼으로만 접는다)
     document.addEventListener('click', function (e) {
-      if (fab.classList.contains('open') && !fab.contains(e.target)) close();
+      if (!pc.matches && fab.classList.contains('open') && !fab.contains(e.target)) close();
     });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && fab.classList.contains('open')) { close(); toggle.focus(); }
+      if (!pc.matches && e.key === 'Escape' && fab.classList.contains('open')) { close(); toggle.focus(); }
     });
   }
 
