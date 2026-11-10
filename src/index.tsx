@@ -403,6 +403,7 @@ app.on('GET', ['/rss.xml', '/feed.xml'], async (c) => {
   const toUTC = (d: string) => { const t = new Date(d); return isNaN(t.getTime()) ? new Date().toUTCString() : t.toUTCString() }
 
   type FeedItem = { title: string; link: string; date: string; desc: string; creator: string }
+  // link·guid 는 사이트맵 <loc> 와 같은 처리(smLoc) — 한글 slug 를 %XX 로 인코딩 (2026-11-10)
   const items: FeedItem[] = []
   try {
     const store = new Store(c.env.R2)
@@ -445,8 +446,8 @@ app.on('GET', ['/rss.xml', '/feed.xml'], async (c) => {
   <image><url>${base}/static/img/og-default.jpg</url><title>${esc(clinic.nameKo)}</title><link>${base}</link></image>
 ${items.map((it) => `  <item>
     <title>${esc(it.title)}</title>
-    <link>${it.link}</link>
-    <guid isPermaLink="true">${it.link}</guid>
+    <link>${smLoc(it.link)}</link>
+    <guid isPermaLink="true">${smLoc(it.link)}</guid>
     <pubDate>${toUTC(it.date)}</pubDate>
     <description>${esc(it.desc)}</description>
     <dc:creator>${esc(it.creator)}</dc:creator>
@@ -460,64 +461,32 @@ ${items.map((it) => `  <item>
 
 app.get('/robots.txt', (c) => {
   const base = clinic.domain
-  return c.text(`# ${clinic.nameKo} (${clinic.nameEn})
-# robots.txt — 검색엔진 색인 허용 / 관리·API 차단 / AI 크롤러(AEO) 허용
-
-User-agent: *
-Allow: /
+  // 이름을 지정한 그룹은 `User-agent: *` 규칙을 물려받지 않는다(가장 구체적인 그룹 하나만 적용).
+  // 그래서 모든 그룹에 같은 규칙을 반복한다 — 관리·API·로그인 차단, 공개 이미지(/api/images/)는 허용. (2026-11-10)
+  const rules = `Allow: /
 Disallow: /admin
 Disallow: /admin/
 Disallow: /api/
 Disallow: /login
 Disallow: /signup
 Disallow: /logout
-Allow: /api/images/
+Allow: /api/images/`
+  const group = (uas: string[]) => uas.map((ua) => `User-agent: ${ua}\n${rules}`).join('\n\n')
+  const searchBots = ['Googlebot', 'Googlebot-Image', 'Yeti', 'Daumoa', 'bingbot']
+  const aiBots = [
+    'GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-Web', 'anthropic-ai', 'PerplexityBot', 'Perplexity-User',
+    'Google-Extended', 'Applebot', 'Applebot-Extended', 'Amazonbot', 'Bytespider', 'CCBot', 'cohere-ai', 'Meta-ExternalAgent',
+  ]
+  return c.text(`# ${clinic.nameKo} (${clinic.nameEn})
+# robots.txt — 검색엔진 색인 허용 / 관리·API 차단 / AI 크롤러(AEO) 허용
 
-# 주요 검색엔진 — 전체 색인 허용
-User-agent: Googlebot
-Allow: /
-User-agent: Googlebot-Image
-Allow: /
-User-agent: Yeti
-Allow: /
-User-agent: Daumoa
-Allow: /
-User-agent: bingbot
-Allow: /
+${group(['*'])}
 
-# AI 답변 엔진 크롤러 허용 (AEO — 생성형 검색 노출)
-User-agent: GPTBot
-Allow: /
-User-agent: OAI-SearchBot
-Allow: /
-User-agent: ChatGPT-User
-Allow: /
-User-agent: ClaudeBot
-Allow: /
-User-agent: Claude-Web
-Allow: /
-User-agent: anthropic-ai
-Allow: /
-User-agent: PerplexityBot
-Allow: /
-User-agent: Perplexity-User
-Allow: /
-User-agent: Google-Extended
-Allow: /
-User-agent: Applebot
-Allow: /
-User-agent: Applebot-Extended
-Allow: /
-User-agent: Amazonbot
-Allow: /
-User-agent: Bytespider
-Allow: /
-User-agent: CCBot
-Allow: /
-User-agent: cohere-ai
-Allow: /
-User-agent: Meta-ExternalAgent
-Allow: /
+# 주요 검색엔진 — 전체 색인 허용 (관리·API·로그인 제외)
+${group(searchBots)}
+
+# AI 답변 엔진 크롤러 허용 (AEO — 생성형 검색 노출. 관리·API·로그인 제외)
+${group(aiBots)}
 
 # 사이트맵
 Sitemap: ${base}/sitemap.xml
