@@ -38,6 +38,7 @@ import { api } from './routes/api'
 import { admin } from './routes/admin'
 import { member } from './routes/member'
 import { getSession, sessionSecret } from './lib/auth'
+import { googleHide } from './lib/google-hide'
 
 const app = new Hono<{ Bindings: Bindings }>()
 
@@ -48,6 +49,10 @@ function isThinEncycloSlug(slug: string): boolean {
   const light = glossary.find((e) => e.slug === slug)
   return light ? isThinGlossary(light) : false
 }
+
+// 구글 전용 검색 제외 — 구글 크롤러 + 대량 생성 구역(백과·지역 조합)의 200 HTML 응답에만
+// `X-Robots-Tag: googlebot: noindex`. 그 밖의 요청은 그대로. 맨 바깥(가장 먼저 등록)이어야 한다. (lib/google-hide.ts)
+app.use('*', googleHide)
 
 // 동적 HTML 응답에도 기본 헤더 적용 (_headers는 정적 자산에만 적용됨).
 app.use('*', async (c, next) => {
