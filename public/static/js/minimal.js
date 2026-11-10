@@ -268,8 +268,14 @@
       e.stopPropagation();
       fab.classList.contains('open') ? close() : open();
     });
-    // 항상 펼쳐진 상태로 노출 (원장님 요청) — 클릭 없이 외부채널이 바로 보이도록 기본 open
-    open();
+    // 기본은 접힘(2026-11-10) — 펼친 채로 두면 모바일에서 첫 화면 글자와 하단 바 '예약 신청' 버튼을 가린다. 눌러야 펼쳐진다.
+    // 펼친 뒤 바깥을 누르거나 Esc 를 누르면 다시 접힌다.
+    document.addEventListener('click', function (e) {
+      if (fab.classList.contains('open') && !fab.contains(e.target)) close();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && fab.classList.contains('open')) { close(); toggle.focus(); }
+    });
   }
 
   /* ---- 모바일 플로팅 상담 바 : 스크롤 다운 시 숨김, 업/멈춤 시 노출 ---- */

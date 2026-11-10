@@ -662,9 +662,18 @@ a:focus-visible, button:focus-visible, .core-feature:focus-visible { outline: 2p
 @media (max-width: 860px) { .rsv-grid { grid-template-columns: 1fr; } }
 
 /* ---------- 29-b. 우하단 플로팅 빠른 연결 (FAB) ---------- */
-.fab { position: fixed; right: 22px; bottom: 24px; z-index: 95; display: flex; flex-direction: column; align-items: center; }
-/* 모바일에서는 기존 하단 sticky-cta 사용 → FAB 숨김 */
-@media (max-width: 860px) { .fab { display: none; } }
+/* 기본 접힘 — 사용자가 눌러야 펼쳐진다(2026-11-10). 접힌 동안 빈 메뉴 영역이 뒤 콘텐츠의 탭을 막지 않게 pointer-events 를 끈다.
+   ※ 컨테이너 규칙은 반드시 #quick-fab 으로 쓴다. '.fab' 은 FontAwesome 브랜드 아이콘(<i class="fab fa-youtube">) 클래스와 이름이 같아서
+     ① 여기 규칙이 푸터·버튼의 브랜드 아이콘까지 화면 오른쪽 아래로 끌어다 붙이고 ② 뒤에 로드되는 FontAwesome 의 .fab{display:inline-block} 이
+     모바일 숨김(display:none)을 덮어썼다. */
+#quick-fab { position: fixed; right: 22px; bottom: 24px; z-index: 95; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+#quick-fab .fab-toggle { pointer-events: auto; }
+/* 모바일: 하단 고정 바(sticky-cta) 버튼을 가리지 않도록 바 위쪽에 둔다 */
+@media (max-width: 860px) {
+  #quick-fab { right: 14px; bottom: calc(84px + env(safe-area-inset-bottom)); }
+  #quick-fab .fab-toggle { width: 52px; height: 52px; }
+  #quick-fab .fab-toggle i { font-size: 1.25rem; }
+}
 .fab-toggle {
   width: 58px; height: 58px; border-radius: 50%; border: 0; cursor: pointer;
   background: var(--gold-grad); color: #fff; position: relative;
@@ -690,10 +699,10 @@ a:focus-visible, button:focus-visible, .core-feature:focus-visible { outline: 2p
   width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
   color: #fff; font-size: 1.18rem; position: relative; text-decoration: none;
   box-shadow: 0 10px 24px -8px rgba(46,58,75,.45);
-  opacity: 0; transform: translateY(14px) scale(.7); pointer-events: none;
-  transition: opacity .3s var(--ease), transform .3s var(--ease);
+  opacity: 0; transform: translateY(14px) scale(.7); pointer-events: none; visibility: hidden;
+  transition: opacity .3s var(--ease), transform .3s var(--ease), visibility 0s .3s;
 }
-.fab.open .fab-item { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+.fab.open .fab-item { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; visibility: visible; transition: opacity .3s var(--ease), transform .3s var(--ease), visibility 0s; }
 /* 순차 등장 */
 .fab.open .fab-item:nth-child(1) { transition-delay: .04s; }
 .fab.open .fab-item:nth-child(2) { transition-delay: .09s; }
@@ -718,6 +727,18 @@ a:focus-visible, button:focus-visible, .core-feature:focus-visible { outline: 2p
   border: 5px solid transparent; border-left-color: var(--ink); opacity: 0; transition: opacity .2s;
 }
 .fab-item:hover::before, .fab-item:hover::after { opacity: 1; }
+
+/* ---------- 29-c. 글 끝 상담 블록 (칼럼·백과 상세 본문 끝) ---------- */
+.article-end-cta { margin-top: 2.5rem; border: 1px solid var(--line); border-left: 3px solid var(--gold); border-radius: 4px; background: var(--paper-2); padding: 1.6rem 1.7rem; }
+.article-end-cta .aec-title { font-family: var(--serif-kr); font-size: 1.25rem; font-weight: 600; line-height: 1.35; color: var(--ink); margin: 0 0 .5rem; word-break: keep-all; }
+.article-end-cta .aec-desc { font-size: .95rem; line-height: 1.75; color: var(--ink-2); margin: 0 0 1.25rem; word-break: keep-all; }
+.article-end-cta .aec-btns { display: flex; flex-wrap: wrap; gap: .6rem; }
+.article-end-cta .btn { padding: .85rem 1.35rem; justify-content: center; }
+@media (max-width: 560px) {
+  .article-end-cta { padding: 1.4rem 1.25rem; }
+  .article-end-cta .aec-btns { flex-direction: column; }
+  .article-end-cta .btn { width: 100%; }
+}
 
 /* ---------- 30. 예약 폼 UX — 단계 표시 + 칩 ---------- */
 .rsv-steps {

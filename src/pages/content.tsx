@@ -1,5 +1,6 @@
 import { html, raw } from 'hono/html'
 import { Layout, Breadcrumb } from '../components/layout'
+import { articleEndCta } from '../components/article-end-cta'
 import { clinic } from '../data/clinic'
 import { columnHubLine, htmlHasHubLink } from '../lib/hub-link'
 import { getTreatment, treatments as ALL_TREATMENTS } from '../data/treatments'
@@ -469,6 +470,7 @@ export function ColumnDetailPage(col: Column, relCols: Column[] = [], relCases: 
             <p class="muted" style="font-size:.82rem;margin-top:.4rem">게시 ${fmt(col.createdAt)}${updated ? ` · 수정 ${fmt(col.updatedAt)}` : ''}</p>
           </div>`)}
           <p class="muted" style="font-size:.78rem;margin-top:1.4rem;line-height:1.8">※ 이 글은 일반적인 치과 건강 정보이며 진단을 대신하지 않습니다. 치료 방법과 결과는 개인의 구강 상태에 따라 다를 수 있으니 정확한 내용은 내원하여 전문의와 상담하시기 바랍니다.</p>
+          ${raw(articleEndCta())}
           ${raw(relCases.length ? `<div style="margin-top:2.5rem"><h2 style="font-size:1.25rem">${mainTx ? mainTx.name + ' ' : ''}치료 케이스</h2>${relCases.map((x) => `<a href="/cases/${x.slug}" class="link-arrow" style="display:block;padding:.4rem 0">${x.title} <i class="fas fa-arrow-right"></i></a>`).join('')}</div>` : '')}
           ${raw(relCols.length ? `<div style="margin-top:2rem"><h2 style="font-size:1.25rem">함께 읽으면 좋은 칼럼</h2>${relCols.map((x) => `<a href="/column/${x.slug}" class="link-arrow" style="display:block;padding:.4rem 0">${x.title} <i class="fas fa-arrow-right"></i></a>`).join('')}</div>` : '')}
         </article>

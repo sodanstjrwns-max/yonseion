@@ -1,5 +1,6 @@
 import { html, raw } from 'hono/html'
 import { Layout, Breadcrumb } from '../components/layout'
+import { articleEndCta } from '../components/article-end-cta'
 import { clinic } from '../data/clinic'
 import { hubA } from '../lib/hub-link'
 import { encyclopedia, getEntry, encycloCategories } from '../data/encyclopedia'
@@ -222,6 +223,7 @@ export function EncyclopediaDetail(slug: string) {
           ${raw(enrich ? ENRICH_STYLE + enrichHtml(enrich, entry.term) : '')}
           <p class="muted enc-review" style="font-size:.82rem;margin-top:2.5rem">일반 건강정보입니다. 진료 판단은 내원 상담에서 원장이 직접 합니다. · 최종 수정 <time datetime="${reviewed}">${reviewed}</time></p>
           <p class="muted" style="font-size:.8rem;margin-top:.6rem">※ 본 내용은 일반적인 의학 정보이며, 개인의 상태에 따라 진단·치료 방법이 다를 수 있습니다. 정확한 내용은 내원하여 전문의와 상담하시기 바랍니다.</p>
+          ${raw(articleEndCta())}
         </article>
         <aside class="sidebar">
           ${raw(related.length ? `
@@ -308,6 +310,7 @@ export function GlossaryDetail(slug: string) {
           ${related.length ? `<h2>관련 진료 안내</h2><p>${entry.term}와(과) 관련된 진료가 궁금하시다면 ${related.map((t) => `<a href="/treatments/${t!.slug}">${t!.name}</a>`).join(', ')} 페이지에서 더 자세한 내용을 확인하실 수 있습니다.</p>` : ''}`)}
           <p class="muted enc-review" style="font-size:.82rem;margin-top:2.5rem">일반 건강정보입니다. 진료 판단은 내원 상담에서 원장이 직접 합니다. · 최종 수정 <time datetime="${reviewed}">${reviewed}</time></p>
           <p class="muted" style="font-size:.8rem;margin-top:.6rem">※ 본 내용은 일반적인 의학 정보이며, 개인의 상태에 따라 진단·치료 방법이 다를 수 있습니다. 정확한 내용은 내원하여 전문의와 상담하시기 바랍니다.</p>
+          ${raw(articleEndCta())}
         </article>
         <aside class="sidebar">
           ${raw(related.length ? `

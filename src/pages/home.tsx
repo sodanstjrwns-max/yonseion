@@ -694,9 +694,12 @@ export function HomePage() {
     #noticePopupRoot .np-foot button{background:none;border:0;font:inherit;color:#8A93A6;font-size:.85rem;cursor:pointer;padding:.3rem .3rem;min-height:44px}
     #noticePopupRoot .np-foot button:hover{color:#14243E}
     #noticePopupRoot .np-expand,#noticePopupRoot .np-nav{display:none}
-    #noticePopupRoot .np-overlay.np-compact{inset:88px 16px auto auto;padding:0;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;overflow:visible}
+    /* 접힌 알약(모바일): 헤더 줄의 로고와 메뉴 버튼 사이에 둔다 — 첫 화면 글자를 가리지 않는다. 스크롤을 시작하면 숨고 맨 위로 오면 다시 보인다(np-away). */
+    #noticePopupRoot .np-overlay.np-compact{inset:22px calc(var(--gutter,1.5rem) + 50px) auto auto;padding:0;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;overflow:visible;transition:opacity .3s ease,transform .3s ease,visibility 0s}
+    #noticePopupRoot .np-overlay.np-compact.np-away{opacity:0;pointer-events:none;visibility:hidden;transform:translateY(-10px);transition:opacity .25s ease,transform .25s ease,visibility 0s .25s}
+    .mobile-nav.open ~ main #noticePopupRoot .np-overlay.np-compact{visibility:hidden}
     #noticePopupRoot .np-compact .np-stack,#noticePopupRoot .np-compact .np-nav{display:none!important}
-    #noticePopupRoot .np-compact .np-expand{display:block;min-height:44px;padding:10px 18px;background:#faf8f2;border:1px solid var(--gold,#C59F66);border-radius:99px;color:var(--ink,#14243E);font-size:14px;font-weight:600;box-shadow:0 4px 18px #14243e22;cursor:pointer}
+    #noticePopupRoot .np-compact .np-expand{display:block;min-height:44px;padding:10px 14px;white-space:nowrap;background:#faf8f2;border:1px solid var(--gold,#C59F66);border-radius:99px;color:var(--ink,#14243E);font-size:14px;font-weight:600;box-shadow:0 4px 18px #14243e22;cursor:pointer}
     #noticePopupRoot .np-count{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;margin-left:6px;padding:0 6px;border-radius:99px;background:var(--gold,#C59F66);color:#fff;font-size:12px;font-weight:800;vertical-align:1px}
     #noticePopupRoot .np-single{flex-direction:column;align-items:center}
     #noticePopupRoot .np-single .np-stack{margin:auto auto 0;width:100%;max-width:420px;flex-wrap:nowrap}
@@ -776,7 +779,7 @@ export function HomePage() {
       }
       function applyMode(){
         if(compact){ ov.classList.add('np-compact'); ov.classList.remove('np-single'); setDialog(false); updateChip(); return; }
-        ov.classList.remove('np-compact'); setDialog(true);
+        ov.classList.remove('np-compact'); ov.classList.remove('np-away'); setDialog(true);
         ov.classList.toggle('np-single', mq.matches);
         if(mq.matches) show(idx, 0);
       }
@@ -824,6 +827,15 @@ export function HomePage() {
       var onMq = function(){ if(!compact && !ov.hidden) applyMode(); };
       if(mq.addEventListener) mq.addEventListener('change', onMq); else if(mq.addListener) mq.addListener(onMq);
       applyMode();
+      // 접힌 알약은 맨 위에서만 보인다 — 스크롤을 시작하면 숨기고, 맨 위로 돌아오면 다시 보인다.
+      var away = false;
+      function syncAway(){
+        if(!compact) return;
+        var a = (window.pageYOffset || document.documentElement.scrollTop || 0) > 24;
+        if(a !== away){ away = a; ov.classList.toggle('np-away', a); }
+      }
+      window.addEventListener('scroll', syncAway, {passive:true});
+      syncAway();
       ov.hidden = false;
       requestAnimationFrame(function(){ requestAnimationFrame(function(){ ov.classList.add('show'); }); });
       if(!compact){ lock(); setTimeout(focusFirst, 60); }
